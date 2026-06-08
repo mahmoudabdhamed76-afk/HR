@@ -1,0 +1,14 @@
+{
+  "name": "emdadx-hr-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Standalone frontend for EmdadX HR.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
