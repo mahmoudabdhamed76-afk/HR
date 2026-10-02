@@ -7,5 +7,6 @@ ENV PORT=8686 \
     DATA_DIR=/app/data \
     TZ=Africa/Cairo
 RUN mkdir -p /app/data
+VOLUME ["/app/data"]
 EXPOSE 8686
 CMD ["node", "--experimental-sqlite", "--no-warnings", "server.js"]
