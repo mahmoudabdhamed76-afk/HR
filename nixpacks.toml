@@ -1,3 +1,0 @@
-# Nixpacks config for Railway / local deployments
-[start]
-cmd = "npm start"
