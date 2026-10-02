@@ -198,6 +198,8 @@ input[type=date].inp,input[type=time].inp{direction:ltr;text-align:right}
 .lg-wave-txt small{display:block;font-size:20px;font-weight:700;opacity:.9}
 .lg-wave-txt b{color:var(--gold)}
 .lg-side{display:flex;align-items:center;justify-content:center;padding:32px;z-index:2}
+.login.solo{grid-template-columns:1fr;place-items:center;min-height:100vh;min-height:100dvh;background:radial-gradient(700px 380px at 85% 0%,rgba(37,99,217,.13),transparent 70%),radial-gradient(600px 360px at 5% 100%,rgba(247,193,45,.16),transparent 70%),var(--login-bg)}
+.login.solo .lg-side{width:100%;padding:70px 16px calc(30px + var(--safe-b))}
 .lg-card{width:100%;max-width:420px;background:var(--card);border-radius:28px;box-shadow:var(--sh-lg);padding:32px 30px 26px;position:relative}
 .lg-card::before{content:'';position:absolute;inset:-1px;border-radius:29px;padding:1px;background:linear-gradient(160deg,rgba(247,193,45,.8),transparent 40%,transparent 60%,rgba(10,35,87,.25));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
 .lg-logo{width:68px;height:68px;border-radius:22px;background:linear-gradient(150deg,var(--navy-2),var(--navy));color:var(--gold);display:grid;place-items:center;margin:0 auto 12px;box-shadow:0 16px 30px -14px rgba(10,35,87,.9)}
@@ -700,9 +702,14 @@ table.tbl{width:100%;border-collapse:separate;border-spacing:0;min-width:980px}
 .ph-edit .ph-act span{font-size:12px;color:var(--muted)}
 .weak-banner{display:flex;align-items:center;gap:12px;background:var(--red-bg);border:1px solid rgba(220,53,69,.25);color:var(--ink);border-radius:16px;padding:12px 14px;margin-bottom:16px;font-weight:600;font-size:13.5px}
 .weak-banner svg.i{color:var(--red)}
-.weak-banner .btn{margin-inline-start:auto}
+.weak-banner>div{flex:1;min-width:0}
+.weak-banner .btn{margin-inline-start:auto;flex-shrink:0}
+@media (max-width:700px){.weak-banner{flex-wrap:wrap;font-size:13px}.weak-banner>div{flex-basis:calc(100% - 40px)}.weak-banner .btn{width:100%}}
 /* live ticker at the top */
 .ticker.top{margin:0 0 18px}
+.ticker{display:block;height:50px!important;min-height:50px;max-height:50px;line-height:1.2;contain:paint}
+.ticker .ticker-track{position:absolute;top:0;left:0;height:50px}
+.ticker-it{height:50px;line-height:1.2}
 .ticker .tk-live{position:absolute;top:0;bottom:0;right:0;z-index:3;display:flex;align-items:center;gap:8px;padding:0 16px 0 20px;background:linear-gradient(135deg,var(--gold-2),var(--gold));color:#0a2357;font-weight:900;font-size:13.5px;direction:rtl;box-shadow:-12px 0 24px rgba(10,35,87,.45)}
 .ticker .tk-live i{width:9px;height:9px;border-radius:50%;background:#d22a3b;animation:pulse-r 1.5s infinite}
 @keyframes pulse-r{0%{box-shadow:0 0 0 0 rgba(210,42,59,.6)}70%{box-shadow:0 0 0 8px rgba(210,42,59,0)}100%{box-shadow:0 0 0 0 rgba(210,42,59,0)}}
@@ -1391,24 +1398,7 @@ async function renderLogin(err) {
   try { S.pub = await api('/api/public-info', undefined, { noLogout: true }); } catch {}
   const qs = new URLSearchParams(location.search);
   let mode = qs.has('emp') ? 'employee' : qs.has('admin') ? 'admin' : (LS.get('em_att_mode') || 'employee');
-  const feat = [['t-orange', 'calGrid', 'تقرير يومي', 'بكل التفاصيل'], ['t-purple', 'filter', 'تصفية البيانات', 'بالاسم أو التاريخ أو الحالة'], ['t-green', 'userPlus', 'إضافة الموظفين', 'وإدارتهم حسب الأقسام'], ['t-blue', 'calCheck', 'تحديد التاريخ', 'والوقت بدقة'], ['t-red', 'pin', 'تسجيل الموقع', 'أثناء الحضور والانصراف'],
-    ['t-indigo', 'moon', 'تحديد الورديات', 'صباحي - مسائي - راحة'], ['t-purple', 'clipboard', 'الأذونات', 'والإجازات'], ['t-blue', 'printer', 'طباعة عادية', 'مباشرة'], ['t-red', 'pdf', 'طباعة التقارير', 'PDF'], ['t-green', 'sheet', 'تصدير التقارير', 'إلى Excel']];
-  $('#app').innerHTML = `${themeBtn('btn-soft theme-fab')}<div class="login">
-    <section class="lg-hero">
-      <div class="lg-kicker">إدارة أسهل لنجاح أكبر ${swoosh('#f7c12d', 150)}</div>
-      <h1 class="lg-title">برنامج إدارة<em>الحضور والانصراف</em></h1>
-      <div class="lg-pill">لجميع أنواع الأعمال والجهات</div>
-      <p class="lg-tag">بكل سهولة.. تابع حضور موظفيك من أي مكان وفي أي وقت</p>
-      <div class="lg-feats">
-        <div><div class="fi">${ic('users')}</div><b>مناسب لجميع</b><span>القطاعات والأنشطة</span></div>
-        <div><div class="fi">${ic('phone')}</div><b>سهل الاستخدام</b><span>على جميع الأجهزة</span></div>
-        <div><div class="fi">${ic('shield')}</div><b>آمن وموثوق</b><span>لجميع بياناتك</span></div>
-        <div><div class="fi">${ic('cloud')}</div><b>من أي مكان</b><span>في أي وقت</span></div>
-      </div>
-      <div class="lg-more"><h4>أهم مميزات البرنامج</h4><div class="g">${feat.map(f => `<div><div class="tile sm ${f[0]}">${ic(f[1])}</div><b>${f[2]}</b><span>${f[3]}</span></div>`).join('')}</div></div>
-    </section>
-    <svg class="lg-wave" viewBox="0 0 560 260" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 C 160 10, 300 70, 380 150 C 430 200, 500 230, 560 260 L 0 260 Z" fill="#0a2357"/><path d="M0 70 C 150 45, 280 95, 350 165" stroke="#f7c12d" stroke-width="7" fill="none" stroke-linecap="round" opacity=".9"/></svg>
-    <div class="lg-wave-txt"><small>مناسب</small><b>لكل الأعمال</b></div>
+  $('#app').innerHTML = `${themeBtn('btn-soft theme-fab')}<div class="login solo">
     <section class="lg-side">
       <div class="lg-card">
         <div class="lg-logo">${ic('finger')}</div>
