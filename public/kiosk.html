@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a2357">
+<title>شاشة الحضور بالـ QR — EmdadX</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;-webkit-text-size-adjust:100%}
+body{font-family:Cairo,Tahoma,Arial,sans-serif;background:radial-gradient(900px 500px at 85% -10%,#1d55c0 0%,transparent 60%),radial-gradient(700px 500px at 0% 110%,rgba(247,193,45,.18),transparent 60%),#081a44;color:#fff;overflow:hidden}
+.wrap{height:100%;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;padding:28px 34px}
+.head{display:flex;align-items:center;gap:14px}
+.logo{width:58px;height:58px;border-radius:18px;background:linear-gradient(150deg,#ffd75e,#f7c12d);color:#0a2357;display:grid;place-items:center;font-weight:900;font-size:26px}
+.head b{display:block;font-size:22px;font-weight:900}
+.head span{color:#9fb3dd;font-weight:700}
+.clock{font-size:clamp(54px,8vw,110px);font-weight:900;line-height:1;margin-top:26px;direction:ltr;text-align:right;letter-spacing:-2px}
+.clock small{font-size:.35em;color:#f7c12d;margin-inline-start:8px}
+.date{font-size:22px;color:#bcd0f5;font-weight:700;margin-top:6px}
+.how{margin-top:26px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:18px 20px;font-size:17px;line-height:1.9}
+.how b{color:#f7c12d}
+.feed{margin-top:18px;display:flex;flex-direction:column;gap:8px;max-height:34vh;overflow:hidden}
+.it{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border-radius:14px;padding:8px 12px;font-weight:800;animation:in .5s ease}
+@keyframes in{from{opacity:0;transform:translateY(-8px)}}
+.it i{width:10px;height:10px;border-radius:50%;background:#3fcf86;flex-shrink:0}
+.it.out i{background:#ff6f7d}
+.it span{margin-inline-start:auto;color:#bcd0f5;font-size:14px}
+.qrbox{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.card{background:#fff;border-radius:30px;padding:22px;box-shadow:0 40px 90px -30px rgba(0,0,0,.7);position:relative;width:min(100%,62vh)}
+.card svg{width:100%;height:auto;display:block}
+.ring{position:absolute;top:-14px;left:-14px;width:64px;height:64px}
+.ring svg{transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;color:#0a2357;font-weight:900;font-size:18px;background:#f7c12d;border-radius:50%;margin:8px}
+.site{font-size:24px;font-weight:900}
+.hint{color:#bcd0f5;font-weight:700;text-align:center}
+.err{position:fixed;inset:0;display:none;place-items:center;background:#081a44;font-size:22px;font-weight:800;text-align:center;padding:30px}
+.fs{position:fixed;bottom:14px;left:14px;background:rgba(255,255,255,.1);color:#fff;border:0;border-radius:12px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer}
+@media (max-width:800px){.wrap{grid-template-columns:1fr;overflow:auto;height:auto}body{overflow:auto}.card{width:min(100%,420px)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section>
+    <div class="head"><div class="logo" id="lg">E</div><div><b id="co">...</b><span>شاشة تسجيل الحضور بالـ QR</span></div></div>
+    <div class="clock" id="ck">--:--</div>
+    <div class="date" id="dt"></div>
+    <div class="how">١- افتح <b>كاميرا الموبايل</b> أو زرار "امسح كود المقر" في البرنامج<br>٢- وجّهها على الكود اللي جنبك<br>٣- البرنامج هيفتح ويسجلك <b>حضور أو انصراف</b> على طول<br><small style="color:#9fb3dd">الكود بيتغير كل 30 ثانية — مينفعش يتصور ويتبعت لحد</small></div>
+    <div class="feed" id="fd"></div>
+  </section>
+  <section class="qrbox">
+    <div class="site" id="st"></div>
+    <div class="card"><div id="qr"></div>
+      <div class="ring"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="none" stroke="rgba(10,35,87,.15)" stroke-width="6"/><circle id="rc" cx="32" cy="32" r="28" fill="none" stroke="#0a2357" stroke-width="6" stroke-linecap="round" stroke-dasharray="176" stroke-dashoffset="0"/></svg><b id="cd">30</b></div></div>
+    <div class="hint">الكود ده لموظفين الموقع بس • كل تسجيل بيوصل للإدارة لحظيًا</div>
+  </section>
+</div>
+<div class="err" id="er"></div>
+<button class="fs" id="fsb">ملء الشاشة</button>
+<script src="vendor/qrcode/qrcode.js"></script>
+<script>
+(function () {
+  var BASE = location.pathname.replace(/\/[^/]*$/, '');
+  var K = new URLSearchParams(location.search).get('k') || '';
+  var tok = null, expAt = 0, slotSec = 30, offset = 0;
+  var dfmt = new Intl.DateTimeFormat('ar-EG-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  function $(id) { return document.getElementById(id); }
+  function err(t) { var e = $('er'); e.textContent = t; e.style.display = 'grid'; }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function t12(ts) { var h = +ts.slice(11, 13), m = ts.slice(14, 16); return pad(h % 12 || 12) + ':' + m + (h < 12 ? ' ص' : ' م'); }
+  function esc(s) { return String(s || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function draw() {
+    var url = location.origin + BASE + '/?emp&qr=' + encodeURIComponent(tok);
+    var q = qrcode(0, 'M'); q.addData(url); q.make();
+    $('qr').innerHTML = q.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
+  }
+  function load() {
+    fetch(BASE + '/api/kiosk/qr?k=' + encodeURIComponent(K)).then(function (r) { return r.json(); }).then(function (j) {
+      if (j.error) return err(j.error);
+      $('er').style.display = 'none';
+      $('co').textContent = j.company; $('lg').textContent = (j.company || 'E').slice(0, 1); $('st').textContent = '📍 ' + j.site;
+      document.title = 'QR الحضور — ' + j.site;
+      offset = Date.parse(j.now.ts.replace(' ', 'T') + 'Z') - Date.now();
+      slotSec = j.slot_sec; expAt = Date.now() + j.ttl * 1000;
+      if (j.token !== tok) { tok = j.token; draw(); }
+    }).catch(function () { setTimeout(load, 3000); });
+  }
+  function feed() {
+    fetch(BASE + '/api/kiosk/feed?k=' + encodeURIComponent(K)).then(function (r) { return r.json(); }).then(function (j) {
+      if (!j.rows) return;
+      $('fd').innerHTML = j.rows.slice(0, 7).map(function (r) { var o = !!r.out_at; return '<div class="it ' + (o ? 'out' : '') + '"><i></i>' + esc(r.name) + ' — ' + (o ? 'انصراف' : 'حضور') + (r.qr ? ' بالـ QR' : '') + '<span>' + t12(o ? r.out_at : r.in_at) + '</span></div>'; }).join('');
+    }).catch(function () {});
+  }
+  function tick() {
+    var now = new Date(Date.now() + offset), iso = now.toISOString();
+    var h = now.getUTCHours();
+    $('ck').innerHTML = pad(h % 12 || 12) + ':' + pad(now.getUTCMinutes()) + '<small>' + (h < 12 ? 'ص' : 'م') + '</small>';
+    $('dt').textContent = dfmt.format(new Date(iso.slice(0, 10) + 'T00:00:00Z'));
+    var left = Math.max(0, Math.ceil((expAt - Date.now()) / 1000));
+    $('cd').textContent = left;
+    $('rc').setAttribute('stroke-dashoffset', String(176 * (1 - left / slotSec)));
+    if (left <= 0 && tok) load();
+  }
+  if (!K) return err('افتح الشاشة دي من الإعدادات ← مواقع العمل ← "شاشة QR"');
+  load(); feed(); setInterval(tick, 500); setInterval(feed, 10000); setInterval(load, 60000);
+  $('fsb').onclick = function () { var d = document.documentElement; (d.requestFullscreen || d.webkitRequestFullscreen || function () {}).call(d); };
+  if (navigator.wakeLock) { var lock = function () { navigator.wakeLock.request('screen').catch(function () {}); }; lock(); document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') lock(); }); }
+})();
+</script>
+</body>
+</html>

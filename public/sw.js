@@ -1,5 +1,5 @@
-/* EmdadX Attendance — Service Worker (app shell cache, never caches the API) */
-const CACHE = 'emdadx-att-v2';
+/* EmdadX Attendance — Service Worker (app shell cache + push notifications; never caches the API) */
+const CACHE = 'emdadx-att-v4';
 const SHELL = ['./', 'index.html', 'manifest.json', 'icon.svg'];
 
 self.addEventListener('install', e => {
@@ -11,7 +11,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   const url = new URL(req.url);
-  if (req.method !== 'GET' || url.origin !== location.origin || url.pathname.includes('/api/')) return;
+  if (req.method !== 'GET' || url.origin !== location.origin || url.pathname.includes('/api/') || url.pathname.includes('/v/')) return;
   // network first, fall back to cache (always fresh when online)
   e.respondWith(
     fetch(req).then(res => {
@@ -21,4 +21,26 @@ self.addEventListener('fetch', e => {
       return res;
     }).catch(() => caches.match(req).then(r => r || caches.match('index.html')))
   );
+});
+
+/* ---------- push notifications ---------- */
+self.addEventListener('push', e => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch { d = { title: 'إشعار جديد', body: e.data ? e.data.text() : '' }; }
+  const url = new URL(d.url || './', self.registration.scope).href;
+  e.waitUntil(self.registration.showNotification(d.title || 'EmdadX', {
+    body: d.body || '', icon: 'icon.svg', badge: 'icon.svg', tag: d.tag || undefined, renotify: !!d.tag,
+    dir: 'rtl', lang: 'ar', data: { url }, vibrate: [80, 40, 80],
+  }));
+});
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || self.registration.scope;
+  e.waitUntil((async () => {
+    const list = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const c of list) {
+      if (c.url.startsWith(self.registration.scope)) { await c.focus(); c.postMessage({ type: 'open', url }); return; }
+    }
+    await clients.openWindow(url);
+  })());
 });
