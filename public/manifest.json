@@ -1,0 +1,16 @@
+{
+  "name": "إدارة الحضور والانصراف — EmdadX",
+  "short_name": "الحضور",
+  "description": "برنامج إدارة الحضور والانصراف بالموقع لجميع أنواع الأعمال",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eef3fa",
+  "theme_color": "#0a2357",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
