@@ -1172,6 +1172,102 @@ img,video,canvas,iframe{max-width:100%}
 .rt-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border-radius:999px;padding:2px 10px 2px 3px;font-size:12px;font-weight:700;cursor:pointer}
 .rt-chip .av{width:22px;height:22px;font-size:10px}
 @media (max-width:700px){.routes{padding:14px 12px;border-radius:22px}.rt-title h2{font-size:17px}.rt-meta{margin-inline-start:0;width:100%}.rt-stat{order:4;width:100%;white-space:normal;text-align:center}.rt-steps{order:3}.rt-dest{width:66px}.rt-bld{width:46px;height:44px}.rt-way{height:114px}}
+/* ================= v1.7: technician status (busy / available) ================= */
+.sdot{width:12px;height:12px;border-radius:50%;display:inline-block;flex-shrink:0;background:#9aa7c2;position:relative}
+.sdot.busy{background:#e5394d;animation:pulse-r 1.8s infinite}
+.sdot.free{background:#18b46a;animation:pulse 2.2s infinite}
+.sdot.off{background:#a9b4cc}
+.sdot.lg{width:16px;height:16px}
+.avst{position:relative;flex-shrink:0;display:inline-block}
+.avst>.sdot{position:absolute;bottom:-2px;inset-inline-start:-2px;width:14px;height:14px;border:2.5px solid var(--card)}
+.avst.lg>.sdot{width:18px;height:18px;border-width:3px}
+.emp-hello .avst>.sdot{border-color:#0d2a63}
+.hello-st{display:flex;width:fit-content;align-items:center;gap:6px;margin-top:5px;padding:2px 10px;border-radius:999px;font-size:12px!important;font-weight:800;background:rgba(255,255,255,.1);color:#fff!important}
+.hello-st.busy{background:rgba(229,57,77,.28)}.hello-st.free{background:rgba(24,180,106,.25)}
+.hello-st .sdot{width:8px;height:8px;animation:none}
+.stcard{background:var(--card);border-radius:24px;box-shadow:var(--sh);padding:16px;position:relative;overflow:hidden;border:2px solid transparent;animation:fadeUp .35s ease}
+.stcard::before{content:'';position:absolute;inset:0 0 auto 0;height:5px}
+.stcard.free{border-color:rgba(24,180,106,.25)}.stcard.free::before{background:linear-gradient(90deg,#18b46a,#7fe3b0)}
+.stcard.busy{border-color:rgba(229,57,77,.3);background:linear-gradient(180deg,var(--red-bg),transparent 62%),var(--card)}.stcard.busy::before{background:linear-gradient(90deg,#e5394d,#ff8a96)}
+.st-head{display:flex;align-items:center;gap:12px}
+.st-head .t{flex:1;min-width:0}
+.st-head b{display:block;font-size:16px;font-weight:900;color:var(--heading);line-height:1.35}
+.st-head .t span{display:block;font-size:12.5px;color:var(--muted);line-height:1.5}
+.st-head .t span strong{color:var(--heading);font-weight:900}
+.st-clock{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;background:var(--card);border-radius:14px;padding:6px 14px;box-shadow:inset 0 0 0 1.5px rgba(229,57,77,.2)}
+.st-clock span{font-size:12.5px;font-weight:800;color:var(--muted);display:flex;gap:6px;align-items:center}
+.st-clock span svg.i{width:15px;height:15px}
+.st-clock b{font-size:24px;font-weight:900;color:var(--red);font-variant-numeric:tabular-nums;direction:ltr}
+.hello-st{cursor:pointer}
+.st-timer{font-size:20px;font-weight:900;color:var(--red);direction:ltr;font-variant-numeric:tabular-nums;background:var(--card);border-radius:12px;padding:4px 10px;box-shadow:0 1px 0 var(--line)}
+.stbtn{width:100%;height:62px;border-radius:19px;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:10px;color:#fff;font-weight:900;font-size:18px;position:relative;overflow:hidden;transition:transform .15s}
+.stbtn:active{transform:scale(.97)}
+.stbtn svg.i{width:24px;height:24px;stroke-width:2.2}
+.stbtn small{display:block;font-size:11.5px;font-weight:700;opacity:.88;line-height:1.2}
+.stbtn .lbl{display:flex;flex-direction:column;align-items:flex-start;text-align:right}
+.stbtn.go{background:linear-gradient(135deg,#f0566a,#c9283a);box-shadow:0 14px 26px -14px rgba(220,53,69,.9)}
+.stbtn.done{background:linear-gradient(135deg,#25c47a,#0f8a4f);box-shadow:0 14px 26px -14px rgba(20,149,90,.9)}
+.st-acts{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
+.st-acts .btn{height:62px;border-radius:19px;margin-top:14px;padding:0 14px;flex-direction:column;gap:2px;font-size:12px}
+.st-acts .btn svg.i{width:20px;height:20px}
+.st-meta{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:12px;font-size:12px;color:var(--muted);font-weight:700}
+.st-meta span{display:inline-flex;align-items:center;gap:4px}
+.st-meta svg.i{width:13px;height:13px}
+.st-meta .warn{color:var(--orange)}
+/* center picker */
+.stc-list{display:flex;flex-direction:column;gap:8px;max-height:min(52vh,430px);overflow-y:auto;padding:2px;margin:0 -2px}
+.stc-it{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:16px;border:1.5px solid var(--line);background:var(--card);text-align:right;transition:border-color .15s,background .15s,transform .1s;cursor:pointer}
+.stc-it:active{transform:scale(.98)}
+@media (hover:hover){.stc-it:hover{border-color:var(--red);background:var(--red-bg)}}
+.stc-it .t{flex:1;min-width:0}
+.stc-it b{display:block;font-size:14.5px;color:var(--heading);font-weight:800;line-height:1.35}
+.stc-it span{font-size:12px;color:var(--muted)}
+.stc-it .tag{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.stc-it .tag.near{background:var(--green-bg);color:var(--green)}
+.stc-it .tag.task{background:var(--blue-bg,#e8f0ff);color:var(--blue)}
+.stc-it .tag.cur{background:var(--red-bg);color:var(--red)}
+.stc-it .d{font-size:11.5px;color:var(--muted);font-weight:700;white-space:nowrap}
+.stc-it.new{border-style:dashed;color:var(--title-2);font-weight:800;justify-content:center}
+.stc-empty{text-align:center;color:var(--muted);font-size:13px;padding:16px}
+/* management board */
+.stb-sum{display:flex;gap:8px;flex-wrap:wrap}
+.stb-pill{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;font-weight:800;font-size:13px;background:var(--sky-2);color:var(--ink-2)}
+.stb-pill b{font-size:16px;color:var(--heading)}
+.stb-pill.busy{background:var(--red-bg);color:var(--red)}.stb-pill.busy b{color:var(--red)}
+.stb-pill.free{background:var(--green-bg);color:var(--green)}.stb-pill.free b{color:var(--green)}
+.stb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-top:14px}
+.stb-it{display:flex;align-items:center;gap:12px;padding:12px;border-radius:18px;border:1.5px solid var(--line-2);background:var(--card);text-align:right;width:100%;cursor:pointer;transition:border-color .15s,transform .15s,box-shadow .2s;position:relative;overflow:hidden}
+.stb-it:hover{transform:translateY(-1px);box-shadow:var(--sh)}
+.stb-it.busy{border-color:rgba(229,57,77,.35);background:linear-gradient(135deg,var(--red-bg),transparent 70%),var(--card)}
+.stb-it.free{border-color:rgba(24,180,106,.3)}
+.stb-it.flash{animation:stflash 1.4s ease 2}
+@keyframes stflash{0%,100%{box-shadow:0 0 0 0 rgba(247,193,45,0)}50%{box-shadow:0 0 0 4px rgba(247,193,45,.55)}}
+.stb-it .t{flex:1;min-width:0}
+.stb-it b{display:block;font-size:14px;color:var(--heading);font-weight:800;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stb-it .w{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:12.5px;font-weight:800;line-height:1.45;overflow:hidden}
+.stb-it.busy .w{color:var(--red)}.stb-it.free .w{color:var(--green)}
+.stb-it .s{display:block;font-size:11.5px;color:var(--muted);line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stb-it .tm{font-size:13px;font-weight:900;color:var(--red);white-space:nowrap;font-variant-numeric:tabular-nums;align-self:flex-start}
+.stb-it.free .tm{color:var(--green);font-size:12px}
+.stb-off{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+.stb-off summary{cursor:pointer;font-size:12.5px;font-weight:800;color:var(--muted);list-style:none;display:flex;align-items:center;gap:8px}
+.stb-off summary::-webkit-details-marker{display:none}
+.stb-off .names{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.stb-off .names button{display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 4px;border-radius:999px;background:var(--sky-2);font-size:12px;font-weight:700;color:var(--ink-2)}
+.stb-off .names .av{width:22px;height:22px;font-size:10px;border-radius:7px}
+.lvb{display:inline-flex;align-items:center;gap:4px;font-weight:800;color:var(--red)}
+.lvb .sdot{width:7px;height:7px;animation:none}
+.ecard .stl{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:800;padding:7px 10px;border-radius:12px;background:var(--sky-2);color:var(--muted)}
+.ecard .stl.busy{background:var(--red-bg);color:var(--red)}.ecard .stl.free{background:var(--green-bg);color:var(--green)}
+.ecard .stl span{font-weight:700;color:var(--muted);margin-inline-start:auto;font-size:11.5px}
+.stlog{display:flex;flex-direction:column;gap:0}
+.stlog-it{display:grid;grid-template-columns:16px 1fr auto;gap:10px;align-items:start;padding:10px 0;border-bottom:1px solid var(--line-2)}
+.stlog-it:last-child{border:0}
+.stlog-it .sdot{margin-top:5px;animation:none}
+.stlog-it b{display:block;font-size:14px;color:var(--heading)}
+.stlog-it span{font-size:12px;color:var(--muted)}
+.stlog-it .m{font-weight:900;color:var(--heading);font-size:13px;white-space:nowrap}
+@media (max-width:700px){.stb-grid{grid-template-columns:1fr}.st-timer{font-size:18px}}
 </style>
 </head>
 <body>
@@ -1801,6 +1897,7 @@ const Sync = {
   },
   close() { if (this.es) { this.es.close(); this.es = null; } clearInterval(this.watch); setLive(false); },
   onChange(d) {
+    if (d.type === 'status') { Status.onEvent(d); return; }
     if (d.type === 'loc') { Live.onLoc(d); Routes.refreshSoon(); return; }
     if (d.type === 'task' || d.type === 'plan') Routes.refreshSoon();
     if (d.type === 'chat') { Chat.onEvent(d); return; }
@@ -1985,7 +2082,9 @@ PAGES.dashboard = {
     const weak = me.weak_pass ? `<div class="weak-banner">${ic('lock')}<div>كلمة مرور حسابك ضعيفة أو لسه الافتراضية — غيّرها دلوقتي علشان محدش يدخل على البرنامج غيرك.</div><a class="btn btn-sm btn-red" href="#/settings" data-act="weak-fix">${ic('key')} تغيير</a></div>` : '';
     const liveCard = `<div class="card live-card"><div class="card-h"><div class="tile sm t-green">${ic('radar')}</div><div><h3>أماكن الموظفين دلوقتي</h3><p><b data-live-count="working">0</b> في الشغل • <b data-live-count="centers">0</b> في مراكز • تحديث كل ${iv} دقيقة</p></div><div class="act"><span class="live"><i></i>مباشر</span><a class="btn btn-xs btn-soft" href="#/tracking">${ic('route')}<span class="btn-txt">الخريطة الكاملة</span></a></div></div>
       <div class="live-grid"><div class="maphold" data-maphold="dash"><div class="map-msg">${ic('refresh', 'spin')} جاري تحميل الخريطة...</div></div><div class="live-list" data-live-list="dash">${Live.listHtml('dash')}</div></div></div>`;
+    const stCard = `<div class="card"><div class="card-h"><div class="tile sm t-red">${ic('wrench')}</div><div><h3>حالة الفنيين</h3><p>🔴 مشغول في مركز • 🟢 متاح لأي شغل — بتتحدث لوحدها</p></div><div class="act"><span class="live"><i></i>مباشر</span></div></div><div data-stboard>${Status.boardHtml()}</div></div>`;
     return `${weak}<div data-keep="ticker"></div><div data-keep="routes"></div>
+      ${stCard}
       ${liveCard}
       <div class="kpis">${kpis.map(k => `<button class="kpi" style="--c:var(--${k[0].slice(2)})" data-act="kpi" data-page="${k[5]}" data-st="${k[6]}"><div class="row"><div class="tile ${k[0]}">${ic(k[1])}</div><div class="v ltr" data-count="${k[2]}">0</div></div><div><div class="l">${k[3]}</div><div class="s">${k[4]}</div></div></button>`).join('')}</div>
       <div class="g-dash">
@@ -2015,6 +2114,7 @@ PAGES.dashboard = {
     const th = $('[data-keep=ticker]', page); if (th) keepTicker(th, PAGES.dashboard._tick);
     const rh = $('[data-keep=routes]', page); if (rh) Routes.mount(rh);
     if (silent) Routes.refreshSoon();
+    Status.refresh();
     (async () => {
       await mountMap('dash', $('[data-maphold=dash]', page));
       if (!silent || !Live.data) { try { await Live.load(); } catch {} }
@@ -2160,9 +2260,10 @@ PAGES.employees = {
         ${exportBtns()}
       </div>
       ${L.length ? `<div class="ecards">${L.map(e => {
-        const dp = deptOf(e.dept_id), sh = shiftOf(e.shift_id), st = siteOf(e.site_id), k = sh ? SK[sh.kind] : null;
+        const dp = deptOf(e.dept_id), sh = shiftOf(e.shift_id), st = siteOf(e.site_id), k = sh ? SK[sh.kind] : null, es = e.active ? (S.boot.emp_status || {})[e.id] : null;
         return `<div class="ecard ${e.active ? '' : 'off'}"><span class="stripe" style="background:${dp ? dp.color : '#cfd8e6'}"></span>
-          <div class="hd"><a href="javascript:void 0" class="who-link" data-act="emp-profile" data-id="${e.id}" style="display:flex;align-items:center;gap:12px;flex:1;min-width:0" title="ملف الموظف">${av(e.name, e.id, 'lg', e.photo)}<div style="min-width:0;flex:1"><b>${esc(e.name)}</b><span>${esc(e.job || 'بدون وظيفة')}</span></div></a>${chip(e.code, 'navy')}</div>
+          <div class="hd"><a href="javascript:void 0" class="who-link" data-act="emp-profile" data-id="${e.id}" style="display:flex;align-items:center;gap:12px;flex:1;min-width:0" title="ملف الموظف">${es ? `<span class="avst lg">${av(e.name, e.id, 'lg', e.photo)}<i class="sdot ${es.state}"></i></span>` : av(e.name, e.id, 'lg', e.photo)}<div style="min-width:0;flex:1"><b>${esc(e.name)}</b><span>${esc(e.job || 'بدون وظيفة')}</span></div></a>${chip(e.code, 'navy')}</div>
+          ${es && es.state !== 'off' ? `<button class="stl ${es.state}" data-act="st-log" data-id="${e.id}"><i class="sdot ${es.state}"></i>${es.state === 'busy' ? 'مشغول في ' + esc(es.center || '') : 'متاح'}<span>${es.since ? (es.state === 'busy' ? 'من ' + t12(es.since) : ago(tsAgo(es.since))) : ''}</span></button>` : ''}
           <div class="tags">${dp ? `<span class="chip" style="background:${dp.color}1a;color:${dp.color}">${ic('building')}${esc(dp.name)}</span>` : chip('بدون قسم', 'slate')}
             ${sh ? chip(sh.name, k.c, k.i) : chip('بدون وردية', 'slate', 'clock')}${e.active ? '' : chip('موقوف', 'red')}</div>
           <div class="kv"><span>الراحة</span><b>${restText(e.rest_days)}</b><span>المواعيد</span><b>${sh ? t12(sh.start_time) + ' - ' + t12(sh.end_time) : '—'}</b><span>الموقع</span><b>${st ? esc(st.name) : 'بدون تقييد'}</b>${e.phone ? `<span>الهاتف</span><b class="ltr" style="text-align:right">${esc(e.phone)}</b>` : ''}</div>
@@ -2485,7 +2586,8 @@ PAGES.settings = {
           ${location.protocol !== 'https:' && !['localhost', '127.0.0.1'].includes(location.hostname) ? `<div class="note warn" style="margin-top:12px">${ic('alert')}<div>الموبايلات بتسمح بتحديد الموقع (GPS) على روابط <b>https</b> بس. علشان التسجيل بالموقع يشتغل من موبايلات الموظفين ارفع البرنامج على <b>Railway</b> (الخطوات في ملف README) — أو اقفل "لازم يفعّل الموقع" مؤقتًا.</div></div>` : ''}</div>
         ${logoCard(isAdmin)}
         <div class="card"><div class="card-h"><div class="tile sm t-green">${ic('bell')}</div><div><h3>إشعارات الموبايل</h3><p>توصلك حتى والبرنامج مقفول</p></div></div>
-          ${Push.card(S.boot.push_on, 'هيوصلك إشعار لما: موظف يطلب إجازة أو يبعت رسالة، فني يعتذر عن مهمة أو يخلّصها، وملخص آخر اليوم.')}</div>
+          ${Push.card(S.boot.push_on, 'هيوصلك إشعار لما: فني يبقى مشغول أو متاح، موظف يطلب إجازة أو يبعت رسالة، فني يعتذر عن مهمة أو يخلّصها، وملخص آخر اليوم.')}
+          <label class="switch" style="margin-top:14px"><input type="checkbox" data-autosave="status_push" ${s.status_push !== '0' ? 'checked' : ''} ${dis}><span class="tr"></span>إشعار لما فني يدوس "أنا شغال" أو "خلصت"</label></div>
         <div class="card"><div class="card-h"><div class="tile sm t-indigo">${ic('megaphone')}</div><div><h3>ملخص آخر اليوم</h3><p>الحضور والغياب والزيارات والمهام في رسالة واحدة</p></div><div class="act"><button class="btn btn-xs btn-wa" data-act="summary-wa">${ic('wa')}<span class="btn-txt">ابعته دلوقتي</span></button></div></div>
           <div class="stack" style="gap:14px" data-sform>
             <label class="switch"><input type="checkbox" name="daily_summary" ${s.daily_summary === '1' ? 'checked' : ''} ${dis}><span class="tr"></span>ابعت الملخص كإشعار للإدارة كل يوم</label>
@@ -2772,7 +2874,7 @@ const Live = {
   itemHtml(x, sel) {
     const st = this.st(x), pl = this.placeText(x);
     return `<button class="lv-it ${sel ? 'on' : ''}" data-act="live-focus" data-id="${x.emp_id}">${av(x.name, x.emp_id, 'sm', x.photo)}
-      <div class="t"><b>${esc(x.name)}</b><div class="sub"><span class="lvs ${st}"><i></i>${this.stText(x)}</span>${pl ? `<span>${ic('pin')}${esc(pl)}</span>` : ''}</div></div>
+      <div class="t"><b>${esc(x.name)}</b><div class="sub">${x.busy ? `<span class="lvb"><i class="sdot busy"></i>مشغول في ${esc(x.busy.center)}</span>` : ''}<span class="lvs ${st}"><i></i>${this.stText(x)}</span>${pl ? `<span>${ic('pin')}${esc(pl)}</span>` : ''}</div></div>
       <div class="end"><span>${x.last ? ago(tsAgo(x.last.at)) : ''}</span>${x.last && x.last.battery !== null && x.last.battery !== undefined ? `<span>${ic('battery')} ${x.last.battery}%</span>` : ''}${x.visits_today ? `<span>${ic('wrench')} ${x.visits_today}</span>` : ''}</div></button>`;
   },
   listHtml(mode) {
@@ -4011,6 +4113,7 @@ const ACT = {
   'user-del': async el => { if (!await confirmBox('حذف المستخدم ده؟', { danger: true, ok: 'حذف' })) return; await busy(null, async () => { await api('/api/users/delete', { id: +el.dataset.id }); toast('تم الحذف'); renderPage(true); }); },
   'change-pass': el => busy(el, async () => { const v = formVals($('[data-pform]')); await api('/api/me/password', v); $$('[data-pform] input').forEach(i => i.value = ''); toast('تم تغيير كلمة المرور'); }),
   backup: el => busy(el, async () => { const ph = el.dataset.photos === '1'; const d = await api('/api/backup' + (ph ? '?photos=1' : '')); downloadBlob(new Blob([JSON.stringify(d)], { type: 'application/json' }), `نسخة-الحضور${ph ? '-بالصور' : ''}-${today()}.json`); toast('تم تنزيل النسخة الاحتياطية'); }),
+  'st-log': el => statusLogModal(+el.dataset.id),
   'clear-demo': async () => { if (!await confirmBox('هيتم مسح كل الموظفين التجريبيين وسجلاتهم. الأقسام والورديات والمواقع هتفضل.', { danger: true, ok: 'مسح', title: 'مسح البيانات التجريبية' })) return; await busy(null, async () => { await api('/api/demo/clear', {}); await reloadBoot(); toast('تم مسح البيانات التجريبية'); renderPage(true); }); },
 };
 document.addEventListener('click', e => {
@@ -4135,7 +4238,7 @@ function updateLocPill() {
 function empHeader(title) {
   const h = S.home, e = h.emp;
   return `<div class="emp-top"><div class="emp-bar"><button class="btn btn-icon btn-sm" data-etab="profile">${ic('menu')}</button><h1>${esc(title)}</h1>${themeBtn('btn-sm')}<button class="btn btn-icon btn-sm" data-eact="refresh">${ic('refresh')}</button></div>
-    <div class="emp-hello">${av(e.name, e.id, 'lg', e.photo)}<div><b>${esc(e.name)}</b><span>${esc(e.job || '')}${e.dept ? ' • ' + esc(e.dept) : ''}</span></div></div></div>`;
+    <div class="emp-hello"><span class="avst lg">${av(e.name, e.id, 'lg', e.photo)}<i class="sdot ${h.status ? 'busy' : 'free'}"></i></span><div><b>${esc(e.name)}</b><span>${esc(e.job || '')}${e.dept ? ' • ' + esc(e.dept) : ''}</span>${stHelloPill()}</div></div></div>`;
 }
 function renderEmp() {
   const h = S.home; if (!h) return;
@@ -4186,6 +4289,7 @@ function empHomeHtml() {
       <span class="shift ${shCls}">${sh}</span>${state}${perms}
       <div class="punch-wrap">${btn}${h.punch_mode === 'qr_or_gps' && !(r.in_at && r.out_at && !open) ? `<button class="btn btn-soft btn-sm" data-eact="scan" style="margin-top:4px">${ic('camera')} أو امسح كود المقر</button>` : ''}<button class="locpill wait" id="locPill" data-eact="locate"></button></div>
       ${(open || Tracker.going()) && h.settings.track === '1' ? `<div class="trackpill ok" id="trackPill"></div>` : ''}</div>
+    ${stCardHtml()}
     ${h.settings.chat === '1' ? `<button class="ebanner msgb ${h.chat_unread ? '' : 'hide'}" data-msg-banner data-etab="chat"><div class="tile sm t-green">${ic('chat')}</div><div class="grow"><b>عندك <span data-msg-count>${h.chat_unread}</span> رسالة جديدة من الإدارة</b><span>دوس هنا علشان تقراها</span></div>${ic('chevL')}</button>` : ''}
     ${(h.decided || []).filter(l => !seenDecided().includes(l.id)).map(l => `<div class="note ${l.status === 'approved' ? '' : 'warn'}">${ic(l.status === 'approved' ? 'checkCircle' : 'alert')}<div style="flex:1"><b>${LT[l.type]}</b> ${l.status === 'approved' ? 'اتوافق عليها ✓' : 'اترفضت'} (${dShort(l.from_date)})${l.reply ? `<br><span class="muted">الرد: ${esc(l.reply)}</span>` : ''}</div><button class="btn btn-ghost btn-icon btn-sm" data-eact="dec-ok" data-id="${l.id}">${ic('x')}</button></div>`).join('')}
     ${curT ? eTaskCard(curT) : ''}${(h.plans_today || []).some(p => p.state === 'planned') ? `<div class="ecard2"><h3>${ic('cal')} زياراتك المخططة النهارده</h3>${h.plans_today.map(p => `<div class="cust-it"><b class="pl-time ltr">${p.time ? t12(p.time) : '—'}</b><b>${esc(p.center)}${p.note ? `<br><small class="muted">${esc(p.note)}</small>` : ''}</b>${p.state === 'planned' ? `<button class="btn btn-xs btn-green" data-eact="plan-visit" data-id="${p.id}">${ic('wrench')} سجّل</button>` : chip(PLS[p.state][0], PLS[p.state][1])}</div>`).join('')}</div>` : ''}${pushNudge}
@@ -4392,7 +4496,7 @@ function empVisitsHtml() {
   const openT = T.filter(t => OPEN_T.includes(t.status)), doneT = T.filter(t => t.status === 'done');
   const tasksHtml = openT.map(eTaskCard).join('');
   if (!S.plans) loadPlans().then(() => { if (S.etab === 'visits') renderEmp(); }).catch(() => {});
-  const head = empHeader('شغلي') + `<div class="emp-body"><div data-qbar-holder>${OQ.bar()}</div>${tasksHtml}${ePlansHtml()}`;
+  const head = empHeader('شغلي') + `<div class="emp-body"><div data-qbar-holder>${OQ.bar()}</div>${stCardHtml()}${tasksHtml}${ePlansHtml()}`;
   if (!v) { loadVis().then(() => { if (S.etab === 'visits') renderEmp(); }).catch(e => toast(e.message, 'err')); return head + `<div class="ecard2 empty">${ic('refresh', 'spin')}<div>جاري التحميل...</div></div></div>`; }
   const td = nowParts().date; const todays = v.visits.filter(x => x.date === td);
   const fu = v.visits.filter(x => x.result !== 'done').length;
@@ -4418,7 +4522,7 @@ function bindCenterPicker(root, centers, onChange) {
   const obj = () => centers.find(c => String(c.id) === sel.value) || null;
   return { obj, name: () => { const c = obj(); return c ? c.name : sel.value === '__new' ? nw.value.trim() : ''; } };
 }
-async function visitForm(task = null, plan = null, device = null) {
+async function visitForm(task = null, plan = null, device = null, preset = null) {
   let v; try { v = S.vis || await loadVis(); } catch (e) { return toast(e.message, 'err'); }
   const level = v.settings.photo_quality || 'low';
   const custody = (v.custody || (S.home && S.home.custody) || []).filter(c => c.balance > 0);
@@ -4428,7 +4532,7 @@ async function visitForm(task = null, plan = null, device = null) {
     title: task ? 'قفل المهمة بزيارة' : 'تسجيل زيارة مركز', sub: task ? task.title : plan ? 'من جدول زياراتك' : 'سجّل الشغل اللي عملته وسلّمته لمين', icon: 'wrench', tile: 't-red', size: 'lg',
     body: `${task ? `<div class="note">${ic('send')}<div>الزيارة دي هتتربط بالمهمة <b>${esc(task.title)}</b> وهتتقفل لوحدها بعد الحفظ.</div></div>` : ''}
       ${v.offline ? `<div class="note warn">${ic('signal')}<div>مفيش نت — الزيارة هتتحفظ على الموبايل وتتبعت لوحدها أول ما النت يرجع.</div></div>` : ''}
-      ${centerPicker(v.centers, task ? task.center_id : plan ? plan.center_id : null, task ? task.center : plan ? plan.center : device ? device.center : '')}
+      ${centerPicker(v.centers, task ? task.center_id : plan ? plan.center_id : preset ? preset.center_id : null, task ? task.center : plan ? plan.center : device ? device.center : preset ? preset.center : '')}
       <div class="field"><label>نوع الشغل</label><div class="daypick">${(() => { const want = task ? (/دوري|وقائ/.test(task.title) ? /دوري/ : /تركيب/.test(task.title) ? /تركيب/ : /معايرة/.test(task.title) ? /معايرة/ : /عطل|إصلاح/) : null; let pick = want ? v.work_types.findIndex(t => want.test(t)) : 0; if (pick < 0) pick = 0; return v.work_types.map((t, i) => `<label><input type="radio" name="work_type" value="${esc(t)}" ${i === pick ? 'checked' : ''}><span>${esc(t)}</span></label>`).join(''); })()}</div></div>
       ${device || (task && task.device_id) ? `<div class="chip c-blue" style="align-self:flex-start">${ic('printer')} ${esc(device ? [device.name, device.model, device.serial ? 'S/N ' + device.serial : ''].filter(Boolean).join(' — ') : (task.dev_name || 'الطابعة') + (task.dev_serial ? ' — S/N ' + task.dev_serial : ''))}</div>` : ''}
       <div class="field"><div class="lbl-row"><label>العطل / المشكلة</label>${Mic.btn()}</div><input class="inp" name="fault_desc" placeholder="مثال: خطوط بيضاء على الفيلم" value="${esc(task ? task.title : '')}" autocomplete="off"></div>
@@ -4635,6 +4739,9 @@ document.addEventListener('click', async e => {
   if (k === 'pin') busy(a, async () => { const v = formVals($('#pinForm')); await api('/api/my/pin', v); $$('#pinForm input').forEach(i => i.value = ''); toast('تم تغيير الرقم السري'); });
   if (k === 'leave-send') busy(a, async () => { const v = formVals($('#lvForm')); await api('/api/my/leave', v); toast('تم إرسال الطلب للإدارة'); await loadHome(true); });
   if (k === 'visit-new') visitForm();
+  if (k === 'st-busy') statusPicker();
+  if (k === 'st-jump') { const c = $('#stCard'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' }); else { S.etab = 'home'; renderEmp(); setTimeout(() => { const c2 = $('#stCard'); if (c2) c2.scrollIntoView({ block: 'center' }); }, 50); } }
+  if (k === 'st-free') statusDone(a);
   if (k === 'task') taskAct(a);
   if (k === 'plan-new') planModal(0);
   if (k === 'scan-dev') { const key = await Scan.open(scanDevKey, 'وجّه الكاميرا على ستيكر الـ QR اللي على الطابعة'); if (key) empDeviceModal(key); }
@@ -4755,6 +4862,7 @@ const EmpSync = {
     if (d.type === 'reward') { S.myRewards = null; EmpPoll.tick(); }
     if (d.type === 'plan_remind') { toast(`⏰ تذكير: زيارة ${d.center}${d.time ? ' الساعة ' + t12(d.time) : ''}`, 'info', 'cal'); if (navigator.vibrate) navigator.vibrate([120, 60, 120]); }
     if (d.type === 'custody') { S.vis = null; toast('عهدتك من قطع الغيار اتحدثت', 'info', 'brief'); if (S.etab !== 'chat') EmpPoll.tick(); }
+    if (d.type === 'status') { if (d.by) toast(`${d.by} خلّى حالتك متاح 🟢`, 'info', 'checkCircle'); EmpPoll.tick(); }
   },
 };
 
@@ -4797,6 +4905,156 @@ const Tracker = {
 };
 
 /* ------------------------------------------------------------ Boot --- */
+/* ===================================================== v1.7: technician status (busy / available) === */
+const arN = x => String(x || '').toLowerCase().replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/[ً-ْـ]/g, '').replace(/\s+/g, ' ').trim();
+const minsTxt = m => (m || 0) < 1 ? 'أقل من دقيقة' : dur(m);
+function stHelloPill() { const b = !!(S.home && S.home.status); return `<span class="hello-st ${b ? 'busy' : 'free'}" data-eact="st-jump"><i class="sdot ${b ? 'busy' : 'free'}"></i>${b ? 'مشغول' : 'متاح'}</span>`; }
+function stCardHtml() {
+  const h = S.home; if (!h) return '';
+  const st = h.status, td = h.status_today || { jobs: 0, done_mins: 0 };
+  const todayLine = td.jobs ? `<span>${ic('wrench')} النهارده: ${td.jobs === 1 ? 'شغلانة واحدة' : td.jobs + ' شغلانات'}</span>${td.done_mins ? `<span>${ic('timer')} ${dur(td.done_mins)} شغل خلصته</span>` : ''}` : '';
+  if (st) return `<div class="stcard busy" id="stCard"><div class="st-head"><span class="sdot busy lg"></span><div class="t"><b>حالتك: مشغول</b><span>في <strong>${esc(st.center)}</strong>${st.area ? ' — ' + esc(st.area) : ''}</span></div></div>
+    <div class="st-clock"><span>${ic('timer')} بقالك شغال</span><b data-elapsed="${st.since}">00:00:00</b></div>
+    <div class="st-acts"><button class="stbtn done" data-eact="st-free">${ic('checkCircle')}<span class="lbl">خلصت<small>هترجع متاح عند الإدارة</small></span></button><button class="btn btn-soft" data-eact="st-busy">${ic('hospital')}غيّر المركز</button></div>
+    <div class="st-meta"><span>${ic('clock')} بدأت ${t12(st.since)}</span>${st.far ? `<span class="warn">${ic('alert')} موبايلك كان بعيد عن المركز</span>` : ''}${todayLine}</div></div>`;
+  return `<div class="stcard free" id="stCard"><div class="st-head"><span class="sdot free lg"></span><div class="t"><b>حالتك: متاح</b><span>الإدارة شايفاك فاضي لأي شغل</span></div></div>
+    <button class="stbtn go" data-eact="st-busy">${ic('wrench')}<span class="lbl">أنا شغال<small>اختار المركز اللي أنت فيه</small></span></button>
+    ${todayLine ? `<div class="st-meta">${todayLine}</div>` : ''}</div>`;
+}
+async function statusPicker() {
+  let v = S.vis;
+  if (!v) { try { v = await loadVis(); } catch (e) { v = visCache(); if (!v) return toast(e.message, 'err'); } }
+  if (!S.loc || S.loc.err || Date.now() - (S.loc.at || 0) > 120000) locate();
+  const h = S.home, cur = h.status;
+  const taskC = new Set((h.tasks || []).filter(t => ['accepted', 'onway', 'arrived'].includes(t.status)).map(t => t.center_id).filter(Boolean));
+  const planC = new Set((h.plans_today || []).filter(p => p.state === 'planned').map(p => p.center_id).filter(Boolean));
+  const centers = v.centers || [];
+  const myLoc = () => (S.loc && !S.loc.err && !S.loc.busy && typeof S.loc.lat === 'number') ? S.loc : null;
+  const listHtml = q => {
+    const l = myLoc();
+    let L = centers.map(c => { const d = l && c.lat !== null && c.lat !== undefined ? haversine(l.lat, l.lng, c.lat, c.lng) : null; return { ...c, d, near: d !== null && d <= Math.max(c.radius || 300, 150) * 1.5 }; });
+    if (q) { const n = arN(q); L = L.filter(c => arN(c.name + ' ' + (c.area || '')).includes(n)); }
+    const rank = c => (c.near ? -8 : 0) + (taskC.has(c.id) ? -2 : 0) + (planC.has(c.id) ? -1 : 0) + (cur && cur.center_id === c.id ? 3 : 0);
+    L.sort((a, b) => (rank(a) - rank(b)) || ((a.d ?? 1e12) - (b.d ?? 1e12)) || a.name.localeCompare(b.name, 'ar'));
+    if (!L.length) return `<div class="stc-empty">مفيش مركز بالاسم ده — دوس "مركز مش في القائمة" تحت</div>`;
+    return L.slice(0, 80).map(c => {
+      const near = c.near;
+      const tag = cur && cur.center_id === c.id ? '<span class="tag cur">أنت فيه دلوقتي</span>' : taskC.has(c.id) ? '<span class="tag task">مهمتك</span>' : near ? '<span class="tag near">قريب منك</span>' : planC.has(c.id) ? '<span class="tag task">في جدولك</span>' : '';
+      return `<button class="stc-it" data-stc="${c.id}"><div class="tile xs ${near ? 't-green' : 't-navy'}">${ic('hospital')}</div><div class="t"><b>${esc(c.name)}</b>${c.area ? `<span>${esc(c.area)}</span>` : ''}</div>${tag}${c.d !== null ? `<span class="d">${meters(c.d)}</span>` : ''}</button>`;
+    }).join('');
+  };
+  const m = modal({
+    title: cur ? 'نقلت لمركز تاني؟' : 'أنت في مركز إيه؟', sub: 'اختار المركز وحالتك هتبقى "مشغول" عند الإدارة فورًا', icon: 'hospital', tile: 't-red',
+    body: `<div class="inp-ico">${ic('search')}<input class="inp" placeholder="ابحث باسم المركز أو المنطقة" data-stq autocomplete="off"></div>
+      <div class="stc-list" data-stlist>${listHtml('')}</div>
+      <button class="stc-it new" data-stnew>${ic('plus')} مركز مش في القائمة</button>
+      <div style="display:flex;flex-direction:column;gap:8px" data-stnewbox><input class="inp" placeholder="اكتب اسم المركز" data-stname autocomplete="off"><button class="btn btn-red" data-stgo>${ic('wrench')} ابدأ الشغل</button></div>`,
+  });
+  const list = $('[data-stlist]', m.el), q = $('[data-stq]', m.el), box = $('[data-stnewbox]', m.el);
+  box.style.display = 'none';
+  q.addEventListener('input', () => { list.innerHTML = listHtml(q.value.trim()); });
+  let hadLoc = !!myLoc();
+  const lw = setInterval(() => { if (!m.el.isConnected) return clearInterval(lw); if (!hadLoc && myLoc()) { hadLoc = true; list.innerHTML = listHtml(q.value.trim()); } }, 700);
+  const go = (body, btn) => busy(btn, async () => {
+    const l = myLoc() && Date.now() - S.loc.at < 300000 ? S.loc : null;
+    const r = await api('/api/my/status', { busy: true, ...body, lat: l ? l.lat : null, lng: l ? l.lng : null, acc: l ? l.acc : null });
+    m.close(); S.home.status = r.status; renderEmp(); window.scrollTo(0, 0);
+    if (navigator.vibrate) navigator.vibrate(70);
+    toast(`حالتك بقت مشغول في ${r.status.center} — الإدارة شايفاك 🔴`, 'info', 'wrench');
+    loadHome(true);
+  });
+  list.addEventListener('click', e => { const b = e.target.closest('[data-stc]'); if (b && !b.disabled) go({ center_id: +b.dataset.stc }, b); });
+  $('[data-stnew]', m.el).onclick = ev => { box.style.display = 'flex'; ev.currentTarget.style.display = 'none'; $('[data-stname]', m.el).value = q.value.trim(); $('[data-stname]', m.el).focus(); };
+  $('[data-stgo]', m.el).onclick = ev => { const n = $('[data-stname]', m.el).value.trim(); if (!n) return toast('اكتب اسم المركز', 'warn'); go({ center_name: n }, ev.currentTarget); };
+}
+async function statusDone(btn) {
+  if (!S.home || !S.home.status) return;
+  const r = await busy(btn, () => api('/api/my/status', { busy: false }));
+  if (!r) return;
+  S.home.status = null; renderEmp(); if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
+  const e = r.ended;
+  if (e && !e.visited) {
+    const m = modal({ title: 'تمام.. بقيت متاح 🟢', sub: 'الإدارة شايفاك فاضي دلوقتي', icon: 'checkCircle', tile: 't-green', size: 'sm',
+      body: `<p style="font-weight:700;line-height:1.9">اشتغلت <b>${minsTxt(e.mins)}</b> في <b>${esc(e.center)}</b>.<br>تحب تسجّل الزيارة دي (العطل والحل والصورة)؟</p>`,
+      foot: `<button class="btn btn-gold" data-v style="flex:1">${ic('wrench')} سجّل الزيارة</button><button class="btn btn-soft" data-close>بعدين</button>` });
+    $('[data-v]', m.el).onclick = () => { m.close(); visitForm(null, null, null, { center_id: e.center_id, center: e.center }); };
+  } else toast(`تمام — حالتك بقت متاح 🟢${e ? ` (اشتغلت ${minsTxt(e.mins)} في ${e.center})` : ''}`, 'ok', 'checkCircle');
+  loadHome(true);
+}
+
+/* management side: live board + per-technician log */
+const Status = {
+  data: null, flash: new Set(),
+  async load() { this.data = await api('/api/status'); return this.data; },
+  refreshSoon: debounce(() => Status.refresh(), 400),
+  async refresh() { if (S.kind !== 'user' || !$('[data-stboard]')) return; try { await this.load(); this.paint(); } catch {} },
+  paint() { $$('[data-stboard]').forEach(el => { el.innerHTML = this.boardHtml(); }); tickClock(); },
+  itemHtml(x) {
+    const b = x.state === 'busy', st = x.status;
+    const w = b ? `مشغول في ${esc(st.center)}` : 'متاح';
+    const sub = b ? [st.area ? esc(st.area) : '', st.far ? '⚠️ موبايله كان بعيد عن المركز' : '', x.jobs_today > 1 ? `${x.jobs_today} شغلانات النهارده` : ''].filter(Boolean).join(' • ') || esc(x.job || '')
+      : [x.last_center ? `آخر شغل: ${esc(x.last_center)}` : esc(x.job || ''), x.jobs_today ? `${x.jobs_today} النهارده` : ''].filter(Boolean).join(' • ');
+    const tm = b ? `<span class="tm ltr" data-elapsed="${st.since}"></span>` : x.free_since ? `<span class="tm" data-ago="${x.free_since}">${ago(tsAgo(x.free_since))}</span>` : '';
+    return `<button class="stb-it ${x.state} ${this.flash.has(x.emp_id) ? 'flash' : ''}" data-act="st-log" data-id="${x.emp_id}"><span class="avst">${av(x.name, x.emp_id, '', x.photo)}<i class="sdot ${x.state}"></i></span><div class="t"><b>${esc(x.name)}</b><span class="w">${w}</span>${sub ? `<span class="s">${sub}</span>` : ''}</div>${tm}</button>`;
+  },
+  boardHtml() {
+    const d = this.data;
+    if (!d) return `<div class="empty" style="padding:20px">${ic('refresh', 'spin')}</div>`;
+    const B = d.list.filter(x => x.state === 'busy'), F = d.list.filter(x => x.state === 'free'), O = d.list.filter(x => x.state === 'off');
+    const sum = `<div class="stb-sum"><span class="stb-pill busy"><i class="sdot busy"></i><b>${B.length}</b>مشغول</span><span class="stb-pill free"><i class="sdot free"></i><b>${F.length}</b>متاح</span><span class="stb-pill"><i class="sdot off"></i><b>${O.length}</b>مش في الشغل</span></div>`;
+    const items = B.concat(F);
+    const grid = items.length ? `<div class="stb-grid">${items.map(x => this.itemHtml(x)).join('')}</div>`
+      : `<div class="empty" style="padding:22px">${ic('wrench')}<b style="margin-top:6px">محدش في الشغل دلوقتي</b>أول ما فني يسجل حضور أو يدوس "أنا شغال" هيظهر هنا</div>`;
+    const off = O.length ? `<details class="stb-off"><summary>${ic('chevL')} مش في الشغل (${O.length})</summary><div class="names">${O.map(x => `<button data-act="st-log" data-id="${x.emp_id}">${av(x.name, x.emp_id, '', x.photo)}${esc(x.name)}</button>`).join('')}</div></details>` : '';
+    return sum + grid + off;
+  },
+  onEvent(d) {
+    if (d.name) {
+      if (d.busy) toast(d.from ? `🔴 ${d.name} نقل من ${d.from} لـ ${d.center}` : `🔴 ${d.name} بقى مشغول في ${d.center}${d.far ? ' — موبايله بعيد عن المركز' : ''}`, d.far ? 'warn' : 'info', 'wrench');
+      else if (d.by === 'out') toast(`${d.name} انصرف — حالته اتقفلت (${d.center})`, 'info', 'logout');
+      else if (d.auto) toast(`${d.name}: حالة "مشغول" في ${d.center} اتقفلت تلقائي`, 'info', 'clock');
+      else toast(`🟢 ${d.name} خلّص${d.center ? ' في ' + d.center : ''}${d.mins ? ' بعد ' + dur(d.mins) : ''} وبقى متاح${d.by ? ` (${d.by})` : ''}`, 'ok', 'checkCircle');
+    }
+    this.flash.add(d.emp_id); setTimeout(() => this.flash.delete(d.emp_id), 5000);
+    this.refreshSoon(); Live.refreshSoon();
+    if (S.page === 'employees') refreshSoon(); else if (S.boot) reloadBoot().catch(() => {});
+  },
+};
+setInterval(() => { $$('[data-ago]').forEach(el => { el.textContent = ago(tsAgo(el.dataset.ago)); }); }, 20000);
+async function statusLogModal(id, date) {
+  date = date || today();
+  let d; try { d = await api(`/api/status/log?emp=${id}&date=${date}`); } catch (e) { return toast(e.message, 'err'); }
+  const x = (Status.data && Status.data.list.find(r => r.emp_id === id)) || {};
+  const cur = d.current, isToday = date === today();
+  const total = d.rows.reduce((t, r) => t + (r.mins || 0), 0);
+  const endTxt = r => !r.ended_by || r.ended_by === 'الفني' ? '' : ' • ' + (r.ended_by === 'انصراف' ? 'اتقفلت مع الانصراف' : r.ended_by === 'غيّر المركز' ? 'نقل لمركز تاني' : r.ended_by === 'تلقائي' ? 'اتقفلت تلقائي' : 'قفلها ' + esc(r.ended_by));
+  const now = cur ? `<div class="stcard busy" style="padding:14px"><div class="st-head"><span class="sdot busy lg"></span><div class="t"><b>مشغول دلوقتي</b><span>في <strong>${esc(cur.center)}</strong> من ${t12(cur.since)}${cur.far ? ' • ⚠️ موبايله كان بعيد عن المركز' : ''}</span></div></div><div class="st-clock"><span>${ic('timer')} بقاله شغال</span><b data-elapsed="${cur.since}"></b></div></div>`
+    : isToday ? `<div class="stcard free" style="padding:14px"><div class="st-head"><span class="sdot ${x.state === 'off' ? 'off' : 'free'} lg"></span><div class="t"><b>${x.state === 'off' ? 'مش في الشغل دلوقتي' : 'متاح دلوقتي'}</b><span>${x.free_since ? 'فاضي ' + ago(tsAgo(x.free_since)) : x.in_at ? 'حاضر من ' + t12(x.in_at) : 'مسجلش حضور'}</span></div></div></div>` : '';
+  const rows = d.rows.length ? `<div class="stlog">${d.rows.map(r => `<div class="stlog-it"><span class="sdot ${r.end_at ? 'off' : 'busy'}"></span><div><b>${esc(r.center)}</b><span>${t12(r.since)} ← ${r.end_at ? t12(r.end_at) : 'لسه شغال'}${endTxt(r)}${r.far ? ' • ⚠️ بعيد عن المركز' : ''}</span></div><span class="m">${minsTxt(r.mins)}</span></div>`).join('')}</div>`
+    : `<div class="empty" style="padding:18px">${ic('wrench')}<div>${isToday ? 'مداسش "أنا شغال" النهارده' : 'مفيش شغل متسجل اليوم ده'}</div></div>`;
+  const emp = d.emp;
+  const m = modal({
+    title: emp.name, sub: 'حالة الشغل في المراكز', icon: 'wrench', tile: 't-red',
+    body: `${now}
+      <div class="row" style="gap:10px;align-items:flex-end"><div class="field" style="flex:1"><label>اليوم</label><input type="date" class="inp" value="${date}" max="${today()}" data-stdate></div>${d.rows.length ? `<div class="stb-pill" style="margin-bottom:4px"><b>${d.rows.length}</b>شغلانة • ${dur(total)}</div>` : ''}</div>
+      ${rows}`,
+    foot: `${cur ? `<button class="btn btn-soft" data-stclear style="color:var(--green)">${ic('checkCircle')} خليه متاح</button>` : ''}<span class="sp"></span><button class="btn btn-soft" data-act="chat-emp" data-id="${emp.id}">${ic('chat')} رسالة</button>${emp.phone ? `<a class="btn btn-soft btn-icon" href="tel:${esc(emp.phone)}" title="اتصال">${ic('call')}</a>` : ''}`,
+  });
+  tickClock();
+  $('[data-stdate]', m.el).onchange = ev => { const v = ev.target.value; if (v) { m.close(); statusLogModal(id, v); } };
+  $$('[data-act=chat-emp]', m.el).forEach(b => b.addEventListener('click', () => m.close()));
+  const cl = $('[data-stclear]', m.el);
+  if (cl) cl.onclick = async ev => {
+    if (!await confirmBox(`${emp.name} لسه مشغول في ${cur.center}. تخلّي حالته "متاح"؟ (هيوصله إشعار)`, { ok: 'خليه متاح', icon: 'checkCircle' })) return;
+    const r = await busy(ev.currentTarget, () => api('/api/status/clear', { emp_id: id }));
+    if (r) { m.close(); toast(`حالة ${emp.name} بقت متاح`); Status.refresh(); }
+  };
+}
+document.addEventListener('change', e => {
+  const el = e.target.closest && e.target.closest('[data-autosave]'); if (!el || S.kind !== 'user') return;
+  busy(null, async () => { await api('/api/settings/save', { [el.dataset.autosave]: el.checked ? '1' : '0' }); await reloadBoot(); toast('اتحفظ'); });
+});
+
 function start() {
   if (!S.token) return renderLogin();
   if (S.kind === 'emp') return startEmp();

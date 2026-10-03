@@ -13,7 +13,7 @@ const _emit = process.emitWarning;
 process.emitWarning = function (w, ...rest) { if (String(w && w.message || w).includes('SQLite')) return; return _emit.call(process, w, ...rest); };
 const { DatabaseSync } = require('node:sqlite');
 
-const VERSION = '1.6.0';
+const VERSION = '1.7.0';
 const PORT = Number(process.env.PORT) || 8686;
 const HOST = process.env.HOST || '0.0.0.0';
 const APP_PATH = (process.env.APP_PATH || '').replace(/\/+$/, '');
@@ -123,6 +123,11 @@ CREATE TABLE IF NOT EXISTS kb_votes (kb_id INTEGER NOT NULL, who TEXT NOT NULL, 
 CREATE TABLE IF NOT EXISTS rewards (
   id INTEGER PRIMARY KEY AUTOINCREMENT, emp_id INTEGER NOT NULL, kind TEXT DEFAULT 'msg', title TEXT, message TEXT, stars INTEGER DEFAULT 0, amount REAL DEFAULT 0,
   style TEXT DEFAULT 'confetti', adj_id INTEGER, by_name TEXT, created_at TEXT, seen_at TEXT, demo INTEGER DEFAULT 0);
+CREATE TABLE IF NOT EXISTS emp_status (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, emp_id INTEGER NOT NULL, center_id INTEGER, center_name TEXT NOT NULL, note TEXT,
+  start_at TEXT NOT NULL, end_at TEXT, ended_by TEXT, lat REAL, lng REAL, dist REAL, demo INTEGER DEFAULT 0);
+CREATE INDEX IF NOT EXISTS ix_status_emp ON emp_status(emp_id, start_at);
+CREATE INDEX IF NOT EXISTS ix_status_open ON emp_status(end_at);
 CREATE TABLE IF NOT EXISTS push_subs (
   id INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT NOT NULL, ref_id INTEGER NOT NULL, endpoint TEXT UNIQUE NOT NULL, p256dh TEXT NOT NULL,
   auth TEXT NOT NULL, ua TEXT, created_at TEXT, last_ok TEXT, fails INTEGER DEFAULT 0);
@@ -193,6 +198,7 @@ const DEFAULT_SETTINGS = {
   signature_required: '0',    // receiver signature on every visit
   company_logo: '',           // uploaded logo (relative path inside uploads)
   punch_mode: 'gps',          // gps | qr_or_gps | qr
+  status_push: '1',           // push the management when a technician becomes busy / available
   daily_summary: '1',         // push a daily summary to the management
   daily_summary_time: '20:00',
   nudge_enabled: '1',         // remind an employee when his location stopped updating
@@ -653,6 +659,16 @@ function seed() {
   seedChat(empIds, t);
   seedV12(empIds, [empIds[4], empIds[6]], today, rnd, t);
   seedV13([empIds[4], empIds[6]], today, t);
+  seedStatus([empIds[4], empIds[6]], today);
+}
+function seedStatus(techs, today) {
+  // one technician busy in a center right now, the other finished a job earlier today
+  const cs = all('SELECT id, name, lat, lng FROM centers WHERE demo = 1 ORDER BY id LIMIT 3'); if (cs.length < 2) return;
+  const nowM = tsMin(nowLocal().ts), dayM = tsMin(today + ' 00:00:00');
+  const at = m => minToTs(Math.max(dayM + 1, Math.round(m)));
+  const ins = 'INSERT INTO emp_status (emp_id, center_id, center_name, start_at, end_at, ended_by, lat, lng, dist, demo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)';
+  run(ins, techs[1], cs[1].id, cs[1].name, at(nowM - 170), at(nowM - 105), 'الفني', cs[1].lat, cs[1].lng, 20);
+  run(ins, techs[0], cs[0].id, cs[0].name, at(nowM - 38), null, null, cs[0].lat, cs[0].lng, 35);
 }
 function seedV13(techs, today, t) {
   const cs = all('SELECT id, name FROM centers ORDER BY id LIMIT 6'); if (!cs.length) return;
@@ -931,6 +947,7 @@ function myHome(emp) {
     plans_today: all(PLAN_SQL + " WHERE p.emp_id = ? AND p.date = ? ORDER BY COALESCE(p.time, '99')", emp.id, now.date).map(planOut),
     punch_mode: SETTINGS.punch_mode, signature_required: SETTINGS.signature_required,
     push_on: !!one("SELECT id FROM push_subs WHERE kind = 'emp' AND ref_id = ? LIMIT 1", emp.id),
+    status: statusOut(curStatus(emp.id)), status_today: statusToday(emp.id, now.date),
   };
 }
 route('GET', '/api/my/home', 'emp', (b, a, c) => {
@@ -983,6 +1000,8 @@ route('POST', '/api/my/punch', 'emp', (b, a) => {
     run('UPDATE attendance SET out_at = ?, out_lat = ?, out_lng = ?, out_acc = ?, out_dist = ?, out_photo = ?, updated_at = ? WHERE id = ?',
       now.ts, hasLoc ? lat : null, hasLoc ? lng : null, acc, dist, ph, now.ts, open.id);
     rec = one('SELECT * FROM attendance WHERE id = ?', open.id);
+    const ended = endStatus(emp.id, now, 'انصراف');
+    if (ended) broadcast('status', { emp_id: emp.id, name: emp.name, busy: false, center: ended.center_name, mins: Math.round(tsMin(now.ts) - tsMin(ended.start_at)), by: 'out' });
   }
   const field = type === 'in' ? 'in_addr' : 'out_addr';
   broadcast('punch', { emp_id: emp.id, name: emp.name, punch: type, time: now.time, dist, radius: site ? site.radius : null });
@@ -1039,6 +1058,7 @@ function bootstrap(a) {
     pm_due: one('SELECT COUNT(*) AS n FROM devices WHERE active = 1 AND next_pm IS NOT NULL AND next_pm <= ?', addDays(nowLocal().date, 14)).n,
     parts: all('SELECT id, name, code, unit, price, active FROM parts ORDER BY name'),
     push_on: !!one("SELECT id FROM push_subs WHERE kind = 'user' AND ref_id = ? LIMIT 1", a.user.id),
+    emp_status: Object.fromEntries(statusBoard().list.map(x => [x.emp_id, { state: x.state, center: x.status ? x.status.center : x.last_center, since: x.status ? x.status.since : x.free_since }])),
   };
 }
 route('GET', '/api/bootstrap', 'user', (b, a) => bootstrap(a));
@@ -1159,6 +1179,7 @@ route('POST', '/api/employees/delete', 'user', (b, a) => {
     run('DELETE FROM part_moves WHERE emp_id = ?', id); run('DELETE FROM advances WHERE emp_id = ?', id); run('DELETE FROM payroll_adj WHERE emp_id = ?', id);
     run("DELETE FROM push_subs WHERE kind = 'emp' AND ref_id = ?", id); run('UPDATE tasks SET emp_id = NULL WHERE emp_id = ?', id);
     run('DELETE FROM plans WHERE emp_id = ?', id); run('UPDATE kb SET emp_id = NULL WHERE emp_id = ?', id); run('DELETE FROM rewards WHERE emp_id = ?', id);
+    run('DELETE FROM emp_status WHERE emp_id = ?', id);
     run('DELETE FROM employees WHERE id = ?', id);
   });
   photos.forEach(deletePhoto);
@@ -1362,7 +1383,7 @@ route('POST', '/api/users/delete', 'user', (b, a) => {
   run("DELETE FROM sessions WHERE kind = 'user' AND ref_id = ?", id); run('DELETE FROM users WHERE id = ?', id); return { ok: true };
 });
 
-const BACKUP_TABLES = ['settings', 'users', 'departments', 'shifts', 'sites', 'employees', 'roster', 'attendance', 'leaves', 'holidays', 'centers', 'visits', 'messages', 'locations', 'devices', 'tasks', 'parts', 'part_moves', 'advances', 'payroll_adj', 'plans', 'kb', 'kb_votes', 'rewards'];
+const BACKUP_TABLES = ['settings', 'users', 'departments', 'shifts', 'sites', 'employees', 'roster', 'attendance', 'leaves', 'holidays', 'centers', 'visits', 'messages', 'locations', 'devices', 'tasks', 'parts', 'part_moves', 'advances', 'payroll_adj', 'plans', 'kb', 'kb_votes', 'rewards', 'emp_status'];
 function makeBackup(withPhotos) {
   const out = { app: 'emdadx-attendance', version: VERSION, at: nowLocal().ts, tables: {} };
   for (const t of BACKUP_TABLES) out.tables[t] = all(`SELECT * FROM ${t}`);
@@ -1429,6 +1450,7 @@ route('POST', '/api/demo/clear', 'user', (b, a) => {
       run('DELETE FROM part_moves WHERE emp_id = ?', id); run('DELETE FROM advances WHERE emp_id = ?', id); run('DELETE FROM payroll_adj WHERE emp_id = ?', id);
       run('DELETE FROM tasks WHERE emp_id = ?', id); run("DELETE FROM push_subs WHERE kind = 'emp' AND ref_id = ?", id);
       run('DELETE FROM plans WHERE emp_id = ?', id); run('DELETE FROM rewards WHERE emp_id = ?', id);
+      run('DELETE FROM emp_status WHERE emp_id = ?', id);
     }
     run('DELETE FROM kb WHERE demo = 1'); run('DELETE FROM kb_votes WHERE kb_id NOT IN (SELECT id FROM kb)');
     run('DELETE FROM employees WHERE demo = 1');
@@ -1648,14 +1670,16 @@ route('GET', '/api/live', 'user', () => {
   const centers = all('SELECT id, name, lat, lng, radius FROM centers WHERE active = 1 AND lat IS NOT NULL');
   const sites = new Map(all('SELECT * FROM sites').map(x => [x.id, x]));
   const depts = new Map(all('SELECT id, name, color FROM departments').map(x => [x.id, x]));
+  const busyMap = new Map(all(STATUS_SQL + ' WHERE s.end_at IS NULL').map(r => [r.emp_id, r]));
   const list = [];
   for (const e of all('SELECT * FROM employees WHERE active = 1 ORDER BY name')) {
     const o = open.get(e.id), l = last.get(e.id);
-    if (!o && !l) continue;
+    if (!o && !l && !busyMap.has(e.id)) continue;
     const site = sites.get(e.site_id);
     const item = {
       emp_id: e.id, name: e.name, code: e.code, job: e.job, photo: e.photo, phone: e.phone, dept: (depts.get(e.dept_id) || {}).name || null,
       working: !!o, in_at: o ? o.in_at : null, tracking: trackAllowed(e), visits_today: vis.get(e.id) || 0, pings_today: pings.get(e.id) || 0,
+      busy: busyMap.has(e.id) ? statusOut(busyMap.get(e.id)) : null,
       last: l ? { lat: l.lat, lng: l.lng, acc: l.acc, at: l.at, kind: l.kind, battery: l.battery } : (o && o.in_lat !== null ? { lat: o.in_lat, lng: o.in_lng, acc: o.in_acc, at: o.in_at, kind: 'in', battery: null } : null),
     };
     if (item.last) {
@@ -2634,6 +2658,134 @@ function dailySummary() {
 }
 route('GET', '/api/summary/today', 'user', () => dailySummary());
 const nudged = new Map();
+/* ===================================================== v1.7: technician status (busy / available) === */
+// A technician taps "أنا شغال" + picks the center he is working in -> busy (red).
+// He taps "خلصت" -> available (green). The management sees it live + gets a push.
+const STATUS_SQL = `SELECT s.*, c.name AS c_name, c.area AS c_area, c.lat AS c_lat, c.lng AS c_lng, c.radius AS c_radius
+  FROM emp_status s LEFT JOIN centers c ON c.id = s.center_id`;
+const minsAr = m => { m = Math.max(0, Math.round(m)); if (m < 60) return `${m} د`; const h = Math.floor(m / 60); return `${h} س${m % 60 ? ' و' + (m % 60) + ' د' : ''}`; };
+function curStatus(empId) { return one(STATUS_SQL + ' WHERE s.emp_id = ? AND s.end_at IS NULL ORDER BY s.id DESC LIMIT 1', Number(empId)) || null; }
+function statusOut(s) {
+  if (!s) return null;
+  const radius = Math.max(s.c_radius || 300, 150);
+  return { id: s.id, center_id: s.center_id, center: s.c_name || s.center_name, area: s.c_area || null, since: s.start_at, note: s.note || null,
+    dist: s.dist ?? null, far: s.dist !== null && s.dist !== undefined && s.dist > radius * 1.5 };
+}
+function endStatus(empId, now, by) {
+  const s = curStatus(empId); if (!s) return null;
+  run('UPDATE emp_status SET end_at = ?, ended_by = ? WHERE emp_id = ? AND end_at IS NULL', now.ts, by, Number(empId));
+  return s;
+}
+// today's finished jobs only (the running one is added on the phone so the payload stays stable)
+function statusToday(empId, date) {
+  const rows = all('SELECT start_at, end_at FROM emp_status WHERE emp_id = ? AND start_at >= ?', Number(empId), date + ' 00:00:00');
+  return { jobs: rows.length, done_mins: Math.round(rows.filter(r => r.end_at).reduce((t, r) => t + tsMin(r.end_at) - tsMin(r.start_at), 0)) };
+}
+function statusBoard() {
+  const now = nowLocal(), nowM = tsMin(now.ts), dayStart = now.date + ' 00:00:00', dayM = tsMin(dayStart);
+  const limit = minToTs(nowM - Number(SETTINGS.open_hours || 16) * 60);
+  const open = new Map(all('SELECT emp_id, in_at FROM attendance WHERE out_at IS NULL AND in_at >= ?', limit).map(r => [r.emp_id, r]));
+  const lastOut = new Map(all('SELECT emp_id, MAX(out_at) AS o FROM attendance WHERE out_at >= ? GROUP BY emp_id', dayStart).map(r => [r.emp_id, r.o]));
+  const cur = new Map(all(STATUS_SQL + ' WHERE s.end_at IS NULL').map(r => [r.emp_id, r]));
+  const day = new Map();
+  for (const r of all('SELECT * FROM emp_status WHERE start_at >= ? OR end_at >= ? OR end_at IS NULL ORDER BY start_at', dayStart, dayStart)) {
+    let t = day.get(r.emp_id); if (!t) day.set(r.emp_id, t = { jobs: 0, mins: 0, last: null });
+    if (r.start_at >= dayStart) t.jobs++;
+    if (r.end_at) { t.mins += tsMin(r.end_at) - Math.max(tsMin(r.start_at), dayM); if (!t.last || r.end_at >= t.last.end_at) t.last = r; }
+  }
+  const depts = new Map(all('SELECT id, name, color FROM departments').map(x => [x.id, x]));
+  // field staff only (technicians / engineers) — office staff never show up on this board
+  const fieldIds = new Set([
+    ...all('SELECT DISTINCT emp_id AS id FROM emp_status'), ...all('SELECT DISTINCT emp_id AS id FROM visits WHERE date >= ?', addDays(now.date, -90)),
+    ...all('SELECT DISTINCT emp_id AS id FROM tasks WHERE emp_id IS NOT NULL'), ...all('SELECT DISTINCT emp_id AS id FROM plans'),
+  ].map(r => r.id));
+  const list = [];
+  for (const e of all('SELECT id, name, code, job, photo, phone, dept_id FROM employees WHERE active = 1 ORDER BY name')) {
+    const c = cur.get(e.id), t = day.get(e.id) || { jobs: 0, mins: 0, last: null }, o = open.get(e.id), le = t.last;
+    if (!c && !fieldIds.has(e.id) && !/فني|صيان|مهندس|تقني|ميدان/.test(`${e.job || ''} ${(depts.get(e.dept_id) || {}).name || ''}`)) continue;
+    let state = 'off', free_since = null;
+    if (c) state = 'busy';
+    else if (o) { state = 'free'; free_since = le && le.end_at > o.in_at ? le.end_at : o.in_at; }
+    else if (le && !(lastOut.get(e.id) && lastOut.get(e.id) >= le.end_at)) { state = 'free'; free_since = le.end_at; }
+    const dp = depts.get(e.dept_id);
+    list.push({
+      emp_id: e.id, name: e.name, code: e.code, job: e.job, photo: e.photo, phone: e.phone, dept: dp ? dp.name : null,
+      state, status: statusOut(c), free_since, last_center: le ? le.center_name : null, in_at: o ? o.in_at : null,
+      jobs_today: t.jobs, busy_mins_today: Math.round(t.mins + (c ? nowM - Math.max(tsMin(c.start_at), dayM) : 0)),
+    });
+  }
+  const rank = { busy: 0, free: 1, off: 2 };
+  list.sort((x, y) => (rank[x.state] - rank[y.state]) || (x.state === 'busy' ? x.status.since.localeCompare(y.status.since) : x.state === 'free' ? String(y.free_since).localeCompare(String(x.free_since)) : x.name.localeCompare(y.name, 'ar')));
+  return { now, list, counts: { busy: list.filter(x => x.state === 'busy').length, free: list.filter(x => x.state === 'free').length, off: list.filter(x => x.state === 'off').length }, push: SETTINGS.status_push === '1' };
+}
+function statusPush(data) { if (SETTINGS.status_push === '1') pushAdmins({ url: './#/dashboard', ...data }); }
+route('POST', '/api/my/status', 'emp', (b, a) => {
+  const emp = a.emp; const now = nowLocal();
+  const prev = curStatus(emp.id);
+  if (!b.busy) {
+    if (!prev) return { ok: true, status: null, already: true };
+    endStatus(emp.id, now, 'الفني');
+    const mins = Math.round(tsMin(now.ts) - tsMin(prev.start_at)), center = prev.c_name || prev.center_name;
+    const visited = !!one('SELECT id FROM visits WHERE emp_id = ? AND at >= ? AND (center_id = ? OR center_name = ?) LIMIT 1', emp.id, prev.start_at, prev.center_id, center);
+    broadcast('status', { emp_id: emp.id, name: emp.name, busy: false, center, mins });
+    notifyEmp(emp.id, 'status');
+    statusPush({ title: `🟢 ${emp.name} بقى متاح`, body: `خلّص شغله في ${center} بعد ${minsAr(mins)}`, tag: 'status-' + emp.id });
+    return { ok: true, status: null, ended: { ...statusOut(prev), mins, visited } };
+  }
+  let center = num(b.center_id) ? one('SELECT * FROM centers WHERE id = ?', num(b.center_id)) : null;
+  const cname = str(b.center_name, 120);
+  if (!center && cname) center = one('SELECT * FROM centers WHERE name = ? COLLATE NOCASE', cname);
+  if (!center && !cname) fail(400, 'اختار المركز اللي أنت فيه');
+  if (!center) {
+    const r = run('INSERT INTO centers (name, created_by, created_at) VALUES (?, ?, ?)', cname, emp.name, now.ts);
+    center = one('SELECT * FROM centers WHERE id = ?', Number(r.lastInsertRowid));
+    audit(emp.name, 'center.auto', cname); broadcast('centers');
+  }
+  if (prev && prev.center_id === center.id) return { ok: true, status: statusOut(prev), same: true };
+  const lat = num(b.lat), lng = num(b.lng);
+  const dist = lat !== null && lng !== null && center.lat !== null ? Math.round(haversine(lat, lng, center.lat, center.lng)) : null;
+  tx(() => {
+    if (prev) run('UPDATE emp_status SET end_at = ?, ended_by = ? WHERE emp_id = ? AND end_at IS NULL', now.ts, 'غيّر المركز', emp.id);
+    run('INSERT INTO emp_status (emp_id, center_id, center_name, note, start_at, lat, lng, dist) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', emp.id, center.id, center.name, str(b.note, 200), now.ts, lat, lng, dist);
+  });
+  const st = statusOut(curStatus(emp.id));
+  const from = prev ? (prev.c_name || prev.center_name) : null;
+  broadcast('status', { emp_id: emp.id, name: emp.name, busy: true, center: center.name, from, far: st.far, dist });
+  notifyEmp(emp.id, 'status');
+  statusPush({ title: `🔴 ${emp.name} مشغول`, body: `${from ? `نقل من ${from} لـ ` : 'في '}${center.name}${st.far ? ` — موبايله بعيد عن المركز ${dist >= 1000 ? (dist / 1000).toFixed(1) + ' كم' : dist + ' م'}` : ''}`, tag: 'status-' + emp.id });
+  return { ok: true, status: st };
+});
+route('GET', '/api/status', 'user', () => statusBoard());
+route('GET', '/api/status/log', 'user', (b, a, c) => {
+  const id = Number(c.url.searchParams.get('emp')), date = c.url.searchParams.get('date') || nowLocal().date;
+  if (!isDate(date)) fail(400, 'التاريخ غير صحيح');
+  const e = one('SELECT id, name, code, job, photo, phone FROM employees WHERE id = ?', id); if (!e) fail(404, 'الموظف مش موجود');
+  const nowM = tsMin(nowLocal().ts);
+  const rows = all(STATUS_SQL + ' WHERE s.emp_id = ? AND s.start_at >= ? AND s.start_at < ? ORDER BY s.start_at DESC', id, date + ' 00:00:00', addDays(date, 1) + ' 00:00:00')
+    .map(r => ({ ...statusOut(r), end_at: r.end_at, ended_by: r.ended_by, mins: Math.round((r.end_at ? tsMin(r.end_at) : nowM) - tsMin(r.start_at)) }));
+  return { emp: e, date, rows, current: statusOut(curStatus(id)) };
+});
+route('POST', '/api/status/clear', 'user', (b, a) => {
+  const id = Number(b.emp_id); const e = one('SELECT id, name FROM employees WHERE id = ?', id); if (!e) fail(404, 'الموظف مش موجود');
+  const now = nowLocal(); const s = endStatus(id, now, a.who);
+  if (!s) return { ok: true, already: true };
+  const mins = Math.round(tsMin(now.ts) - tsMin(s.start_at));
+  audit(a.who, 'status.clear', `${e.name} — ${s.center_name}`);
+  broadcast('status', { emp_id: id, name: e.name, busy: false, center: s.c_name || s.center_name, mins, by: a.who });
+  notifyEmp(id, 'status', { by: a.who });
+  pushEmp(id, { title: '🟢 حالتك بقت متاح', body: `${a.who} خلّى حالتك متاح (كنت مشغول في ${s.c_name || s.center_name})`, url: './?emp', tag: 'status' });
+  return { ok: true };
+});
+// a status left open (forgot to tap "خلصت" and never checked out) closes itself after the max shift length
+function statusAutoEnd(now) {
+  const limit = minToTs(tsMin(now.ts) - Number(SETTINGS.open_hours || 16) * 60);
+  for (const s of all('SELECT s.*, e.name FROM emp_status s JOIN employees e ON e.id = s.emp_id WHERE s.end_at IS NULL AND s.start_at < ?', limit)) {
+    run("UPDATE emp_status SET end_at = ?, ended_by = 'تلقائي' WHERE id = ?", now.ts, s.id);
+    broadcast('status', { emp_id: s.emp_id, name: s.name, busy: false, center: s.center_name, auto: true });
+    notifyEmp(s.emp_id, 'status');
+  }
+}
+
 function minuteJobs() {
   try {
     const now = nowLocal();
@@ -2642,6 +2794,7 @@ function minuteJobs() {
       const s = dailySummary(); pushAdmins({ title: s.title, body: s.text, url: './#/dashboard', tag: 'summary' }); broadcast('summary', s);
     }
     planReminders(now);
+    statusAutoEnd(now);
     if (SETTINGS.nudge_enabled === '1' && SETTINGS.track_enabled === '1' && Number(now.time.slice(3, 5)) % 5 === 0) {
       const iv = trackInterval(), nowM = tsMin(now.ts);
       const limit = minToTs(nowM - Number(SETTINGS.open_hours || 16) * 60);
