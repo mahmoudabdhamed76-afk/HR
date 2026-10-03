@@ -1,5 +1,5 @@
 /* EmdadX Attendance — Service Worker (app shell cache + push notifications; never caches the API) */
-const CACHE = 'emdadx-att-v4';
+const CACHE = 'emdadx-att-v5';
 const SHELL = ['./', 'index.html', 'manifest.json', 'icon.svg'];
 
 self.addEventListener('install', e => {

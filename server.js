@@ -13,7 +13,7 @@ const _emit = process.emitWarning;
 process.emitWarning = function (w, ...rest) { if (String(w && w.message || w).includes('SQLite')) return; return _emit.call(process, w, ...rest); };
 const { DatabaseSync } = require('node:sqlite');
 
-const VERSION = '1.2.0';
+const VERSION = '1.3.0';
 const PORT = Number(process.env.PORT) || 8686;
 const HOST = process.env.HOST || '0.0.0.0';
 const APP_PATH = (process.env.APP_PATH || '').replace(/\/+$/, '');
@@ -112,6 +112,14 @@ CREATE TABLE IF NOT EXISTS advances (
   start_month TEXT NOT NULL, note TEXT, by_name TEXT, created_at TEXT);
 CREATE TABLE IF NOT EXISTS payroll_adj (
   id INTEGER PRIMARY KEY AUTOINCREMENT, emp_id INTEGER NOT NULL, month TEXT NOT NULL, kind TEXT NOT NULL, amount REAL NOT NULL, note TEXT, by_name TEXT, created_at TEXT);
+CREATE TABLE IF NOT EXISTS plans (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, emp_id INTEGER NOT NULL, center_id INTEGER, center_name TEXT, date TEXT NOT NULL, time TEXT, note TEXT,
+  remind_min INTEGER DEFAULT 30, series TEXT, status TEXT DEFAULT 'planned', visit_id INTEGER, notified_at TEXT, created_by TEXT, demo INTEGER DEFAULT 0, created_at TEXT, updated_at TEXT);
+CREATE INDEX IF NOT EXISTS ix_plans_date ON plans(date, emp_id);
+CREATE TABLE IF NOT EXISTS kb (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, code TEXT, model TEXT, problem TEXT NOT NULL, solution TEXT NOT NULL, emp_id INTEGER, author TEXT,
+  center_id INTEGER, center_name TEXT, visit_id INTEGER, votes INTEGER DEFAULT 0, views INTEGER DEFAULT 0, demo INTEGER DEFAULT 0, created_at TEXT, updated_at TEXT);
+CREATE TABLE IF NOT EXISTS kb_votes (kb_id INTEGER NOT NULL, who TEXT NOT NULL, at TEXT, PRIMARY KEY (kb_id, who));
 CREATE TABLE IF NOT EXISTS push_subs (
   id INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT NOT NULL, ref_id INTEGER NOT NULL, endpoint TEXT UNIQUE NOT NULL, p256dh TEXT NOT NULL,
   auth TEXT NOT NULL, ua TEXT, created_at TEXT, last_ok TEXT, fails INTEGER DEFAULT 0);
@@ -136,6 +144,10 @@ for (const sql of [
   "ALTER TABLE visits ADD COLUMN rated_at TEXT",
   "ALTER TABLE visits ADD COLUMN client_at TEXT",
   "ALTER TABLE visits ADD COLUMN parts_used TEXT",
+  "ALTER TABLE visits ADD COLUMN fault_code TEXT",
+  "ALTER TABLE visits ADD COLUMN fault_model TEXT",
+  "ALTER TABLE visits ADD COLUMN fault_desc TEXT",
+  "ALTER TABLE visits ADD COLUMN plan_id INTEGER",
 ]) { try { db.exec(sql); } catch { /* already exists */ } }
 
 const stmtCache = new Map();
@@ -171,6 +183,7 @@ const DEFAULT_SETTINGS = {
   track_enabled: '1',         // live location while checked in
   track_interval: '15',       // minutes between location updates
   signature_required: '0',    // receiver signature on every visit
+  company_logo: '',           // uploaded logo (relative path inside uploads)
   punch_mode: 'gps',          // gps | qr_or_gps | qr
   daily_summary: '1',         // push a daily summary to the management
   daily_summary_time: '20:00',
@@ -631,6 +644,29 @@ function seed() {
   seedLive(empIds, [empIds[4], empIds[6]], today, rnd);
   seedChat(empIds, t);
   seedV12(empIds, [empIds[4], empIds[6]], today, rnd, t);
+  seedV13([empIds[4], empIds[6]], today, t);
+}
+function seedV13(techs, today, t) {
+  const cs = all('SELECT id, name FROM centers ORDER BY id LIMIT 6'); if (!cs.length) return;
+  const nm = id => (one('SELECT name FROM employees WHERE id = ?', id) || {}).name;
+  const K = 'INSERT INTO kb (code, model, problem, solution, emp_id, author, center_id, center_name, votes, demo, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,1,?,?)';
+  const cases = [
+    ['E-104', 'Fuji DryPix 6000', 'خطوط بيضاء طولية على الفيلم', 'رأس الطباعة الحرارية عليه أتربة. نظفته بقطعة قطن وكحول أيزوبروبيل في اتجاه واحد، وسيبته 5 دقايق ينشف، وعملت Test Print — الخطوط اختفت.', 0, 0, 6],
+    ['E-104', 'Fuji DryPix 6000', 'خطوط بيضاء على الفيلم بعد التنظيف', 'لو التنظيف منفعش: رول الضغط (Platen Roller) مخدوش. غيرته وعملت معايرة كثافة من قائمة الصيانة.', 1, 1, 3],
+    ['J-21', 'Agfa Drystar 5302', 'الفيلم بيتزنق جوه الطابعة (Paper Jam)', 'الدرج مش راكب على آخره والأفلام فيها رطوبة. طلعت الأفلام وقلبت الرزمة ونضفت رولات السحب، ونبهت المركز يقفل علبة الأفلام كويس.', 0, 2, 5],
+    ['', 'Carestream DryView 5950', 'الصورة باهتة والكثافة ضعيفة', 'عملت Densitometer Calibration من قائمة الخدمة واتظبطت قيمة Dmax — اتأكدت إن نوع الفيلم في الإعدادات مطابق للعلبة.', 1, 3, 4],
+    ['N-03', 'Konica Drypro 873', 'الطابعة مش ظاهرة على الشبكة من جهاز الأشعة', 'الـ IP اتغير بعد ما الراوتر فصل. ثبّت IP للطابعة وراجعت AE Title والبورت 104 على المودالتي وعملت DICOM Echo — اشتغلت.', 0, 4, 7],
+    ['E-104', 'Fuji DryPix 6000', 'خطوط على الفيلم', 'تنظيف رأس الطباعة بالكحول حل المشكلة — المركز بيشتغل في مكان فيه تراب، نصحتهم بغطا للطابعة.', 1, 5, 2],
+    ['T-12', 'Fuji DryPix 6000', 'الطابعة بتفصل وتدي إنذار حرارة', 'مروحة التبريد واقفة. غيرتها من العهدة ونضفت فتحات التهوية — درجة الحرارة رجعت طبيعي.', 0, 1, 4],
+  ];
+  tx(() => {
+    cases.forEach((c, i) => { const e = techs[c[4] % techs.length], cen = cs[c[5] % cs.length], ts = addDays(today, -(3 + i * 5)) + ' 13:' + String(10 + i).padStart(2, '0') + ':00';
+      run(K, c[0] || null, c[1], c[2], c[3], e, nm(e), cen.id, cen.name, c[6], ts, ts); });
+    const P = "INSERT INTO plans (emp_id, center_id, center_name, date, time, note, remind_min, status, created_by, demo, created_at, updated_at) VALUES (?,?,?,?,?,?,30,'planned',?,1,?,?)";
+    [[0, 0, 0, '10:00', 'متابعة الطابعة بعد تغيير الرول'], [0, 2, 1, '12:30', 'صيانة دورية'], [1, 3, 0, '11:00', 'توريد أفلام وفحص'], [1, 1, 2, '09:30', ''], [0, 4, 3, '13:00', 'معايرة كثافة']].forEach(x => {
+      const e = techs[x[0]], cen = cs[x[1] % cs.length]; run(P, e, cen.id, cen.name, addDays(today, x[2]), x[3], x[4] || null, nm(e), t, t);
+    });
+  });
 }
 function seedV12(empIds, techs, today, rnd, t) {
   const salaries = { 'مدير عام': 18000, 'محاسبة': 9000, 'مندوب مبيعات': 8000, 'مندوبة مبيعات': 8000, 'خدمة عملاء': 7000, 'مهندس صيانة': 12500, 'مسؤولة موارد بشرية': 9500, 'فني صيانة': 9000, 'فرد أمن': 6000 };
@@ -792,7 +828,7 @@ function route(method, p, auth, fn) { routes.set(method + ' ' + p, { auth, fn })
 const needAdmin = a => { if (a.user.role !== 'admin') fail(403, 'الصلاحية دي للمدير بس'); };
 
 route('GET', '/api/ping', null, () => ({ ok: true, version: VERSION, time: nowLocal() }));
-route('GET', '/api/public-info', null, () => ({ company_name: SETTINGS.company_name, company_sub: SETTINGS.company_sub, version: VERSION, demo: !!one('SELECT id FROM employees WHERE demo = 1 LIMIT 1') }));
+route('GET', '/api/public-info', null, () => ({ company_name: SETTINGS.company_name, company_sub: SETTINGS.company_sub, version: VERSION, logo: logoVer(), demo: !!one('SELECT id FROM employees WHERE demo = 1 LIMIT 1') }));
 
 route('POST', '/api/login', null, (b, a, ctx) => {
   rateLimit(ctx.ip + '|' + (b.mode || ''));
@@ -870,6 +906,7 @@ function myHome(emp) {
     last_ping: (one('SELECT at FROM locations WHERE emp_id = ? ORDER BY id DESC LIMIT 1', emp.id) || {}).at || null,
     decided: all("SELECT id, type, status, from_date, to_date, reply, decided_at FROM leaves WHERE emp_id = ? AND status <> 'pending' AND decided_at >= ? ORDER BY decided_at DESC LIMIT 3", emp.id, addDays(now.date, -3)),
     tasks: myTasks(emp.id), custody: custodyOf(emp.id),
+    plans_today: all(PLAN_SQL + " WHERE p.emp_id = ? AND p.date = ? ORDER BY COALESCE(p.time, '99')", emp.id, now.date).map(planOut),
     punch_mode: SETTINGS.punch_mode, signature_required: SETTINGS.signature_required,
     push_on: !!one("SELECT id FROM push_subs WHERE kind = 'emp' AND ref_id = ? LIMIT 1", emp.id),
   };
@@ -1094,6 +1131,7 @@ route('POST', '/api/employees/delete', 'user', (b, a) => {
     run('DELETE FROM messages WHERE emp_id = ?', id); run('DELETE FROM locations WHERE emp_id = ?', id);
     run('DELETE FROM part_moves WHERE emp_id = ?', id); run('DELETE FROM advances WHERE emp_id = ?', id); run('DELETE FROM payroll_adj WHERE emp_id = ?', id);
     run("DELETE FROM push_subs WHERE kind = 'emp' AND ref_id = ?", id); run('UPDATE tasks SET emp_id = NULL WHERE emp_id = ?', id);
+    run('DELETE FROM plans WHERE emp_id = ?', id); run('UPDATE kb SET emp_id = NULL WHERE emp_id = ?', id);
     run('DELETE FROM employees WHERE id = ?', id);
   });
   photos.forEach(deletePhoto);
@@ -1168,6 +1206,8 @@ route('GET', '/api/dashboard', 'user', () => {
     tasks_open: all(TASK_SQL + " WHERE t.status IN ('new','accepted','onway','arrived') ORDER BY CASE t.priority WHEN 'urgent' THEN 0 ELSE 1 END, t.due_at LIMIT 8").map(taskOut),
     pm_due: pmDue(14).slice(0, 8),
     top: (() => { const f = today.slice(0, 8) + '01'; return withScores(summarize(rangeRows(f, today, {})), f, today).filter(s => s.score !== null).sort((x, y) => y.score - x.score).slice(0, 5); })(),
+    recurring: kbRecurring().slice(0, 5),
+    plans_today: one("SELECT COUNT(*) AS n, SUM(status = 'done') AS d FROM plans WHERE date = ?", today),
     rating_avg: (one("SELECT AVG(rating) AS r, COUNT(rating) AS n FROM visits WHERE rating IS NOT NULL AND date >= ?", addDays(today, -30)) || {}),
   };
 });
@@ -1295,7 +1335,7 @@ route('POST', '/api/users/delete', 'user', (b, a) => {
   run("DELETE FROM sessions WHERE kind = 'user' AND ref_id = ?", id); run('DELETE FROM users WHERE id = ?', id); return { ok: true };
 });
 
-const BACKUP_TABLES = ['settings', 'users', 'departments', 'shifts', 'sites', 'employees', 'roster', 'attendance', 'leaves', 'holidays', 'centers', 'visits', 'messages', 'locations', 'devices', 'tasks', 'parts', 'part_moves', 'advances', 'payroll_adj'];
+const BACKUP_TABLES = ['settings', 'users', 'departments', 'shifts', 'sites', 'employees', 'roster', 'attendance', 'leaves', 'holidays', 'centers', 'visits', 'messages', 'locations', 'devices', 'tasks', 'parts', 'part_moves', 'advances', 'payroll_adj', 'plans', 'kb', 'kb_votes'];
 function makeBackup(withPhotos) {
   const out = { app: 'emdadx-attendance', version: VERSION, at: nowLocal().ts, tables: {} };
   for (const t of BACKUP_TABLES) out.tables[t] = all(`SELECT * FROM ${t}`);
@@ -1361,7 +1401,9 @@ route('POST', '/api/demo/clear', 'user', (b, a) => {
       run('DELETE FROM roster WHERE emp_id = ?', id); run("DELETE FROM sessions WHERE kind = 'emp' AND ref_id = ?", id);
       run('DELETE FROM part_moves WHERE emp_id = ?', id); run('DELETE FROM advances WHERE emp_id = ?', id); run('DELETE FROM payroll_adj WHERE emp_id = ?', id);
       run('DELETE FROM tasks WHERE emp_id = ?', id); run("DELETE FROM push_subs WHERE kind = 'emp' AND ref_id = ?", id);
+      run('DELETE FROM plans WHERE emp_id = ?', id);
     }
+    run('DELETE FROM kb WHERE demo = 1'); run('DELETE FROM kb_votes WHERE kb_id NOT IN (SELECT id FROM kb)');
     run('DELETE FROM employees WHERE demo = 1');
     run('DELETE FROM devices WHERE demo = 1');
     run('DELETE FROM parts WHERE id NOT IN (SELECT DISTINCT part_id FROM part_moves)');
@@ -1412,6 +1454,7 @@ route('GET', '/api/my/visits', 'emp', (b, a) => {
     settings: { photo_quality: SETTINGS.photo_quality, photo_camera_only: SETTINGS.photo_camera_only, photo_required: SETTINGS.photo_required, signature_required: SETTINGS.signature_required },
     center_devices: all('SELECT d.id, d.center_id, d.name, d.brand, d.model, d.serial, d.next_pm FROM devices d JOIN centers c ON c.id = d.center_id WHERE d.active = 1 AND c.active = 1 ORDER BY d.name'),
     custody: custodyOf(a.emp.id), tasks: myTasks(a.emp.id),
+    kb_models: all("SELECT model, COUNT(*) AS n FROM kb WHERE model IS NOT NULL AND model <> '' GROUP BY model ORDER BY n DESC LIMIT 40").map(r => r.model),
   };
 });
 route('POST', '/api/my/visit', 'emp', (b, a) => {
@@ -1446,7 +1489,7 @@ route('POST', '/api/my/visit', 'emp', (b, a) => {
   const devName = device ? [device.name, device.serial ? 'S/N ' + device.serial : ''].filter(Boolean).join(' — ') : str(b.device, 100);
   const parts = (Array.isArray(b.parts) ? b.parts : []).map(x => ({ part: one('SELECT * FROM parts WHERE id = ?', num(x.part_id)), qty: Math.abs(Number(x.qty) || 0) })).filter(x => x.part && x.qty > 0).slice(0, 20);
   const token = crypto.randomBytes(12).toString('base64url');
-  let id;
+  let id, kbNew = null, planDone = false;
   tx(() => {
     const r = run(`INSERT INTO visits (emp_id, date, at, center_id, center_name, work_type, device, details, result, receiver_name, receiver_role, receiver_phone, arrived_at, lat, lng, acc, dist, photo, photo_size, signature, device_id, task_id, rate_token, client_at, parts_used, created_at, updated_at)
       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
@@ -1460,7 +1503,19 @@ route('POST', '/api/my/visit', 'emp', (b, a) => {
       run('UPDATE devices SET last_pm = ?, next_pm = ? WHERE id = ?', at.slice(0, 10), addMonths(at.slice(0, 10), device.pm_months || 3), device.id);
     }
     if (task) run("UPDATE tasks SET status = 'done', done_at = ?, visit_id = ?, updated_at = ? WHERE id = ?", now.ts, id, now.ts, task.id);
+    // fault info + knowledge base + schedule
+    const fcode = str(b.fault_code, 40), fmodel = str(b.fault_model, 80), fdesc = str(b.fault_desc, 300) || (task ? task.title : null);
+    run('UPDATE visits SET fault_code = ?, fault_model = ?, fault_desc = ? WHERE id = ?', fcode, fmodel, fdesc, id);
+    if (b.save_kb && (fcode || fdesc)) {
+      kbInsert({ code: fcode, model: fmodel, problem: fdesc || fcode, solution: details, emp_id: emp.id, author: emp.name, center_id: center.id, center_name: center.name, visit_id: id }, now);
+      kbNew = { author: emp.name, code: fcode, problem: fdesc || fcode, model: fmodel };
+    }
+    const plan = num(b.plan_id) ? one("SELECT * FROM plans WHERE id = ? AND emp_id = ? AND status = 'planned'", num(b.plan_id), emp.id)
+      : one("SELECT * FROM plans WHERE emp_id = ? AND date = ? AND status = 'planned' AND (center_id = ? OR center_name = ?) ORDER BY time LIMIT 1", emp.id, at.slice(0, 10), center.id, center.name);
+    if (plan) { run("UPDATE plans SET status = 'done', visit_id = ?, updated_at = ? WHERE id = ?", id, now.ts, plan.id); run('UPDATE visits SET plan_id = ? WHERE id = ?', plan.id, id); planDone = true; }
   });
+  if (kbNew) kbNotify(kbNew, emp.id);
+  if (planDone) broadcast('plan', {});
   broadcast('visit', { name: emp.name, center: center.name });
   if (task) { broadcast('task', { id: task.id, name: emp.name, status: 'done' }); pushAdmins({ title: `✅ ${emp.name} خلّص مهمة`, body: `${task.title} — ${center.name}`, url: './#/tasks', tag: 'task' }); }
   if (hasLoc) logLocation(emp, now, lat, lng, acc, null, 'visit');
@@ -2058,10 +2113,10 @@ textarea{width:100%;border:1.5px solid #e2e9f4;border-radius:12px;padding:10px;f
 .btn.g{background:#f7c12d;color:#0a2357}.ok{color:#14955a;font-weight:900;font-size:17px}.ft{text-align:center;color:#6b7a99;font-size:12px;padding:12px}
 .acts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 @media print{body{background:#fff;padding:0}.w{box-shadow:none;border-radius:0}.noprint{display:none!important}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body>
-<div class="w"><div class="h"><div class="lg">${htmlEsc(String(SETTINGS.company_name || 'E').slice(0, 1))}</div><div><b>${htmlEsc(SETTINGS.company_name)}</b><span>تقرير زيارة صيانة</span></div></div>
+<div class="w"><div class="h"><div class="lg">${SETTINGS.company_logo ? `<img src="${base}/logo?v=${logoVer()}" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:14px;background:#fff;padding:4px">` : htmlEsc(String(SETTINGS.company_name || 'E').slice(0, 1))}</div><div><b>${htmlEsc(SETTINGS.company_name)}</b><span>تقرير زيارة صيانة</span></div></div>
 <div class="c"><div><h1>${htmlEsc(v.center)}</h1><div class="sub">${htmlEsc(v.area || '')} • ${htmlEsc(v.date)} — ${t12s(v.at)}</div></div>
 <div><span class="chip" style="background:${res[1]}">${res[0]}</span></div>
-<div class="kv"><span>الفني</span><b>${htmlEsc(v.emp_name || '')}</b>${v.work_type ? `<span>نوع الشغل</span><b>${htmlEsc(v.work_type)}</b>` : ''}${v.device ? `<span>الجهاز</span><b>${htmlEsc(v.device)}</b>` : ''}${v.arrived_at ? `<span>الوصول</span><b>${t12s('0000-00-00 ' + v.arrived_at)}</b>` : ''}<span>الانتهاء</span><b>${t12s(v.at)}</b><span>المستلم</span><b>${htmlEsc(v.receiver_name || '—')}${v.receiver_role ? ' — ' + htmlEsc(v.receiver_role) : ''}</b></div>
+<div class="kv"><span>الفني</span><b>${htmlEsc(v.emp_name || '')}</b>${v.work_type ? `<span>نوع الشغل</span><b>${htmlEsc(v.work_type)}</b>` : ''}${v.device ? `<span>الجهاز</span><b>${htmlEsc(v.device)}</b>` : ''}${v.fault_model ? `<span>الموديل</span><b>${htmlEsc(v.fault_model)}</b>` : ''}${v.fault_desc ? `<span>العطل</span><b>${htmlEsc(v.fault_desc)}${v.fault_code ? ' (' + htmlEsc(v.fault_code) + ')' : ''}</b>` : ''}${v.arrived_at ? `<span>الوصول</span><b>${t12s('0000-00-00 ' + v.arrived_at)}</b>` : ''}<span>الانتهاء</span><b>${t12s(v.at)}</b><span>المستلم</span><b>${htmlEsc(v.receiver_name || '—')}${v.receiver_role ? ' — ' + htmlEsc(v.receiver_role) : ''}</b></div>
 <div class="sec">الشغل اللي اتعمل</div><div class="det">${htmlEsc(v.details || '')}</div>
 ${parts.length ? `<div class="sec">قطع الغيار المستخدمة</div><table><tr><th>الصنف</th><th>الكمية</th></tr>${parts.map(p => `<tr><td>${htmlEsc(p.name)}</td><td>${htmlEsc(p.qty)} ${htmlEsc(p.unit || '')}</td></tr>`).join('')}</table>` : ''}
 ${v.photo ? `<div class="sec">صورة الإثبات</div><img class="ph" src="${base}/v/${token}/photo" alt="">` : ''}
@@ -2091,6 +2146,225 @@ route('GET', '/api/visit-link', 'any', (b, a, c) => {
   return { path: APP_PATH + '/v/' + tk };
 });
 
+/* ---------- Company logo (shown on login, sidebar, reports, kiosk) ---------- */
+const logoVer = () => SETTINGS.company_logo ? crypto.createHash('md5').update(SETTINGS.company_logo).digest('hex').slice(0, 8) : null;
+function checkLogo(dataUrl) {
+  const m = /^data:image\/(png|jpeg|jpg|webp);base64,([A-Za-z0-9+/=]+)$/.exec(String(dataUrl || ''));
+  if (!m) fail(400, 'اللوجو لازم يكون صورة PNG أو JPG');
+  const buf = Buffer.from(m[2], 'base64');
+  if (buf.length < 100 || buf.length > 400 * 1024) fail(400, 'حجم اللوجو كبير');
+  const png = buf.readUInt32BE(0) === 0x89504E47, jpg = buf[0] === 0xFF && buf[1] === 0xD8, webp = buf.subarray(8, 12).toString() === 'WEBP';
+  if (!png && !jpg && !webp) fail(400, 'ملف اللوجو غير صالح');
+  return { buf, ext: png ? '.png' : jpg ? '.jpg' : '.webp' };
+}
+route('POST', '/api/settings/logo', 'user', (b, a) => {
+  needAdmin(a);
+  const old = SETTINGS.company_logo;
+  const rel = b.image ? savePhoto(checkLogo(b.image)).rel : '';
+  run("INSERT OR REPLACE INTO settings (key, value) VALUES ('company_logo', ?)", rel); loadSettings();
+  if (old && old !== rel) deletePhoto(old);
+  audit(a.who, 'settings.logo', rel ? 'upload' : 'remove'); broadcast('settings'); notifyAllEmps('settings');
+  return { ok: true, logo: logoVer() };
+});
+
+/* ---------- Technician's own visit schedule (plans) + reminders ---------- */
+const PLAN_SQL = `SELECT p.*, e.name AS emp_name, e.photo AS emp_photo, e.code AS emp_code, c.name AS c_name, c.area AS c_area, c.lat AS c_lat, c.lng AS c_lng
+  FROM plans p LEFT JOIN employees e ON e.id = p.emp_id LEFT JOIN centers c ON c.id = p.center_id`;
+function planOut(p) {
+  const today = nowLocal().date;
+  const st = p.status === 'planned' && p.date < today ? 'missed' : p.status;
+  return { ...p, center: p.c_name || p.center_name || '—', state: st };
+}
+route('GET', '/api/my/plans', 'emp', (b, a) => {
+  const d = nowLocal().date;
+  return { rows: all(PLAN_SQL + ' WHERE p.emp_id = ? AND p.date BETWEEN ? AND ? ORDER BY p.date, COALESCE(p.time, \'99\')', a.emp.id, addDays(d, -7), addDays(d, 120)).map(planOut) };
+});
+route('POST', '/api/my/plans/save', 'emp', (b, a) => {
+  const emp = a.emp; const now = nowLocal();
+  let center = num(b.center_id) ? one('SELECT * FROM centers WHERE id = ?', num(b.center_id)) : null;
+  const cname = str(b.center_name, 120);
+  if (!center && cname) center = one('SELECT * FROM centers WHERE name = ? COLLATE NOCASE', cname);
+  if (!center && !cname) fail(400, 'اختار المركز');
+  if (!isDate(b.date)) fail(400, 'اختار اليوم');
+  if (b.date < now.date) fail(400, 'مينفعش تجدول في يوم فات');
+  const time = isTime(b.time) ? b.time.slice(0, 5) : null;
+  const remind = [0, 15, 30, 60, 120, 1440].includes(Number(b.remind_min)) ? Number(b.remind_min) : 30;
+  const note = str(b.note, 300);
+  if (Number(b.id)) {
+    const p = one('SELECT * FROM plans WHERE id = ? AND emp_id = ?', Number(b.id), emp.id); if (!p) fail(404, 'الميعاد مش موجود');
+    run('UPDATE plans SET center_id = ?, center_name = ?, date = ?, time = ?, note = ?, remind_min = ?, notified_at = NULL, updated_at = ? WHERE id = ?',
+      center ? center.id : null, center ? center.name : cname, b.date, time, note, remind, now.ts, p.id);
+    broadcast('plan', { name: emp.name, center: center ? center.name : cname, date: b.date, edit: true });
+    return { ok: true };
+  }
+  const rep = ['weekly', 'monthly'].includes(b.repeat) ? b.repeat : 'none';
+  const count = rep === 'none' ? 1 : Math.max(2, Math.min(rep === 'weekly' ? 12 : 6, Number(b.count) || 4));
+  const series = rep === 'none' ? null : crypto.randomBytes(6).toString('hex');
+  tx(() => { for (let i = 0; i < count; i++) {
+    const d = rep === 'weekly' ? addDays(b.date, 7 * i) : rep === 'monthly' ? addMonths(b.date, i) : b.date;
+    run("INSERT INTO plans (emp_id, center_id, center_name, date, time, note, remind_min, series, status, created_by, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,'planned',?,?,?)",
+      emp.id, center ? center.id : null, center ? center.name : cname, d, time, note, remind, series, emp.name, now.ts, now.ts);
+  } });
+  broadcast('plan', { name: emp.name, center: center ? center.name : cname, date: b.date, n: count });
+  return { ok: true, count };
+});
+route('POST', '/api/my/plans/delete', 'emp', (b, a) => {
+  const p = one('SELECT * FROM plans WHERE id = ? AND emp_id = ?', Number(b.id), a.emp.id); if (!p) fail(404, 'الميعاد مش موجود');
+  if (b.series && p.series) run("DELETE FROM plans WHERE series = ? AND emp_id = ? AND status = 'planned' AND date >= ?", p.series, a.emp.id, p.date);
+  else run('DELETE FROM plans WHERE id = ?', p.id);
+  broadcast('plan', {}); return { ok: true };
+});
+route('GET', '/api/plans', 'user', (b, a, c) => {
+  const q = c.url.searchParams; const d = nowLocal().date;
+  let from = isDate(q.get('from')) ? q.get('from') : d, to = isDate(q.get('to')) ? q.get('to') : addDays(d, 6);
+  if (to < from) [from, to] = [to, from];
+  let rows = all(PLAN_SQL + ' WHERE p.date BETWEEN ? AND ? ORDER BY p.date, COALESCE(p.time, \'99\'), e.name LIMIT 3000', from, to).map(planOut);
+  if (q.get('emp')) rows = rows.filter(r => String(r.emp_id) === q.get('emp'));
+  const counts = { all: rows.length, planned: 0, done: 0, missed: 0 };
+  for (const r of rows) counts[r.state] = (counts[r.state] || 0) + 1;
+  return { from, to, rows, counts };
+});
+route('POST', '/api/plans/delete', 'user', (b, a) => { run('DELETE FROM plans WHERE id = ?', Number(b.id)); audit(a.who, 'plan.delete', b.id); broadcast('plan', {}); return { ok: true }; });
+function planReminders(now) {
+  const nowM = tsMin(now.ts);
+  for (const p of all(PLAN_SQL + " WHERE p.status = 'planned' AND p.notified_at IS NULL AND p.date BETWEEN ? AND ?", now.date, addDays(now.date, 1))) {
+    const at = tsMin(p.date + ' ' + (p.time || '08:00') + ':00') - (p.time ? (p.remind_min ?? 30) : 0);
+    if (nowM < at || nowM - at > 180) continue;
+    run('UPDATE plans SET notified_at = ? WHERE id = ?', now.ts, p.id);
+    const center = p.c_name || p.center_name;
+    const when = p.date === now.date ? 'النهارده' : 'بكرة';
+    pushEmp(p.emp_id, { title: `⏰ تذكير: زيارة ${center}`, body: `${when}${p.time ? ' الساعة ' + t12s(p.date + ' ' + p.time) : ''}${p.note ? ' • ' + p.note : ''}`, url: './?emp&tab=visits', tag: 'plan' + p.id });
+    notifyEmp(p.emp_id, 'plan_remind', { id: p.id, center, time: p.time, note: p.note });
+  }
+}
+
+/* ---------- Fault knowledge base + smart assistant (shared between all engineers) ---------- */
+const AR_STOP = new Set(['في', 'من', 'على', 'علي', 'عن', 'الى', 'الي', 'و', 'او', 'ثم', 'مع', 'ده', 'دي', 'دا', 'هو', 'هي', 'انا', 'اللي', 'الذي', 'التي', 'لما', 'لو', 'بعد', 'قبل', 'كان', 'بقى', 'ازاي', 'ايه', 'اية', 'فيه', 'فية', 'مش', 'لا', 'ما', 'بس', 'جدا', 'عند', 'عشان', 'علشان', 'حل', 'مشكله', 'عطل', 'the', 'a', 'of', 'and', 'is', 'to']);
+function arNorm(s) {
+  return String(s || '').toLowerCase().replace(/[ً-ٰٟـ]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي')
+    .replace(/[٠-٩]/g, d => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/[^\p{L}\p{N}\s-]/gu, ' ');
+}
+const codeNorm = s => arNorm(s).replace(/[\s-]+/g, '').toUpperCase();
+function arTokens(s) {
+  const out = new Set();
+  for (let w of arNorm(s).split(/[\s-]+/)) {
+    if (!w || AR_STOP.has(w)) continue;
+    if (w.length > 4 && w.startsWith('ال')) w = w.slice(2);
+    else if (w.length > 5 && /^(وال|بال|فال|كال)/.test(w)) w = w.slice(3);
+    if (w.length > 4 && /(ات|ين|ون|ها|هم)$/.test(w)) w = w.slice(0, -2);
+    if (w.length >= 2 && !AR_STOP.has(w)) out.add(w);
+  }
+  return out;
+}
+const KB_GENERIC = new Set(['طابعه', 'طابعات', 'جهاز', 'اجهزه', 'مركز', 'فيلم', 'افلام', 'اشعه', 'صوره', 'شغال', 'بيطلع', 'بتطلع', 'بيعمل', 'بتعمل']);
+const KB_SQL = 'SELECT k.*, e.photo AS emp_photo FROM kb k LEFT JOIN employees e ON e.id = k.emp_id';
+function kbSearch(q, limit = 20, who = '') {
+  const rows = all(KB_SQL + ' ORDER BY k.updated_at DESC LIMIT 3000');
+  const qt = arTokens(q), qc = codeNorm(q), qcodes = new Set([...arNorm(q).split(/\s+/)].map(codeNorm).filter(x => /\d/.test(x) && x.length >= 2));
+  if (qc && /\d/.test(qc) && qc.length <= 12) qcodes.add(qc);
+  const voted = who ? new Set(all('SELECT kb_id FROM kb_votes WHERE who = ?', who).map(r => r.kb_id)) : new Set();
+  const docs = rows.map(r => ({ r, tp: arTokens(r.problem + ' ' + (r.model || '')), ts: arTokens(r.solution) }));
+  const df = new Map(); for (const d of docs) for (const t of new Set([...d.tp, ...d.ts])) df.set(t, (df.get(t) || 0) + 1);
+  const N = docs.length || 1, idf = t => Math.max(0.02, Math.log((N + 1) / ((df.get(t) || 0) + 0.5))) ** 2 * (KB_GENERIC.has(t) ? 0.3 : 1);
+  const scored = [];
+  for (const { r, tp, ts } of docs) {
+    let sc = 0; const rc = codeNorm(r.code);
+    if (rc && qcodes.has(rc)) sc += 100;
+    for (const t of qt) {
+      const w = idf(t);
+      if (tp.has(t)) sc += 16 * w; else if (ts.has(t)) sc += 6 * w;
+      else if (t.length >= 3 && [...tp].some(x => x.startsWith(t) || t.startsWith(x))) sc += 7 * w;
+    }
+    if (sc < 1.5) continue;
+    scored.push({ ...r, score: sc, voted: voted.has(r.id) });
+  }
+  const top = Math.max(0, ...scored.map(x => x.score));
+  const out = scored.filter(x => x.score >= top * 0.5).map(x => ({ ...x, score: Math.round(x.score * (1 + Math.min(0.3, (x.votes || 0) * 0.03))) }));
+  out.sort((x, y) => y.score - x.score || (y.votes || 0) - (x.votes || 0) || String(y.updated_at).localeCompare(String(x.updated_at)));
+  return out.slice(0, limit);
+}
+function kbAnswer(q, res) {
+  if (!String(q || '').trim()) return '';
+  if (!res.length) return 'مفيش حل متسجل للعطل ده لسه. لما تحله سجّل الحل (من الزيارة أو من "إضافة حل") علشان زمايلك يستفيدوا.';
+  const best = res[0], same = res.filter(r => r.code && codeNorm(r.code) === codeNorm(best.code)).length;
+  let t = best.code ? `العطل ${best.code}${best.model ? ' في ' + best.model : ''} اتسجل قبل كده${same > 1 ? ' ' + same + ' مرات' : ''}.` : `لقيت ${res.length} حالة شبه المشكلة دي.`;
+  t += ` أنسب حل${best.votes ? ` (${best.votes} ${best.votes > 2 && best.votes < 11 ? 'مهندسين' : 'مهندس'} قالوا إنه نفع)` : ''}: ${best.solution}`;
+  t += ` — ${best.author || 'مهندس'}${best.center_name ? '، ' + best.center_name : ''}.`;
+  return t;
+}
+function kbRecurring(days = 60) {
+  const from = addDays(nowLocal().date, -days);
+  const ev = [
+    ...all('SELECT code, model, problem, center_id, center_name, substr(created_at,1,10) AS d FROM kb WHERE created_at >= ?', from),
+    ...all("SELECT fault_code AS code, fault_model AS model, fault_desc AS problem, center_id, center_name, date AS d FROM visits WHERE date >= ? AND (fault_code IS NOT NULL AND fault_code <> '') AND id NOT IN (SELECT visit_id FROM kb WHERE visit_id IS NOT NULL)", from),
+  ];
+  const g = new Map();
+  for (const e of ev) {
+    const key = e.code ? 'C:' + codeNorm(e.code) : 'P:' + [...arTokens(e.problem)].sort().slice(0, 4).join(' ');
+    if (key === 'P:') continue;
+    if (!g.has(key)) g.set(key, { code: e.code || null, model: e.model || null, problem: e.problem, count: 0, centers: new Map(), last: '' });
+    const x = g.get(key); x.count++; x.last = e.d > x.last ? e.d : x.last; if (!x.model && e.model) x.model = e.model;
+    const cn = e.center_name || '—'; x.centers.set(cn, (x.centers.get(cn) || 0) + 1);
+  }
+  return [...g.values()].filter(x => x.count >= 2).map(x => {
+    const centers = [...x.centers.entries()].sort((a, b) => b[1] - a[1]);
+    return { code: x.code, model: x.model, problem: x.problem, count: x.count, last: x.last, centers: centers.map(([name, n]) => ({ name, n })), same_center: centers[0] && centers[0][1] >= 2 ? centers[0][0] : null };
+  }).sort((a, b) => b.count - a.count || b.last.localeCompare(a.last)).slice(0, 12);
+}
+const kbWho = a => a.kind === 'emp' ? 'e' + a.emp.id : 'u' + a.user.id;
+route('GET', '/api/kb', 'any', (b, a, c) => {
+  const q = c.url.searchParams.get('q') || '';
+  const who = kbWho(a);
+  if (q.trim()) { const res = kbSearch(q, 25, who); return { q, rows: res, answer: kbAnswer(q, res) }; }
+  const voted = new Set(all('SELECT kb_id FROM kb_votes WHERE who = ?', who).map(r => r.kb_id));
+  return {
+    rows: all(KB_SQL + ' ORDER BY k.updated_at DESC LIMIT 300').map(r => ({ ...r, voted: voted.has(r.id) })),
+    recurring: kbRecurring(), models: all("SELECT model, COUNT(*) AS n FROM kb WHERE model IS NOT NULL AND model <> '' GROUP BY model ORDER BY n DESC LIMIT 40").map(r => r.model),
+    total: one('SELECT COUNT(*) AS n FROM kb').n,
+  };
+});
+function kbInsert(x, now) {
+  const r = run('INSERT INTO kb (code, model, problem, solution, emp_id, author, center_id, center_name, visit_id, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+    x.code || null, x.model || null, x.problem, x.solution, x.emp_id || null, x.author || null, x.center_id || null, x.center_name || null, x.visit_id || null, now.ts, now.ts);
+  return Number(r.lastInsertRowid);
+}
+function kbNotify(entry, authorEmp) {
+  const d = { author: entry.author, code: entry.code, problem: entry.problem, model: entry.model };
+  broadcast('kb', d);
+  sseSend(c => c.kind === 'emp' && c.id !== authorEmp, { type: 'kb', ...d });
+}
+route('POST', '/api/kb/save', 'any', (b, a) => {
+  const now = nowLocal();
+  const problem = str(b.problem, 300), solution = str(b.solution, 3000);
+  if (!problem) fail(400, 'اكتب المشكلة أو العطل'); if (!solution) fail(400, 'اكتب الحل');
+  const x = { code: str(b.code, 40), model: str(b.model, 80), problem, solution };
+  if (Number(b.id)) {
+    const k = one('SELECT * FROM kb WHERE id = ?', Number(b.id)); if (!k) fail(404, 'مش موجود');
+    if (a.kind === 'emp' && k.emp_id !== a.emp.id) fail(403, 'تقدر تعدّل الحلول اللي إنت كاتبها بس');
+    run('UPDATE kb SET code = ?, model = ?, problem = ?, solution = ?, updated_at = ? WHERE id = ?', x.code || null, x.model || null, x.problem, x.solution, now.ts, k.id);
+    broadcast('kb', {}); notifyAllEmps('kb', {}); return { ok: true, id: k.id };
+  }
+  const author = a.kind === 'emp' ? a.emp.name : (a.user.name || a.user.username);
+  const center = num(b.center_id) ? one('SELECT id, name FROM centers WHERE id = ?', num(b.center_id)) : null;
+  const id = kbInsert({ ...x, emp_id: a.kind === 'emp' ? a.emp.id : null, author, center_id: center ? center.id : null, center_name: center ? center.name : str(b.center_name, 120) }, now);
+  kbNotify({ ...x, author }, a.kind === 'emp' ? a.emp.id : 0);
+  return { ok: true, id };
+});
+route('POST', '/api/kb/delete', 'any', (b, a) => {
+  const k = one('SELECT * FROM kb WHERE id = ?', Number(b.id)); if (!k) fail(404, 'مش موجود');
+  if (a.kind === 'emp' && k.emp_id !== a.emp.id) fail(403, 'تقدر تمسح الحلول اللي إنت كاتبها بس');
+  run('DELETE FROM kb WHERE id = ?', k.id); run('DELETE FROM kb_votes WHERE kb_id = ?', k.id);
+  broadcast('kb', {}); notifyAllEmps('kb', {}); return { ok: true };
+});
+route('POST', '/api/kb/vote', 'any', (b, a) => {
+  const k = one('SELECT * FROM kb WHERE id = ?', Number(b.id)); if (!k) fail(404, 'مش موجود');
+  const who = kbWho(a);
+  const had = one('SELECT kb_id FROM kb_votes WHERE kb_id = ? AND who = ?', k.id, who);
+  if (had) run('DELETE FROM kb_votes WHERE kb_id = ? AND who = ?', k.id, who); else run('INSERT INTO kb_votes (kb_id, who, at) VALUES (?, ?, ?)', k.id, who, nowLocal().ts);
+  const n = one('SELECT COUNT(*) AS n FROM kb_votes WHERE kb_id = ?', k.id).n; run('UPDATE kb SET votes = ? WHERE id = ?', n, k.id);
+  return { ok: true, votes: n, voted: !had };
+});
+
 /* ---------- QR kiosk (rotating code on a screen at the site) ---------- */
 function kioskSecret() { if (!SETTINGS._kiosk_secret) setSecret('_kiosk_secret', crypto.randomBytes(24).toString('hex')); return SETTINGS._kiosk_secret; }
 const hmac = (msg, n = 16) => crypto.createHmac('sha256', kioskSecret()).update(msg).digest('base64url').slice(0, n);
@@ -2109,7 +2383,7 @@ route('GET', '/api/kiosk/link', 'user', (b, a, c) => { needAdmin(a); const site 
 route('GET', '/api/kiosk/qr', null, (b, a, c) => {
   const site = kioskSite(c.url.searchParams.get('k'));
   const nowS = Date.now() / 1000, slot = Math.floor(nowS / QR_SLOT);
-  return { site: site.name, company: SETTINGS.company_name, token: qrToken(site.id, slot), ttl: Math.round((slot + 1) * QR_SLOT - nowS), slot_sec: QR_SLOT, now: nowLocal(), mode: SETTINGS.punch_mode };
+  return { site: site.name, company: SETTINGS.company_name, logo: logoVer(), token: qrToken(site.id, slot), ttl: Math.round((slot + 1) * QR_SLOT - nowS), slot_sec: QR_SLOT, now: nowLocal(), mode: SETTINGS.punch_mode };
 });
 route('GET', '/api/kiosk/feed', null, (b, a, c) => {
   const site = kioskSite(c.url.searchParams.get('k')); const d = nowLocal().date;
@@ -2139,6 +2413,7 @@ function minuteJobs() {
       setSecret('_summary_sent', now.date);
       const s = dailySummary(); pushAdmins({ title: s.title, body: s.text, url: './#/dashboard', tag: 'summary' }); broadcast('summary', s);
     }
+    planReminders(now);
     if (SETTINGS.nudge_enabled === '1' && SETTINGS.track_enabled === '1' && Number(now.time.slice(3, 5)) % 5 === 0) {
       const iv = trackInterval(), nowM = tsMin(now.ts);
       const limit = minToTs(nowM - Number(SETTINGS.open_hours || 16) * 60);
@@ -2198,6 +2473,15 @@ const server = http.createServer(async (req, res) => {
   }
   if (req.method === 'OPTIONS') {
     return send(res, 204, '', { 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Authorization, Content-Type, X-Client-Id', 'Access-Control-Max-Age': '86400' });
+  }
+  if (p === '/logo' && req.method === 'GET') {
+    const f = photoFile(SETTINGS.company_logo);
+    if (!f) { res.writeHead(404); return res.end(); }
+    return fs.stat(f, (err, st) => {
+      if (err) { res.writeHead(404); return res.end(); }
+      res.writeHead(200, { 'Content-Type': f.endsWith('.png') ? 'image/png' : f.endsWith('.webp') ? 'image/webp' : 'image/jpeg', 'Content-Length': st.size, 'Cache-Control': 'public, max-age=3600' });
+      fs.createReadStream(f).pipe(res);
+    });
   }
   const vm = /^\/v\/([A-Za-z0-9_-]{8,40})(\/(photo|sign))?$/.exec(p);
   if (vm && req.method === 'GET') {
