@@ -13,7 +13,7 @@ const _emit = process.emitWarning;
 process.emitWarning = function (w, ...rest) { if (String(w && w.message || w).includes('SQLite')) return; return _emit.call(process, w, ...rest); };
 const { DatabaseSync } = require('node:sqlite');
 
-const VERSION = '1.4.0';
+const VERSION = '1.5.0';
 const PORT = Number(process.env.PORT) || 8686;
 const HOST = process.env.HOST || '0.0.0.0';
 const APP_PATH = (process.env.APP_PATH || '').replace(/\/+$/, '');
@@ -671,6 +671,13 @@ function seedV13(techs, today, t) {
     cases.forEach((c, i) => { const e = techs[c[4] % techs.length], cen = cs[c[5] % cs.length], ts = addDays(today, -(3 + i * 5)) + ' 13:' + String(10 + i).padStart(2, '0') + ':00';
       run(K, c[0] || null, c[1], c[2], c[3], e, nm(e), cen.id, cen.name, c[6], ts, ts); });
     run("INSERT INTO rewards (emp_id, kind, title, message, stars, amount, style, by_name, created_at, demo) VALUES (?, 'stars', ?, ?, 5, 0, 'trophy', 'مدير النظام', ?, 1)", techs[0], 'نجم الأسبوع 🏆', 'شكرًا على مجهودك الأسبوع ده — المراكز كلها بتشكر في شغلك، وأسرع وقت استجابة في الفريق. كمّل كده يا بطل!', t);
+    // a live "on the way" demo: the accepted task becomes on-the-way with a GPS trail heading to its center
+    const tk = one("SELECT t.*, c.lat AS clat, c.lng AS clng FROM tasks t JOIN centers c ON c.id = t.center_id WHERE t.status = 'accepted' AND c.lat IS NOT NULL LIMIT 1");
+    if (tk) {
+      const nowM = tsMin(nowLocal().ts), sLat = 30.0444, sLng = 31.2357;
+      run("UPDATE tasks SET status = 'onway', onway_at = ? WHERE id = ?", minToTs(nowM - 16), tk.id);
+      [[16, 0], [11, 0.25], [6, 0.48], [1, 0.62]].forEach(([ago, f]) => run("INSERT INTO locations (emp_id, at, lat, lng, acc, battery, kind) VALUES (?, ?, ?, ?, 15, 71, 'ping')", tk.emp_id, minToTs(nowM - ago), sLat + (tk.clat - sLat) * f, sLng + (tk.clng - sLng) * f));
+    }
     const c0 = cs[1 % cs.length];
     run("INSERT INTO tasks (center_id, center_name, title, details, priority, emp_id, status, created_by, source, reporter_name, reporter_phone, track_token, created_at, updated_at) VALUES (?,?,?,?,?,NULL,'new',?,'center',?,?,?,?,?)",
       c0.id, c0.name, 'الطابعة مش بتسحب الفيلم', 'الطابعة مش بتسحب الفيلم وبتطلع صوت تكتكة، والشغل واقف', 'urgent', 'أ. ياسمين (المركز)', 'أ. ياسمين', '01012345678', crypto.randomBytes(12).toString('base64url'), t, t);
@@ -2521,6 +2528,49 @@ route('POST', '/api/my/rewards/seen', 'emp', (b, a) => {
   const r = one('SELECT * FROM rewards WHERE id = ? AND emp_id = ?', Number(b.id), a.emp.id); if (!r) fail(404, 'مش موجودة');
   if (!r.seen_at) { run('UPDATE rewards SET seen_at = ? WHERE id = ?', nowLocal().ts, r.id); broadcast('reward_seen', { name: a.emp.name, title: r.title }); }
   return { ok: true };
+});
+
+/* ---------- Live routes board: who is heading to which center, how far, ETA ---------- */
+route('GET', '/api/live/routes', 'user', () => {
+  const now = nowLocal(), nowM = tsMin(now.ts), iv = trackInterval(), day0 = now.date + ' 00:00:00';
+  const lastLoc = id => one('SELECT * FROM locations WHERE emp_id = ? AND at >= ? ORDER BY at DESC, id DESC LIMIT 1', id, day0);
+  const lanes = [], used = new Set();
+  const mk = (e, dest, st, from, extra) => {
+    const l = lastLoc(e.id);
+    const lane = { emp_id: e.id, name: e.name, photo: e.photo, state: st, dest, ...extra, last_at: l ? l.at : null, age_min: l ? Math.round(nowM - tsMin(l.at)) : null };
+    if (l && dest.lat !== null && dest.lat !== undefined) {
+      const cur = Math.round(haversine(l.lat, l.lng, dest.lat, dest.lng));
+      const pts = from ? all('SELECT lat, lng, at FROM locations WHERE emp_id = ? AND at >= ? ORDER BY at, id', e.id, from) : [];
+      let start = pts.length ? Math.round(haversine(pts[0].lat, pts[0].lng, dest.lat, dest.lng)) : cur;
+      for (const p of pts) start = Math.max(start, Math.round(haversine(p.lat, p.lng, dest.lat, dest.lng)));
+      start = Math.max(start, cur, 1);
+      const recent = all('SELECT lat, lng, at FROM locations WHERE emp_id = ? AND at >= ? ORDER BY at DESC, id DESC LIMIT 2', e.id, day0);
+      let speed = null;
+      if (recent.length === 2) { const dt = tsMin(recent[0].at) - tsMin(recent[1].at); if (dt >= 1 && dt <= iv * 3) speed = Math.min(90, Math.round(haversine(recent[0].lat, recent[0].lng, recent[1].lat, recent[1].lng) / 1000 / (dt / 60))); }
+      const near = cur <= Math.max(dest.radius || 250, 150);
+      if (st === 'arrived' || (near && st !== 'plan')) { lane.state = 'arrived'; lane.progress = 1; }
+      else lane.progress = Math.max(0, Math.min(0.98, 1 - cur / start));
+      lane.dist = cur; lane.start = start; lane.speed = speed;
+      lane.eta_min = lane.state === 'arrived' ? 0 : Math.round(cur / 1000 / (speed && speed >= 4 ? speed : 25) * 60);
+    } else { lane.progress = st === 'arrived' ? 1 : 0; lane.dist = null; }
+    lane.stale = lane.age_min === null || lane.age_min > iv * 2 + 5;
+    lanes.push(lane); used.add(e.id);
+  };
+  for (const t of all(TASK_SQL + " WHERE t.status IN ('arrived','onway','accepted') AND t.emp_id IS NOT NULL ORDER BY CASE t.status WHEN 'onway' THEN 0 WHEN 'arrived' THEN 1 ELSE 2 END, t.updated_at DESC")) {
+    if (used.has(t.emp_id)) continue;
+    const e = one('SELECT id, name, photo FROM employees WHERE id = ?', t.emp_id); if (!e) continue;
+    const c = t.center_id ? one('SELECT name, lat, lng, radius FROM centers WHERE id = ?', t.center_id) : null;
+    mk(e, { name: (c && c.name) || t.center_name || '—', lat: c ? c.lat : null, lng: c ? c.lng : null, radius: c ? c.radius : null }, t.status, t.onway_at || t.accepted_at,
+      { kind: 'task', task_id: t.id, title: t.title, priority: t.priority, at: t.arrived_at || t.onway_at || t.accepted_at });
+  }
+  for (const p of all(PLAN_SQL + " WHERE p.date = ? AND p.status = 'planned' ORDER BY COALESCE(p.time, '99')", now.date)) {
+    if (used.has(p.emp_id) || p.c_lat === null) continue;
+    const c = one('SELECT radius FROM centers WHERE id = ?', p.center_id) || {};
+    mk({ id: p.emp_id, name: p.emp_name, photo: p.emp_photo }, { name: p.c_name || p.center_name, lat: p.c_lat, lng: p.c_lng, radius: c.radius }, 'plan', null, { kind: 'plan', plan_id: p.id, title: p.note || 'زيارة من جدوله', time: p.time });
+  }
+  const limit = minToTs(nowM - Number(SETTINGS.open_hours || 16) * 60);
+  const idle = all('SELECT e.id AS emp_id, e.name, e.photo FROM attendance a JOIN employees e ON e.id = a.emp_id WHERE a.out_at IS NULL AND a.in_at >= ? AND e.active = 1 ORDER BY e.name', limit).filter(x => !used.has(x.emp_id));
+  return { now, interval: iv, lanes: lanes.slice(0, 8), more: Math.max(0, lanes.length - 8), idle };
 });
 
 /* ---------- QR kiosk (rotating code on a screen at the site) ---------- */

@@ -1064,6 +1064,79 @@ img,video,canvas,iframe{max-width:100%}
 .cele-amt b{font-size:26px}
 .cele-by{color:#b9c8ec;font-weight:700;font-size:13.5px;margin-top:6px}
 .cele-btn{margin-top:18px;height:52px;padding:0 34px;font-size:17px;border-radius:18px;background:#fff;color:#0a2357;font-weight:900;box-shadow:0 14px 34px -12px rgba(0,0,0,.6)}
+
+/* ================= v1.5: live routes board ================= */
+.routes{position:relative;overflow:hidden;border-radius:26px;padding:18px 20px 16px;margin-bottom:18px;color:#fff;background:radial-gradient(700px 260px at 85% -20%,rgba(91,140,240,.45),transparent 70%),linear-gradient(115deg,#0a2357 0%,#123a86 60%,#1d55c0 100%);box-shadow:0 24px 50px -24px rgba(10,35,87,.75)}
+[data-theme=dark] .routes{background:radial-gradient(700px 260px at 85% -20%,rgba(91,140,240,.3),transparent 70%),linear-gradient(115deg,#0b1d4a 0%,#10306f 60%,#1a4aa8 100%)}
+.routes::after{content:'';position:absolute;bottom:0;right:0;width:200px;height:5px;background:var(--gold)}
+.rt-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.rt-title{display:flex;align-items:center;gap:10px}
+.rt-title h2{font-size:21px;font-weight:900}
+.routes .live{background:rgba(255,255,255,.12);color:#fff}
+.rt-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-inline-start:auto}
+.rt-meta>span,.rt-link{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:5px 11px;font-size:13px;font-weight:800;color:#e6eeff}
+.rt-meta svg.i{width:16px;height:16px;color:var(--gold)}
+.rt-link:hover{background:rgba(255,255,255,.18)}
+.rt-lanes{display:flex;flex-direction:column;gap:10px}
+.rt-lane{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:10px 14px 8px;cursor:pointer;transition:background .2s}
+.rt-lane:hover{background:rgba(255,255,255,.11)}
+.rt-lane.urgent{border-color:rgba(255,107,122,.55)}
+.rt-top{display:flex;align-items:center;gap:10px}
+.rt-who{flex:1;min-width:0}
+.rt-who b{display:block;font-size:14.5px;line-height:1.3}
+.rt-who span{display:block;font-size:12px;color:#b9c8ec;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt-stat{font-size:12.5px;font-weight:800;border-radius:999px;padding:4px 12px;white-space:nowrap;background:rgba(255,255,255,.12)}
+.rt-stat.go{background:rgba(247,193,45,.18);color:#ffd75e}.rt-stat.ok{background:rgba(60,207,134,.2);color:#6ff0ad}
+.rt-stat.warn{background:rgba(255,169,64,.2);color:#ffc06a}.rt-stat.wait,.rt-stat.plan{color:#cfe0ff}
+.rt-road{display:flex;align-items:flex-end;gap:10px;margin-top:4px}
+.rt-home{width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.12);display:grid;place-items:center;flex-shrink:0;margin-bottom:4px}
+.rt-home svg.i{width:18px;height:18px;color:#cfe0ff}
+.rt-way{flex:1;position:relative;height:78px;min-width:0}
+.rt-way::before{content:'';position:absolute;left:0;right:0;bottom:10px;height:10px;border-radius:6px;background:rgba(3,12,36,.55)}
+.rt-way::after{content:'';position:absolute;left:6px;right:6px;bottom:14px;height:2px;background:repeating-linear-gradient(90deg,rgba(255,215,94,.7) 0 12px,transparent 12px 24px);opacity:.7}
+.st-onway:not(.stale) .rt-way::after{animation:roadmv 1s linear infinite}
+@keyframes roadmv{to{background-position:24px 0}}
+.rt-trail{position:absolute;right:0;bottom:10px;height:10px;border-radius:6px;background:linear-gradient(270deg,rgba(247,193,45,.25),rgba(247,193,45,.85));box-shadow:0 0 14px rgba(247,193,45,.55);transition:width 1.2s ease;width:0}
+.rt-man{position:absolute;bottom:14px;right:0;width:42px;height:64px;transition:right 1.2s ease}
+.walker{width:42px;height:64px;overflow:visible;transform:scaleX(-1);filter:drop-shadow(0 4px 6px rgba(0,0,0,.35))}
+.walker line{stroke:#fff;stroke-width:4.2;stroke-linecap:round}
+.walker .w-head{fill:#ffd75e}.walker .w-bag{fill:var(--gold);stroke:#0a2357;stroke-width:1.4}
+.walker .w-leg,.walker .w-arm{transform-box:view-box}
+.walker .w-leg{transform-origin:20px 35px}.walker .w-arm{transform-origin:20px 18px}
+.st-onway:not(.stale) .walker .l1,.rt-empty .walker .l1{animation:legA .7s ease-in-out infinite}
+.st-onway:not(.stale) .walker .l2,.rt-empty .walker .l2{animation:legB .7s ease-in-out infinite}
+.st-onway:not(.stale) .walker .a1{animation:legB .7s ease-in-out infinite}
+.st-onway:not(.stale) .walker .a2{animation:legA .7s ease-in-out infinite}
+.st-onway:not(.stale) .walker .w-all{animation:bobw .35s ease-in-out infinite}
+@keyframes legA{0%,100%{transform:rotate(28deg)}50%{transform:rotate(-28deg)}}
+@keyframes legB{0%,100%{transform:rotate(-28deg)}50%{transform:rotate(28deg)}}
+@keyframes bobw{50%{transform:translateY(-2px)}}
+.rt-empty .walker .w-all{animation:bobw .35s ease-in-out infinite}
+.st-arrived .walker .a1{transform:rotate(-150deg)}.st-arrived .walker .a2{transform:rotate(150deg)}
+.st-arrived .walker .w-all{animation:hop 1.6s ease-in-out infinite}
+@keyframes hop{0%,60%,100%{transform:none}30%{transform:translateY(-6px)}}
+.stale .walker line{stroke:#8b9abd}.stale .walker .w-head{fill:#8b9abd}
+.rt-zz{position:absolute;top:-6px;left:-6px;font-weight:900;color:#b9c8ec;font-size:13px;display:none}
+.stale .rt-zz{display:block;animation:zz 2s ease-in-out infinite}.rt-zz i{font-style:normal;font-size:10px;margin-inline-start:2px}
+@keyframes zz{50%{transform:translateY(-4px);opacity:.5}}
+.rt-dest{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;width:86px;text-align:center}
+.rt-dest>span{font-size:11.5px;font-weight:800;color:#e6eeff;line-height:1.25;max-height:2.6em;overflow:hidden}
+.rt-bld{width:44px;height:44px;position:relative}
+.rt-bld svg{width:100%;height:100%;overflow:visible}
+.rt-bld .b-wall{fill:#e8eefb}.rt-bld .b-roof{fill:none;stroke:#e8eefb;stroke-width:3;stroke-linejoin:round}.rt-bld .b-door{fill:#1b4aa6}.rt-bld .b-win{fill:#9fb7e6}.rt-bld .b-cross{stroke:#dc3545;stroke-width:3;stroke-linecap:round}
+.st-arrived .rt-bld .b-win{fill:#ffd75e}.st-arrived .rt-bld{filter:drop-shadow(0 0 10px rgba(247,193,45,.75))}
+.rt-burst{position:absolute;inset:-10px;border-radius:50%;border:3px solid var(--gold);opacity:0;pointer-events:none}
+.rt-lane.just .rt-burst{animation:burst 1.2s ease-out 2}
+@keyframes burst{0%{transform:scale(.4);opacity:1}100%{transform:scale(1.6);opacity:0}}
+.rt-empty{display:flex;align-items:center;gap:16px;background:rgba(255,255,255,.06);border:1px dashed rgba(255,255,255,.2);border-radius:18px;padding:14px 18px}
+.rt-empty .rt-man{position:relative;right:auto;bottom:auto;flex-shrink:0}
+.rt-empty b{display:block;font-size:15px}.rt-empty span{font-size:12.5px;color:#b9c8ec;line-height:1.7}
+.rt-idle{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:10px}
+.rt-idle:empty{display:none}
+.muted2{font-size:12px;color:#b9c8ec;font-weight:700}
+.rt-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border-radius:999px;padding:2px 10px 2px 3px;font-size:12px;font-weight:700;cursor:pointer}
+.rt-chip .av{width:22px;height:22px;font-size:10px}
+@media (max-width:700px){.routes{padding:14px 12px;border-radius:22px}.rt-title h2{font-size:17px}.rt-meta{margin-inline-start:0;width:100%}.rt-top{flex-wrap:wrap}.rt-stat{order:3;width:100%;white-space:normal;text-align:center}.rt-dest{width:64px}.rt-way{height:62px}}
 </style>
 </head>
 <body>
@@ -1549,7 +1622,7 @@ function deviceId() { let d = LS.get('em_att_device'); if (!d) { d = 'D' + Date.
 async function logout(silent) {
   if (!silent) { try { await api('/api/logout', {}, { noLogout: true }); } catch {} }
   Sync.close(); EmpSync.close(); Tracker.stop();
-  S.token = null; S.kind = null; S.boot = null; S.home = null; S.vis = null; S.trk = null; S.keepTicker = null; Live.data = null;
+  S.token = null; S.kind = null; S.boot = null; S.home = null; S.vis = null; S.trk = null; S.keepTicker = null; Live.data = null; Routes.el = null; Routes.data = null; clearInterval(Routes.timer); clearInterval(Routes.ticker);
   EChat.msgs = null; Chat.cur = null; Chat.msgs = []; S.f = {};
   LS.del('em_att_token'); LS.del('em_att_kind');
   modals.slice().forEach(m => m.close());
@@ -1693,7 +1766,8 @@ const Sync = {
   },
   close() { if (this.es) { this.es.close(); this.es = null; } clearInterval(this.watch); setLive(false); },
   onChange(d) {
-    if (d.type === 'loc') { Live.onLoc(d); return; }
+    if (d.type === 'loc') { Live.onLoc(d); Routes.refreshSoon(); return; }
+    if (d.type === 'task' || d.type === 'plan') Routes.refreshSoon();
     if (d.type === 'chat') { Chat.onEvent(d); return; }
     if (d.type === 'chat_read') { Chat.onRead(d); return; }
     if (d.type === 'punch' || d.type === 'visit') Live.refreshSoon();
@@ -1876,12 +1950,7 @@ PAGES.dashboard = {
     const weak = me.weak_pass ? `<div class="weak-banner">${ic('lock')}<div>كلمة مرور حسابك ضعيفة أو لسه الافتراضية — غيّرها دلوقتي علشان محدش يدخل على البرنامج غيرك.</div><a class="btn btn-sm btn-red" href="#/settings" data-act="weak-fix">${ic('key')} تغيير</a></div>` : '';
     const liveCard = `<div class="card live-card"><div class="card-h"><div class="tile sm t-green">${ic('radar')}</div><div><h3>أماكن الموظفين دلوقتي</h3><p><b data-live-count="working">0</b> في الشغل • <b data-live-count="centers">0</b> في مراكز • تحديث كل ${iv} دقيقة</p></div><div class="act"><span class="live"><i></i>مباشر</span><a class="btn btn-xs btn-soft" href="#/tracking">${ic('route')}<span class="btn-txt">الخريطة الكاملة</span></a></div></div>
       <div class="live-grid"><div class="maphold" data-maphold="dash"><div class="map-msg">${ic('refresh', 'spin')} جاري تحميل الخريطة...</div></div><div class="live-list" data-live-list="dash">${Live.listHtml('dash')}</div></div></div>`;
-    return `${weak}<div data-keep="ticker"></div><section class="hero">
-        <div><div class="hi">${greet}، ${esc(me.name || me.username)} 👋</div><h2>حضور النهارده ${swoosh('#f7c12d', 170)}</h2>
-          <div class="meta"><span>${ic('cal')}${dLong(d.now.date)}</span><span class="bigclock">${ic('clock')}<b class="num" data-clock-sec></b></span><span>${ic('users')}${c.attended} من ${c.expected} حاضرين</span></div></div>
-        <div class="hero-ring"><div class="legend"><span><i style="background:#3fcf86"></i>حاضر ${c.present}</span><span><i style="background:#ffb54f"></i>متأخر ${c.late}</span><span><i style="background:#ff6f7d"></i>غياب ${c.absent + c.not_in}</span><span><i style="background:#aab5ca"></i>لسه ${c.pending}</span></div>
-          <div class="ring"><svg viewBox="0 0 132 132"><circle cx="66" cy="66" r="${R}" stroke="rgba(255,255,255,.14)" stroke-width="12" fill="none"/><circle cx="66" cy="66" r="${R}" stroke="url(#gg)" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}" data-ring="${C * (1 - pct / 100)}" style="transition:stroke-dashoffset 1.2s cubic-bezier(.2,.8,.2,1)"/><defs><linearGradient id="gg" x1="0" x2="1"><stop offset="0" stop-color="#ffd75e"/><stop offset="1" stop-color="#f2b40c"/></linearGradient></defs></svg><div class="v"><b class="ltr" data-count="${pct}">0%</b><span>نسبة الحضور</span></div></div></div>
-      </section>
+    return `${weak}<div data-keep="ticker"></div><div data-keep="routes"></div>
       ${liveCard}
       <div class="kpis">${kpis.map(k => `<button class="kpi" style="--c:var(--${k[0].slice(2)})" data-act="kpi" data-page="${k[5]}" data-st="${k[6]}"><div class="row"><div class="tile ${k[0]}">${ic(k[1])}</div><div class="v ltr" data-count="${k[2]}">0</div></div><div><div class="l">${k[3]}</div><div class="s">${k[4]}</div></div></button>`).join('')}</div>
       <div class="g-dash">
@@ -1909,6 +1978,8 @@ PAGES.dashboard = {
     $$('[data-count]', page).forEach(el => countUp(el, Number(el.dataset.count) || 0, el.textContent.includes('%') ? '%' : '', silent));
     tickClock();
     const th = $('[data-keep=ticker]', page); if (th) keepTicker(th, PAGES.dashboard._tick);
+    const rh = $('[data-keep=routes]', page); if (rh) Routes.mount(rh);
+    if (silent) Routes.refreshSoon();
     (async () => {
       await mountMap('dash', $('[data-maphold=dash]', page));
       if (!silent || !Live.data) { try { await Live.load(); } catch {} }
@@ -3068,13 +3139,13 @@ PAGES.devices = {
     };
     return `<div class="toolbar"><div class="inp-ico" style="min-width:200px;flex:1;max-width:300px">${ic('search')}<input class="inp inp-sm" placeholder="جهاز، سيريال، ماركة..." data-f="dev.q" value="${esc(f.q)}"></div>
         <select class="inp inp-sm" style="width:auto;min-width:170px" data-f="dev.center">${centerOptions(f.center)}</select><span class="sp"></span>
-        <button class="btn btn-sm btn-gold" data-act="dev-stickers">${ic('printer')} طباعة ستيكرات QR</button><button class="btn btn-sm btn-primary" data-act="dev-edit">${ic('plus')} طابعة جديدة</button>${exportBtns()}</div>
+        ${L0.filter(x => x.active).length ? `<a class="btn btn-sm btn-gold" target="_blank" rel="noopener" href="stickers.html?d=${L0.filter(x => x.active).map(x => x.id).join(',')}">${ic('printer')} ستيكرات QR (${L0.filter(x => x.active).length})</a>` : ''}<button class="btn btn-sm btn-primary" data-act="dev-edit">${ic('plus')} طابعة جديدة</button>${exportBtns()}</div>
       <div class="statusbar">${[['', 'الكل', d.rows.length], ['overdue', 'صيانة متأخرة', cnt('overdue')], ['soon', 'خلال أسبوعين', cnt('soon')], ['ok', 'في الميعاد', cnt('ok')], ['none', 'بدون جدول', cnt('none')]].map(x => `<button class="sbtn ${f.pm === x[0] ? 'on' : ''}" data-act="set-status" data-k="dev" data-v="${x[0]}" data-field="pm">${x[1]}<b class="ltr">${x[2]}</b></button>`).join('')}</div>
       ${L0.length ? `<div class="ecards">${L0.map(x => `<div class="ecard ${x.active ? '' : 'off'}"><span class="stripe" style="background:var(--${PMS[x.pm_state][1]})"></span>
           <div class="hd"><div class="tile sm t-blue">${ic('device')}</div><div style="flex:1;min-width:0"><b>${esc(x.name)}</b><span>${esc([x.brand, x.model].filter(Boolean).join(' • ') || '—')}</span></div>${x.serial ? `<span class="chip c-navy ltr">${esc(x.serial)}</span>` : ''}</div>
           <div class="tags">${chip(x.center || '—', 'red', 'hospital')}${chip(pmText(x), PMS[x.pm_state][1], 'calCheck')}${x.faults ? chip(x.faults + ' عطل', 'orange', 'alert') : ''}</div>
           <div class="kv"><span>كل</span><b>${x.pm_months ? x.pm_months + ' شهور' : '—'}</b><span>آخر صيانة</span><b>${x.last_pm ? dShort(x.last_pm) : '—'}</b><span>الجاية</span><b>${x.next_pm ? dShort(x.next_pm) : '—'}</b><span>الزيارات</span><b>${x.visits}${x.last_visit ? ' • آخرها ' + dShort(x.last_visit) : ''}</b></div>
-          <div class="ft"><span class="grow"></span><button class="btn btn-xs btn-soft" data-act="dev-qr" data-id="${x.id}" title="طباعة ستيكر QR">${ic('printer')} QR</button><button class="btn btn-xs btn-soft" data-act="dev-hist" data-id="${x.id}">${ic('history')} السجل</button><button class="btn btn-xs btn-gold" data-act="dev-task" data-id="${x.id}">${ic('send')} كلّف صيانة</button><button class="btn btn-xs btn-soft" data-act="dev-edit" data-id="${x.id}">${ic('edit')}</button><button class="btn btn-xs btn-soft" style="color:var(--red)" data-act="dev-del" data-id="${x.id}">${ic('trash')}</button></div></div>`).join('')}</div>`
+          <div class="ft"><span class="grow"></span><a class="btn btn-xs btn-soft" target="_blank" rel="noopener" href="stickers.html?d=${x.id}" title="ستيكر QR للطابعة دي">${ic('printer')} QR</a><button class="btn btn-xs btn-soft" data-act="dev-hist" data-id="${x.id}">${ic('history')} السجل</button><button class="btn btn-xs btn-gold" data-act="dev-task" data-id="${x.id}">${ic('send')} كلّف صيانة</button><button class="btn btn-xs btn-soft" data-act="dev-edit" data-id="${x.id}">${ic('edit')}</button><button class="btn btn-xs btn-soft" style="color:var(--red)" data-act="dev-del" data-id="${x.id}">${ic('trash')}</button></div></div>`).join('')}</div>`
         : `<div class="card empty"><div class="tile t-blue">${ic('device')}</div><b>مفيش أجهزة</b>سجّل أجهزة كل مركز بالسيريال وميعاد الصيانة الدورية — والبرنامج ينبهك قبلها<div style="margin-top:14px"><button class="btn btn-primary" data-act="dev-edit">${ic('plus')} طابعة جديدة</button></div></div>`}`;
   },
 };
@@ -3466,10 +3537,10 @@ async function centerLinkModal(id) {
       <div class="inp ltr" style="height:auto;padding:10px;word-break:break-all;font-size:12.5px;text-align:left">${esc(url)}</div>
       <div class="note">${ic('info')}<div>المركز بيفتح اللينك أو يمسح الكود، يكتب العطل ويصوّره، والبلاغ يوصلك هنا في "المهام" كبلاغ محتاج فني — والمركز يتابع لحد ما الفني يوصل.</div></div>
       ${d.devices.length ? `<div class="muted" style="font-weight:800;font-size:13px">ستيكرات طابعات المركز (${d.devices.length})</div><div class="mini-list">${d.devices.map(x => `<div class="mini-it"><div class="tile xs t-blue">${ic('printer')}</div><div style="flex:1"><b>${esc(x.name)}</b><span>${esc([x.brand, x.model].filter(Boolean).join(' '))}${x.serial ? ' • ' + esc(x.serial) : ''}</span></div></div>`).join('')}</div>` : ''}`,
-    foot: `<a class="btn btn-wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(msg)}">${ic('wa')} ابعته للمركز</a><button class="btn btn-soft" data-cp>${ic('copy')} نسخ</button><button class="btn btn-primary" data-pr>${ic('printer')} طباعة ستيكرات</button><span class="sp"></span><button class="btn btn-soft" data-close>إغلاق</button>`,
+    foot: `<a class="btn btn-wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(msg)}">${ic('wa')} ابعته للمركز</a><button class="btn btn-soft" data-cp>${ic('copy')} نسخ</button><a class="btn btn-primary" target="_blank" rel="noopener" href="stickers.html?c=${id}">${ic('printer')} ستيكرات المركز${d.devices.length ? ` (${d.devices.length + 1})` : ''}</a><span class="sp"></span><button class="btn btn-soft" data-close>إغلاق</button>`,
   });
   $('[data-cp]', m.el).onclick = () => copyText(url);
-  $('[data-pr]', m.el).onclick = () => printStickers([{ url, title: d.center, line: 'بلاغ أعطال المركز', sub: 'خدمة العملاء والصيانة' }, ...d.devices.map(x => ({ url: absUrl(x.path), title: x.name, line: [[x.brand, x.model].filter(Boolean).join(' '), d.center].filter(Boolean).join(' — '), serial: x.serial }))]);
+  if (0) printStickers([{ url, title: d.center, line: 'بلاغ أعطال المركز', sub: 'خدمة العملاء والصيانة' }, ...d.devices.map(x => ({ url: absUrl(x.path), title: x.name, line: [[x.brand, x.model].filter(Boolean).join(' '), d.center].filter(Boolean).join(' — '), serial: x.serial }))]);
 }
 async function deviceStickers(ids) {
   const d = await api('/api/links?device=' + ids.join(',')).catch(e => { toast(e.message, 'err'); return null; }); if (!d) return;
@@ -3582,6 +3653,94 @@ PAGES.rewards = {
         <div class="card"><div class="card-h"><div class="tile sm t-purple">${ic('history')}</div><div><h3>اللي اتبعت</h3><p>${d.rows.length} مكافأة</p></div></div>
           <div class="mini-list" style="max-height:70vh">${d.rows.map(r => `<div class="mini-it">${av(r.emp_name, r.emp_id, 'sm', r.emp_photo)}<div style="flex:1;min-width:0"><b>${esc(r.emp_name)} — ${esc(r.title || '')}</b><span>${r.stars ? '★'.repeat(r.stars) + ' • ' : ''}${r.amount ? money(r.amount) + ' • ' : ''}${dShort(r.created_at.slice(0, 10))} ${t12(r.created_at)}</span></div><div class="end">${r.seen_at ? chip('اتشافت ' + t12(r.seen_at), 'green', 'checks') : chip('لسه متشافتش', 'slate', 'clock')}${S.boot.me.role === 'admin' ? `<button class="btn btn-xs btn-soft" style="color:var(--red)" data-act="reward-del" data-id="${r.id}">${ic('trash')}</button>` : ''}</div></div>`).join('') || '<div class="empty" style="padding:20px">—</div>'}</div></div>
       </div>`;
+  },
+};
+
+/* ---------- Live routes board (animated technicians walking to their centers, from real GPS) ---------- */
+const WALKER = `<svg class="walker" viewBox="0 0 40 62" aria-hidden="true"><g class="w-all"><circle cx="20" cy="8" r="6.5" class="w-head"/>
+  <g class="w-arm a2"><line x1="20" y1="18" x2="20" y2="31"/></g><g class="w-leg l2"><line x1="20" y1="35" x2="20" y2="55"/></g>
+  <line x1="20" y1="15" x2="20" y2="36" class="w-body"/>
+  <g class="w-leg l1"><line x1="20" y1="35" x2="20" y2="55"/></g><g class="w-arm a1"><line x1="20" y1="18" x2="20" y2="31"/><rect x="15.5" y="30" width="9" height="7" rx="1.5" class="w-bag"/></g></g></svg>`;
+const BLDG = `<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="12" width="34" height="32" rx="3" class="b-wall"/><rect x="18" y="32" width="12" height="12" rx="1.5" class="b-door"/><path d="M21 19h6M24 16v6" class="b-cross"/><rect x="11" y="26" width="5" height="4" rx="1" class="b-win"/><rect x="32" y="26" width="5" height="4" rx="1" class="b-win"/><path d="M4 13 24 4l20 9" class="b-roof"/></svg>`;
+const Routes = {
+  data: null, el: null, disp: {}, timer: null, ticker: null, loading: false,
+  async load() { if (this.loading) return; this.loading = true; try { this.data = await api('/api/live/routes', undefined, { noTrack: true }); this.paint(); } catch {} finally { this.loading = false; } },
+  refreshSoon: debounce(function () { if (S.kind === 'user' && S.page === 'dashboard') Routes.load(); }, 1500),
+  km: m => m === null || m === undefined ? '—' : m < 1000 ? `${Math.round(m / 10) * 10} م` : `${(m / 1000).toFixed(m < 10000 ? 1 : 0)} كم`,
+  key: l => 'e' + l.emp_id,
+  statText(l) {
+    if (l.state === 'arrived') return { t: `وصل ✓${l.at ? ' ' + t12(l.at) : ''}`, c: 'ok' };
+    if (l.stale && l.state === 'onway') return { t: `التحديث واقف من ${l.age_min === null ? '—' : dur(l.age_min)} • آخر مكان على بعد ${this.km(l.dist)}`, c: 'warn' };
+    if (l.state === 'onway') return { t: `في الطريق • باقي ${this.km(l.dist)}${l.eta_min ? ` • حوالي ${dur(l.eta_min)}` : ''}`, c: 'go' };
+    if (l.state === 'accepted') return { t: `قبل المهمة ولسه متحركش • على بعد ${this.km(l.dist)}`, c: 'wait' };
+    if (l.dist === null || l.dist === undefined) return { t: `${l.state === 'plan' ? `في جدوله ${l.time ? 'الساعة ' + t12(l.time) : 'النهارده'}` : l.state === 'accepted' ? 'قبل المهمة' : 'في الطريق'} • لسه مفيش موقع النهارده`, c: 'wait' };
+    if (l.state === 'plan') return { t: `في جدوله ${l.time ? 'الساعة ' + t12(l.time) : 'النهارده'} • على بعد ${this.km(l.dist)}`, c: 'plan' };
+    return { t: '', c: '' };
+  },
+  laneHtml(l) {
+    return `<div class="rt-lane" data-k="${this.key(l)}" data-act="track-emp" data-id="${l.emp_id}" title="افتح خط سيره على الخريطة">
+      <div class="rt-top">${av(l.name, l.emp_id, 'sm', l.photo)}<div class="rt-who"><b>${esc(l.name)}</b><span data-r="title"></span></div><div class="rt-stat" data-r="stat"></div></div>
+      <div class="rt-road"><div class="rt-home" title="نقطة البداية">${ic('building')}</div>
+        <div class="rt-way"><div class="rt-trail"></div><div class="rt-man">${WALKER}<span class="rt-zz">z<i>z</i></span></div></div>
+        <div class="rt-dest"><div class="rt-bld">${BLDG}<span class="rt-burst"></span></div><span data-r="dest"></span></div></div></div>`;
+  },
+  frame() {
+    const t = new Date(srvNow()); const n = this.data ? this.data.lanes : [];
+    const go = n.filter(l => l.state === 'onway').length, arr = n.filter(l => l.state === 'arrived').length;
+    return `<div class="rt-head"><div class="rt-title"><span class="live"><i></i>مباشر</span><h2>الفنيين في الطريق</h2></div>
+      <div class="rt-meta"><span>${ic('clock')}<b class="num" data-clock-sec></b></span><span data-r="counts">${go} في الطريق • ${arr} وصلوا</span><a class="rt-link" href="#/tracking">${ic('route')} الخريطة</a></div></div>
+      <div class="rt-lanes" data-r="lanes"></div><div class="rt-idle" data-r="idle"></div>`;
+  },
+  mount(holder) {
+    if (!this.el) { this.el = document.createElement('section'); this.el.className = 'routes'; this.el.innerHTML = this.frame(); }
+    holder.replaceWith(this.el); this.paint(); tickClock();
+    if (!this.data) this.load();
+    clearInterval(this.timer); this.timer = setInterval(() => { if (S.kind === 'user' && S.page === 'dashboard' && document.visibilityState === 'visible') this.load(); }, 45000);
+    clearInterval(this.ticker); this.ticker = setInterval(() => this.tick(), 1000);
+  },
+  paint() {
+    const el = this.el; if (!el || !this.data) return;
+    const d = this.data, box = $('[data-r=lanes]', el);
+    const go = d.lanes.filter(l => l.state === 'onway').length, arr = d.lanes.filter(l => l.state === 'arrived').length;
+    $('[data-r=counts]', el).textContent = d.lanes.length ? `${go} في الطريق • ${arr} وصلوا${d.more ? ` • +${d.more}` : ''}` : 'محدش في الطريق';
+    const keys = new Set(d.lanes.map(l => this.key(l)));
+    $$('.rt-lane', box).forEach(x => { if (!keys.has(x.dataset.k)) x.remove(); });
+    if (!d.lanes.length) {
+      box.innerHTML = `<div class="rt-empty"><div class="rt-man idle">${WALKER}</div><div><b>مفيش فنيين في الطريق دلوقتي</b><span>أول ما فني يقبل مهمة ويدوس "في الطريق" هتشوفه ماشي هنا لحد ما يوصل المركز — حسب موقعه الحقيقي</span></div></div>`;
+    } else { const e0 = $('.rt-empty', box); if (e0) e0.remove(); }
+    d.lanes.forEach((l, i) => {
+      let x = $(`.rt-lane[data-k="${this.key(l)}"]`, box);
+      if (!x) { box.insertAdjacentHTML('beforeend', this.laneHtml(l)); x = box.lastElementChild; this.disp[this.key(l)] = l.progress || 0; }
+      const prevState = x.dataset.state;
+      x.dataset.state = l.state; x.className = `rt-lane st-${l.state}${l.stale ? ' stale' : ''}${l.priority === 'urgent' ? ' urgent' : ''}`;
+      x.style.order = i;
+      if (prevState && prevState !== 'arrived' && l.state === 'arrived') { x.classList.add('just'); setTimeout(() => x.classList.remove('just'), 2600); }
+      const st = this.statText(l);
+      $('[data-r=title]', x).textContent = (l.kind === 'plan' ? '📅 ' : l.priority === 'urgent' ? '🚨 ' : '') + (l.title || '');
+      const s2 = $('[data-r=stat]', x); s2.textContent = st.t; s2.className = 'rt-stat ' + st.c;
+      $('[data-r=dest]', x).textContent = l.dest.name;
+      const k = this.key(l); const cur = this.disp[k] ?? 0;
+      this.disp[k] = l.state === 'arrived' ? 1 : (l.progress > cur || Math.abs(l.progress - cur) > 0.15 ? l.progress : cur);
+      this.place(x, this.disp[k]);
+    });
+    const idle = d.idle || [];
+    $('[data-r=idle]', el).innerHTML = idle.length ? `<span class="muted2">في الشغل من غير مهمة:</span>${idle.slice(0, 10).map(e => `<span class="rt-chip" data-act="track-emp" data-id="${e.emp_id}">${av(e.name, e.emp_id, 'xs', e.photo)}${esc(e.name.split(' ')[0])}</span>`).join('')}${idle.length > 10 ? `<span class="rt-chip">+${idle.length - 10}</span>` : ''}` : '';
+  },
+  place(x, p) {
+    p = Math.max(0, Math.min(1, p));
+    const man = $('.rt-man', x), trail = $('.rt-trail', x);
+    man.style.right = `calc(${(p * 100).toFixed(2)}% - ${(p * 42).toFixed(1)}px)`;
+    trail.style.width = `${(p * 100).toFixed(2)}%`;
+  },
+  tick() {
+    if (!this.el || !this.el.isConnected || !this.data) return;
+    for (const l of this.data.lanes) {
+      if (l.state !== 'onway' || l.stale || !l.start) continue;
+      const v = (l.speed && l.speed >= 4 ? l.speed : 18) / 3.6; const k = this.key(l);
+      const cap = Math.min(0.97, (l.progress || 0) + 0.12);
+      const nv = Math.min(cap, (this.disp[k] || 0) + v / l.start);
+      if (nv !== this.disp[k]) { this.disp[k] = nv; const x = $(`.rt-lane[data-k="${k}"]`, this.el); if (x) this.place(x, nv); }
+    }
   },
 };
 
