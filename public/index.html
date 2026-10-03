@@ -1022,6 +1022,48 @@ img,video,canvas,iframe{max-width:100%}
 .logo-prev.has{background:#fff;border-style:solid;padding:8px}
 .logo-prev svg.i{width:34px;height:34px}
 @media (max-width:700px){.kb-list{grid-template-columns:1fr}.etabs button{font-size:10.5px}}
+
+/* ================= v1.4: stickers, center reports, rewards ================= */
+.qr-box{background:#fff;border-radius:18px;padding:14px;width:min(240px,70%);margin:0 auto;border:1px solid var(--line)}
+.qr-box svg{width:100%;height:auto;display:block}
+.rep-box{display:flex;align-items:center;gap:10px;background:var(--red-bg);border-radius:12px;padding:8px 12px;font-size:12.5px}
+.rep-box>svg.i{color:var(--red);flex-shrink:0}
+.rep-box div{flex:1;min-width:0}.rep-box b{color:var(--heading)}.rep-box a{color:var(--title-2);font-weight:800}
+.rep-box img{width:46px;height:46px;border-radius:10px;object-fit:cover}
+.star-pick{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.star-pick [data-st]:not(.btn){font-size:32px;line-height:1;color:var(--line);transition:transform .15s,color .15s}
+.star-pick [data-st].on{color:var(--gold)}
+.star-pick [data-st]:not(.btn):active{transform:scale(1.25)}
+.stk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6mm;font-family:var(--font);direction:rtl}
+.stk{border:1.5px dashed #9aa6bf;border-radius:4mm;padding:3.5mm;display:flex;flex-direction:column;align-items:center;gap:2mm;break-inside:avoid;page-break-inside:avoid;color:#0d1b3a;background:#fff}
+.stk-h{display:flex;align-items:center;gap:2mm;width:100%;border-bottom:2px solid #0a2357;padding-bottom:1.5mm}
+.stk-lg{width:9mm;height:9mm;border-radius:2mm;background:#0a2357;color:#f7c12d;display:grid;place-items:center;overflow:hidden;flex-shrink:0}
+.stk-lg svg.i{width:6mm;height:6mm}.stk-lg .logo-img{background:#fff}
+.stk-h b{font-size:10pt;display:block;line-height:1.2}.stk-h span{font-size:7pt;color:#6b7a99}
+.stk-qr{width:38mm}.stk-qr svg{width:100%;height:auto;display:block}
+.stk-t{text-align:center;line-height:1.35}.stk-t b{display:block;font-size:10pt}.stk-t span{display:block;font-size:7.5pt;color:#33415c}
+.stk-f{background:#f7c12d;color:#0a2357;font-weight:900;font-size:8pt;border-radius:2mm;padding:1mm 3mm}
+.cele{position:fixed;inset:0;z-index:500;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 50% 38%,#1d4fb0 0%,#0a2357 55%,#050f2b 100%);opacity:0;transition:opacity .35s}
+.cele.in{opacity:1}.cele.out{opacity:0}
+.cele canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.cele-rays{position:absolute;width:160vmax;height:160vmax;left:50%;top:38%;transform:translate(-50%,-50%);background:repeating-conic-gradient(from 0deg,rgba(247,193,45,.13) 0 9deg,transparent 9deg 22deg);animation:rays 18s linear infinite;pointer-events:none;mask:radial-gradient(circle,#000 0,transparent 60%);-webkit-mask:radial-gradient(circle,#000 0,transparent 60%)}
+@keyframes rays{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.cele.hearts{background:radial-gradient(circle at 50% 38%,#b0306a 0%,#4a1035 60%,#1d0616 100%)}
+.cele.hearts .cele-rays{background:repeating-conic-gradient(from 0deg,rgba(255,160,190,.14) 0 9deg,transparent 9deg 22deg)}
+.cele-card{position:relative;max-width:400px;width:100%;text-align:center;color:#fff;transform:scale(.6) translateY(30px);opacity:0;transition:transform .7s cubic-bezier(.2,1.5,.4,1),opacity .4s;transition-delay:.15s}
+.cele.in .cele-card{transform:none;opacity:1}
+.cele-ic{font-size:96px;line-height:1;filter:drop-shadow(0 12px 30px rgba(247,193,45,.55));animation:bob 2.4s ease-in-out infinite;margin-bottom:6px}
+@keyframes bob{50%{transform:translateY(-10px) rotate(-4deg)}}
+.cele-k{display:inline-block;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:3px 14px;font-size:12.5px;font-weight:800;color:#ffe9a8;margin-bottom:8px}
+.cele h2{font-size:28px;font-weight:900;color:#f7c12d;line-height:1.3;text-shadow:0 4px 20px rgba(0,0,0,.35)}
+.cele-stars{display:flex;justify-content:center;gap:6px;margin:10px 0 4px}
+.cele-stars span{font-size:38px;color:rgba(255,255,255,.18);transform:scale(.3);transition:transform .45s cubic-bezier(.2,1.8,.4,1),color .3s}
+.cele-stars span.on{color:#f7c12d;transform:scale(1);text-shadow:0 0 18px rgba(247,193,45,.8)}
+.cele p{font-size:16.5px;line-height:1.9;font-weight:600;color:#eef3ff;margin:10px 0;white-space:pre-wrap}
+.cele-amt{display:inline-block;background:linear-gradient(135deg,#ffd75e,#f7c12d);color:#0a2357;font-weight:900;font-size:18px;border-radius:16px;padding:8px 20px;margin:6px 0;box-shadow:0 12px 30px -10px rgba(247,193,45,.8)}
+.cele-amt b{font-size:26px}
+.cele-by{color:#b9c8ec;font-weight:700;font-size:13.5px;margin-top:6px}
+.cele-btn{margin-top:18px;height:52px;padding:0 34px;font-size:17px;border-radius:18px;background:#fff;color:#0a2357;font-weight:900;box-shadow:0 14px 34px -12px rgba(0,0,0,.6)}
 </style>
 </head>
 <body>
@@ -1076,6 +1118,7 @@ const I = {
   plus: '<path d="M12 5v14M5 12h14"/>',
   edit: '<path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
   trash: '<path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  gift: '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
   mic: '<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4M8 22h8"/>',
   bulb: '<path d="M9 18h6M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/>',
   printer: '<path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>',
@@ -1525,7 +1568,7 @@ const NAV = [
   { k: 'plans', t: 'جدول زيارات الفنيين', i: 'cal' },
   { k: 'visits', t: 'زيارات المراكز', i: 'wrench', badge2: true },
   { k: 'centers', t: 'المراكز', i: 'hospital' },
-  { k: 'devices', t: 'الأجهزة والصيانة الدورية', i: 'device', badge5: true },
+  { k: 'devices', t: 'الطابعات والصيانة الدورية', i: 'device', badge5: true },
   { k: 'parts', t: 'قطع الغيار والعهد', i: 'brief' },
   { k: 'chat', t: 'المحادثات', i: 'chat', badge3: true },
   { sec: 'التقارير' },
@@ -1537,11 +1580,12 @@ const NAV = [
   { k: 'departments', t: 'الأقسام', i: 'building' },
   { k: 'shifts', t: 'الورديات', i: 'moon' },
   { k: 'leaves', t: 'الأذونات والإجازات', i: 'clipboard', badge: true },
+  { k: 'rewards', t: 'المكافآت والتقدير', i: 'gift' },
   { k: 'sites', t: 'مواقع العمل', i: 'pin' },
   { k: 'settings', t: 'الإعدادات', i: 'gear' },
 ];
 const PT = Object.fromEntries(NAV.filter(n => n.k).map(n => [n.k, n]));
-const PAGE_SUB = { kb: 'الأعطال اللي اتحلت قبل كده — اسأل وهيقولك الحل ومين حله', plans: 'المراكز اللي كل فني ناوي يروحها والتذكير بيها', tasks: 'كلّف الفنيين بالبلاغات وتابع كل مهمة لحظة بلحظة', devices: 'أجهزة كل مركز بالسيريال ومواعيد الصيانة الدورية', parts: 'رصيد قطع الغيار في عهدة كل فني', payroll: 'المرتب الصافي بعد التأخير والغياب والإضافي والسلف', tracking: 'مكان كل موظف أثناء الشغل وخط سيره', chat: 'رسائل الموظفين والتعميمات', visits: 'شغل الصيانة في المراكز والتسليم بالصور', centers: 'المراكز اللي بنخدمها وسجل زياراتها', dashboard: 'نظرة شاملة على حضور النهارده', daily: 'حضور وانصراف كل الموظفين في يوم', log: 'كل السجلات بفلاتر متقدمة', summary: 'إجماليات كل موظف خلال فترة', employees: 'بيانات الموظفين وحساباتهم', departments: 'تنظيم الموظفين حسب الأقسام', shifts: 'المواعيد وجدول الورديات الأسبوعي', leaves: 'طلبات الإجازات والأذونات', sites: 'أماكن الشغل ونطاق التسجيل', settings: 'إعدادات البرنامج والحسابات' };
+const PAGE_SUB = { rewards: 'تقدير ونجوم ومكافآت بتوصل للموظف بأنيميشن', kb: 'الأعطال اللي اتحلت قبل كده — اسأل وهيقولك الحل ومين حله', plans: 'المراكز اللي كل فني ناوي يروحها والتذكير بيها', tasks: 'كلّف الفنيين بالبلاغات وتابع كل مهمة لحظة بلحظة', devices: 'طابعات كل مركز بالسيريال وستيكر QR ومواعيد الصيانة الدورية', parts: 'رصيد قطع الغيار في عهدة كل فني', payroll: 'المرتب الصافي بعد التأخير والغياب والإضافي والسلف', tracking: 'مكان كل موظف أثناء الشغل وخط سيره', chat: 'رسائل الموظفين والتعميمات', visits: 'شغل الصيانة في المراكز والتسليم بالصور', centers: 'المراكز اللي بنخدمها وسجل زياراتها', dashboard: 'نظرة شاملة على حضور النهارده', daily: 'حضور وانصراف كل الموظفين في يوم', log: 'كل السجلات بفلاتر متقدمة', summary: 'إجماليات كل موظف خلال فترة', employees: 'بيانات الموظفين وحساباتهم', departments: 'تنظيم الموظفين حسب الأقسام', shifts: 'المواعيد وجدول الورديات الأسبوعي', leaves: 'طلبات الإجازات والأذونات', sites: 'أماكن الشغل ونطاق التسجيل', settings: 'إعدادات البرنامج والحسابات' };
 
 async function reloadBoot() { S.boot = await api('/api/bootstrap'); setClock(S.boot.now); updateBadges(); return S.boot; }
 function updateBadges() {
@@ -1661,6 +1705,8 @@ const Sync = {
     if (d.type === 'visit' && d.rated) toast(`${d.name} قيّم الخدمة ${'★'.repeat(d.rating || 0)}`, 'ok', 'badgeCheck');
     else if (d.type === 'visit' && d.name) toast(`${d.name} سجّل زيارة في ${d.center}`, 'info', 'wrench');
     if (d.type === 'task' && d.name) toast(d.status === 'done' ? `${d.name} خلّص المهمة ✓` : `${d.name} ${d.label || ''}${d.title ? ' — ' + d.title : ''}`, d.status === 'decline' ? 'warn' : d.status === 'done' ? 'ok' : 'info', 'send');
+    if (d.type === 'reward_seen') { toast(`❤️ ${d.name} شاف المكافأة "${d.title || ''}"`, 'ok', 'gift'); if (S.page === 'rewards') refreshSoon(); return; }
+    if (d.type === 'reward') { if (S.page === 'rewards') refreshSoon(); return; }
     if (d.type === 'plan' && d.name && !d.edit) toast(`${d.name} جدول زيارة لـ ${d.center} — ${dayName(d.date)}${d.n > 1 ? ` (${d.n} مواعيد)` : ''}`, 'info', 'cal');
     if (d.type === 'kb' && d.author) toast(`💡 ${d.author} ضاف حل: ${d.code ? d.code + ' — ' : ''}${d.problem || ''}`, 'info', 'bulb');
     if (d.type === 'plan' && !['plans', 'dashboard'].includes(S.page)) return;
@@ -2015,6 +2061,7 @@ PAGES.employees = {
             ${sh ? chip(sh.name, k.c, k.i) : chip('بدون وردية', 'slate', 'clock')}${e.active ? '' : chip('موقوف', 'red')}</div>
           <div class="kv"><span>الراحة</span><b>${restText(e.rest_days)}</b><span>المواعيد</span><b>${sh ? t12(sh.start_time) + ' - ' + t12(sh.end_time) : '—'}</b><span>الموقع</span><b>${st ? esc(st.name) : 'بدون تقييد'}</b>${e.phone ? `<span>الهاتف</span><b class="ltr" style="text-align:right">${esc(e.phone)}</b>` : ''}</div>
           <div class="ft"><span class="grow">${e.has_device ? `<span class="flag green">${ic('phone')}مربوط بموبايل</span>` : `<span class="flag slate">${ic('phone')}غير مربوط</span>`}</span>
+            <button class="btn btn-xs btn-soft" data-act="reward-new" data-id="${e.id}" title="مكافأة وتقدير" style="color:var(--gold-ink)">${ic('gift')}</button>
             <button class="btn btn-xs btn-soft" data-act="chat-emp" data-id="${e.id}" title="رسالة">${ic('chat')}</button>
             <button class="btn btn-xs btn-soft" data-act="emp-log" data-id="${e.id}" title="سجل الحضور">${ic('list')}</button>
             ${e.has_device ? `<button class="btn btn-xs btn-soft" data-act="emp-reset" data-id="${e.id}" title="فك ربط الموبايل">${ic('refresh')}</button>` : ''}
@@ -2515,7 +2562,7 @@ PAGES.centers = {
           <div class="hd"><div class="tile t-red">${ic('hospital')}</div><div style="flex:1;min-width:0"><b>${esc(c.name)}</b><span>${esc(c.area || 'بدون منطقة')}</span></div><div style="text-align:center"><div style="font-size:24px;font-weight:900;color:var(--heading);line-height:1">${c.visits}</div><span class="muted" style="font-size:11px">زيارة</span></div></div>
           <div class="tags">${c.last_visit ? chip('آخر زيارة ' + dShort(c.last_visit), 'blue', 'calCheck') : chip('لسه متزارش', 'slate')}${c.open_issues ? chip(c.open_issues + ' متابعة مفتوحة', 'purple', 'refresh') : ''}${c.lat !== null ? chip('الموقع محدد', 'green', 'pin') : chip('الموقع هيتحدد من أول زيارة', 'orange', 'pin')}</div>
           <div class="kv">${c.contact ? `<span>المسؤول</span><b>${esc(c.contact)}</b>` : ''}${c.phone ? `<span>الموبايل</span><b><a class="ltr" href="tel:${esc(c.phone)}">${esc(c.phone)}</a></b>` : ''}${c.address ? `<span>العنوان</span><b>${esc(c.address)}</b>` : ''}</div>
-          <div class="ft"><span class="grow">${c.created_by ? 'أضافه: ' + esc(c.created_by) : ''}</span><button class="btn btn-xs btn-soft" data-act="center-visits" data-id="${c.id}">${ic('wrench')} الزيارات</button><button class="btn btn-xs btn-soft" data-act="center-edit" data-id="${c.id}">${ic('edit')}</button><button class="btn btn-xs btn-soft" style="color:var(--red)" data-act="center-del" data-id="${c.id}">${ic('trash')}</button></div></div>`).join('')}</div>`
+          <div class="ft"><span class="grow">${c.created_by ? 'أضافه: ' + esc(c.created_by) : ''}</span><button class="btn btn-xs btn-gold" data-act="center-link" data-id="${c.id}" title="لينك و QR بلاغ الأعطال للمركز">${ic('link')} لينك البلاغ</button><button class="btn btn-xs btn-soft" data-act="center-visits" data-id="${c.id}">${ic('wrench')}<span class="btn-txt">الزيارات</span></button><button class="btn btn-xs btn-soft" data-act="center-edit" data-id="${c.id}">${ic('edit')}</button><button class="btn btn-xs btn-soft" style="color:var(--red)" data-act="center-del" data-id="${c.id}">${ic('trash')}</button></div></div>`).join('')}</div>`
         : `<div class="card empty"><div class="tile t-red">${ic('hospital')}</div><b>مفيش مراكز</b>ضيف المراكز اللي بتخدمها أو سيب الموظفين يضيفوها وقت الزيارة</div>`}`;
   },
 };
@@ -2912,7 +2959,7 @@ async function empProfile(id) {
         <div><b style="color:var(--red)">${s.absent || 0}</b><span>يوم غياب</span></div><div><b style="color:var(--heading)">${hours(s.worked || 0)}</b><span>ساعة عمل</span></div><div><b style="color:var(--purple)">${vis.rows.length}</b><span>زيارة مركز</span></div></div>
       ${lv && lv.last ? `<div class="note">${ic('pin')}<div style="flex:1">آخر موقع: <b>${esc(Live.placeText(lv) || 'متسجل على الخريطة')}</b> — ${t12(lv.last.at)} (${ago(tsAgo(lv.last.at))})${lv.last.battery !== null ? ' • البطارية ' + lv.last.battery + '%' : ''}</div><button class="btn btn-xs btn-soft" data-act="track-emp" data-id="${e.id}">${ic('route')} خط السير</button></div>` : ''}
       ${vis.rows.length ? `<div><div class="muted" style="font-weight:800;font-size:13px;margin-bottom:4px">آخر الزيارات</div>${vis.rows.slice(0, 4).map(v => `<button class="vrow" data-act="visit-view" data-id="${v.id}">${photoImg(v.photo, 'vr-img')}<div class="t"><b>${esc(v.center)}</b><div class="sub">${esc(v.work_type || '')} • ${dShort(v.date)} ${t12(v.at)}</div></div>${resChip(v.result)}</button>`).join('')}</div>` : ''}`,
-    foot: `<button class="btn btn-soft" data-act="emp-log" data-id="${e.id}">${ic('list')}<span class="btn-txt">سجل الحضور</span></button><button class="btn btn-soft" data-act="chat-emp" data-id="${e.id}">${ic('chat')}<span class="btn-txt">رسالة</span></button><button class="btn btn-soft" data-act="emp-edit" data-id="${e.id}" data-close-first="1">${ic('edit')}<span class="btn-txt">تعديل</span></button><span class="sp"></span><button class="btn btn-primary" data-close>إغلاق</button>`,
+    foot: `<button class="btn btn-soft" data-act="emp-log" data-id="${e.id}">${ic('list')}<span class="btn-txt">سجل الحضور</span></button><button class="btn btn-gold" data-act="reward-new" data-id="${e.id}" data-close-first="1">${ic('gift')}<span class="btn-txt">مكافأة</span></button><button class="btn btn-soft" data-act="chat-emp" data-id="${e.id}">${ic('chat')}<span class="btn-txt">رسالة</span></button><button class="btn btn-soft" data-act="emp-edit" data-id="${e.id}" data-close-first="1">${ic('edit')}<span class="btn-txt">تعديل</span></button><span class="sp"></span><button class="btn btn-primary" data-close>إغلاق</button>`,
   });
 }
 
@@ -2940,10 +2987,11 @@ function taskCard(t) {
   return `<div class="ecard tcard ${t.status}"><span class="stripe" style="background:var(--${m.c})"></span>
     <div class="hd"><div class="tile sm ${m.tile}">${ic(m.i)}</div><div style="flex:1;min-width:0"><b>${esc(t.title)}</b><span>${ic('hospital')} ${esc(t.center)}${t.dev_name ? ' • ' + esc(t.dev_name) : ''}</span></div>${t.priority === 'urgent' ? chip('عاجل', 'red', 'alert') : ''}</div>
     <div class="tags">${tsChip(t.status)}${t.due_at ? chip((t.overdue ? 'متأخرة • ' : 'الميعاد ') + dtText(t.due_at), t.overdue ? 'red' : 'slate', 'clock') : ''}${t.arrive_dist !== null && t.arrive_dist !== undefined ? chip('وصل على بُعد ' + meters(t.arrive_dist), t.arrive_dist > 300 ? 'orange' : 'green', 'pin') : ''}</div>
+    ${t.source === 'center' ? `<div class="rep-box">${ic('call')}<div><b>بلاغ من المركز: ${esc(t.reporter_name || '')}</b>${t.reporter_phone ? ` <a class="ltr" href="tel:${esc(t.reporter_phone)}">${esc(t.reporter_phone)}</a>` : ''}</div>${t.photo ? `<a href="${photoUrl(t.photo)}" target="_blank" rel="noopener"><img src="${photoUrl(t.photo)}" alt=""></a>` : ''}</div>` : ''}
     ${t.details ? `<div class="vdet">${esc(t.details)}</div>` : ''}${t.emp_note ? `<div class="note warn" style="padding:8px 12px">${ic('alert')}<div>${esc(t.emp_note)}</div></div>` : ''}
     ${taskSteps(t)}
     ${t.status === 'done' ? `<div class="row wrap" style="gap:6px;font-size:12px">${t.accept_min !== null ? chip('القبول ' + dur(t.accept_min), 'slate') : ''}${t.travel_min !== null ? chip('المشوار ' + dur(t.travel_min), 'slate') : ''}${t.onsite_min !== null ? chip('في المركز ' + dur(t.onsite_min), 'slate') : ''}</div>` : ''}
-    <div class="ft"><span style="flex:1;min-width:0;display:flex;align-items:center;gap:8px">${t.emp_id ? av(t.emp_name, t.emp_id, 'sm', t.emp_photo) : ''}<span style="font-size:12.5px;font-weight:700">${esc(t.emp_name || 'بدون موظف')}</span></span>
+    <div class="ft"><span style="flex:1;min-width:0;display:flex;align-items:center;gap:8px">${t.emp_id ? av(t.emp_name, t.emp_id, 'sm', t.emp_photo) : ''}<span style="font-size:12.5px;font-weight:700">${t.emp_name ? esc(t.emp_name) : '<span style="color:var(--red)">محتاجة فني</span>'}</span></span>${!t.emp_id && OPEN_T.includes(t.status) ? `<button class="btn btn-xs btn-gold" data-act="task-edit" data-id="${t.id}">${ic('user')} حدد فني</button>` : ''}
       ${t.visit_id ? `<button class="btn btn-xs btn-green" data-act="visit-open" data-id="${t.visit_id}">${ic('eye')} الزيارة</button>` : ''}
       ${t.emp_id && OPEN_T.includes(t.status) ? `<button class="btn btn-xs btn-soft" data-act="track-emp" data-id="${t.emp_id}" title="مكانه">${ic('route')}</button><button class="btn btn-xs btn-soft" data-act="chat-emp" data-id="${t.emp_id}" title="رسالة">${ic('chat')}</button>` : ''}
       ${OPEN_T.includes(t.status) || t.status === 'declined' ? `<button class="btn btn-xs btn-soft" data-act="task-edit" data-id="${t.id}" title="تعديل / تحويل لموظف تاني">${ic('edit')}</button>` : ''}
@@ -2952,14 +3000,16 @@ function taskCard(t) {
 PAGES.tasks = {
   async render() {
     const f = S.f.tsk = Object.assign({ status: 'open', emp: '' }, S.f.tsk || {});
-    const d = await api('/api/tasks?' + qsOf({ status: f.status === 'all' ? '' : f.status, emp: f.emp }));
+    const d = await api('/api/tasks?' + qsOf({ status: f.status === 'all' || f.status === 'unassigned' ? '' : f.status, emp: f.emp }));
+    const unas = d.rows.filter(t => !t.emp_id && OPEN_T.includes(t.status));
+    if (f.status === 'unassigned') d.rows = unas;
     S.taskCache = new Map(d.rows.map(t => [t.id, t])); const c = d.counts;
     S.report = {
       title: 'المهام', subtitle: f.status === 'open' ? 'المهام المفتوحة' : (TS[f.status] || { t: 'الكل' }).t, file: 'المهام', sheet: 'المهام',
       cols: [{ h: 'م', w: 5 }, { h: 'المهمة', w: 28 }, { h: 'المركز', w: 22 }, { h: 'الجهاز', w: 18 }, { h: 'الموظف', w: 18 }, { h: 'الأولوية', w: 9 }, { h: 'الحالة', w: 12 }, { h: 'الميعاد', w: 16 }, { h: 'اتبعتت', w: 16 }, { h: 'خلصت', w: 16 }, { h: 'زمن القبول (د)', w: 12 }, { h: 'المشوار (د)', w: 11 }, { h: 'في المركز (د)', w: 12 }],
       rows: d.rows.map((t, i) => [i + 1, t.title, t.center, t.dev_name || '', t.emp_name || '', t.priority === 'urgent' ? 'عاجل' : 'عادي', { t: TS[t.status].t, cls: 's-' + TS[t.status].c }, t.due_at ? t.due_at.slice(0, 16) : '', t.created_at.slice(0, 16), t.done_at ? t.done_at.slice(0, 16) : '', t.accept_min ?? '', t.travel_min ?? '', t.onsite_min ?? '']),
     };
-    const sb = [['open', 'المفتوحة', c.open], ['new', 'جديدة', c.new || 0], ['accepted', 'اتقبلت', c.accepted || 0], ['onway', 'في الطريق', c.onway || 0], ['arrived', 'في المركز', c.arrived || 0], ['overdue', 'متأخرة', c.overdue], ['done', 'خلصت', c.done || 0], ['declined', 'اعتذار', c.declined || 0], ['all', 'الكل', c.all]];
+    const sb = [['unassigned', '🚨 محتاجة فني', unas.length], ['open', 'المفتوحة', c.open], ['new', 'جديدة', c.new || 0], ['accepted', 'اتقبلت', c.accepted || 0], ['onway', 'في الطريق', c.onway || 0], ['arrived', 'في المركز', c.arrived || 0], ['overdue', 'متأخرة', c.overdue], ['done', 'خلصت', c.done || 0], ['declined', 'اعتذار', c.declined || 0], ['all', 'الكل', c.all]];
     return `<div class="toolbar"><select class="inp inp-sm" style="width:auto;min-width:180px" data-f="tsk.emp">${empOptions(f.emp)}</select><span class="sp"></span>
         <button class="btn btn-sm btn-primary" data-act="task-new">${ic('plus')} مهمة جديدة</button>${exportBtns()}</div>
       <div class="statusbar">${sb.map(x => `<button class="sbtn ${f.status === x[0] ? 'on' : ''}" data-act="set-status" data-k="tsk" data-v="${x[0]}">${x[1]}<b class="ltr">${x[2]}</b></button>`).join('')}</div>
@@ -3012,28 +3062,28 @@ PAGES.devices = {
     if (f.q) { const q = f.q.toLowerCase(); L0 = L0.filter(x => [x.name, x.brand, x.model, x.serial, x.center].some(v => String(v || '').toLowerCase().includes(q))); }
     const cnt = k => d.rows.filter(x => x.pm_state === k).length;
     S.report = {
-      title: 'الأجهزة والصيانة الدورية', subtitle: `${L0.length} جهاز`, file: 'الأجهزة', sheet: 'الأجهزة',
+      title: 'الطابعات والصيانة الدورية', subtitle: `${L0.length} طابعة`, file: 'الأجهزة', sheet: 'الأجهزة',
       cols: [{ h: 'م', w: 5 }, { h: 'الجهاز', w: 22 }, { h: 'الماركة', w: 12 }, { h: 'الموديل', w: 12 }, { h: 'السيريال', w: 16 }, { h: 'المركز', w: 24 }, { h: 'كل كام شهر', w: 10 }, { h: 'آخر صيانة', w: 12 }, { h: 'الصيانة الجاية', w: 13 }, { h: 'الحالة', w: 14 }, { h: 'الزيارات', w: 9 }, { h: 'الأعطال', w: 9 }],
       rows: L0.map((x, i) => [i + 1, x.name, x.brand || '', x.model || '', x.serial || '', x.center || '', x.pm_months || '', x.last_pm || '', x.next_pm || '', { t: pmText(x), cls: 's-' + PMS[x.pm_state][1] }, x.visits, x.faults]),
     };
     return `<div class="toolbar"><div class="inp-ico" style="min-width:200px;flex:1;max-width:300px">${ic('search')}<input class="inp inp-sm" placeholder="جهاز، سيريال، ماركة..." data-f="dev.q" value="${esc(f.q)}"></div>
         <select class="inp inp-sm" style="width:auto;min-width:170px" data-f="dev.center">${centerOptions(f.center)}</select><span class="sp"></span>
-        <button class="btn btn-sm btn-primary" data-act="dev-edit">${ic('plus')} جهاز جديد</button>${exportBtns()}</div>
+        <button class="btn btn-sm btn-gold" data-act="dev-stickers">${ic('printer')} طباعة ستيكرات QR</button><button class="btn btn-sm btn-primary" data-act="dev-edit">${ic('plus')} طابعة جديدة</button>${exportBtns()}</div>
       <div class="statusbar">${[['', 'الكل', d.rows.length], ['overdue', 'صيانة متأخرة', cnt('overdue')], ['soon', 'خلال أسبوعين', cnt('soon')], ['ok', 'في الميعاد', cnt('ok')], ['none', 'بدون جدول', cnt('none')]].map(x => `<button class="sbtn ${f.pm === x[0] ? 'on' : ''}" data-act="set-status" data-k="dev" data-v="${x[0]}" data-field="pm">${x[1]}<b class="ltr">${x[2]}</b></button>`).join('')}</div>
       ${L0.length ? `<div class="ecards">${L0.map(x => `<div class="ecard ${x.active ? '' : 'off'}"><span class="stripe" style="background:var(--${PMS[x.pm_state][1]})"></span>
           <div class="hd"><div class="tile sm t-blue">${ic('device')}</div><div style="flex:1;min-width:0"><b>${esc(x.name)}</b><span>${esc([x.brand, x.model].filter(Boolean).join(' • ') || '—')}</span></div>${x.serial ? `<span class="chip c-navy ltr">${esc(x.serial)}</span>` : ''}</div>
           <div class="tags">${chip(x.center || '—', 'red', 'hospital')}${chip(pmText(x), PMS[x.pm_state][1], 'calCheck')}${x.faults ? chip(x.faults + ' عطل', 'orange', 'alert') : ''}</div>
           <div class="kv"><span>كل</span><b>${x.pm_months ? x.pm_months + ' شهور' : '—'}</b><span>آخر صيانة</span><b>${x.last_pm ? dShort(x.last_pm) : '—'}</b><span>الجاية</span><b>${x.next_pm ? dShort(x.next_pm) : '—'}</b><span>الزيارات</span><b>${x.visits}${x.last_visit ? ' • آخرها ' + dShort(x.last_visit) : ''}</b></div>
-          <div class="ft"><span class="grow"></span><button class="btn btn-xs btn-soft" data-act="dev-hist" data-id="${x.id}">${ic('history')} السجل</button><button class="btn btn-xs btn-gold" data-act="dev-task" data-id="${x.id}">${ic('send')} كلّف صيانة</button><button class="btn btn-xs btn-soft" data-act="dev-edit" data-id="${x.id}">${ic('edit')}</button><button class="btn btn-xs btn-soft" style="color:var(--red)" data-act="dev-del" data-id="${x.id}">${ic('trash')}</button></div></div>`).join('')}</div>`
-        : `<div class="card empty"><div class="tile t-blue">${ic('device')}</div><b>مفيش أجهزة</b>سجّل أجهزة كل مركز بالسيريال وميعاد الصيانة الدورية — والبرنامج ينبهك قبلها<div style="margin-top:14px"><button class="btn btn-primary" data-act="dev-edit">${ic('plus')} جهاز جديد</button></div></div>`}`;
+          <div class="ft"><span class="grow"></span><button class="btn btn-xs btn-soft" data-act="dev-qr" data-id="${x.id}" title="طباعة ستيكر QR">${ic('printer')} QR</button><button class="btn btn-xs btn-soft" data-act="dev-hist" data-id="${x.id}">${ic('history')} السجل</button><button class="btn btn-xs btn-gold" data-act="dev-task" data-id="${x.id}">${ic('send')} كلّف صيانة</button><button class="btn btn-xs btn-soft" data-act="dev-edit" data-id="${x.id}">${ic('edit')}</button><button class="btn btn-xs btn-soft" style="color:var(--red)" data-act="dev-del" data-id="${x.id}">${ic('trash')}</button></div></div>`).join('')}</div>`
+        : `<div class="card empty"><div class="tile t-blue">${ic('device')}</div><b>مفيش أجهزة</b>سجّل أجهزة كل مركز بالسيريال وميعاد الصيانة الدورية — والبرنامج ينبهك قبلها<div style="margin-top:14px"><button class="btn btn-primary" data-act="dev-edit">${ic('plus')} طابعة جديدة</button></div></div>`}`;
   },
 };
 function deviceModal(id) {
   const d = id ? (S.devCache || []).find(x => x.id === id) : { pm_months: 3, active: 1, center_id: (S.f.dev && S.f.dev.center) || '' };
   const m = modal({
     title: id ? 'تعديل الجهاز' : 'جهاز جديد', icon: 'device', tile: 't-blue', size: 'lg',
-    body: `<div class="grid2"><div class="field"><label>المركز *</label><select class="inp" name="center_id">${centerOptions(d.center_id, 'اختار المركز')}</select></div><div class="field"><label>اسم الجهاز *</label><input class="inp" name="name" list="dlDevN" value="${esc(d.name || '')}" placeholder="مثال: جهاز مقطعية CT"><datalist id="dlDevN">${['جهاز مقطعية CT', 'جهاز رنين MRI', 'جهاز أشعة X-Ray', 'جهاز ماموجرام', 'جهاز سونار', 'طابعة أفلام', 'نظام CR / DR', 'جهاز تحميض'].map(x => `<option value="${x}">`).join('')}</datalist></div></div>
-      <div class="grid3"><div class="field"><label>الماركة</label><input class="inp" name="brand" value="${esc(d.brand || '')}" placeholder="GE / Siemens"></div><div class="field"><label>الموديل</label><input class="inp" name="model" value="${esc(d.model || '')}"></div><div class="field"><label>السيريال</label><input class="inp ltr" style="text-align:right" name="serial" value="${esc(d.serial || '')}"></div></div>
+    body: `<div class="grid2"><div class="field"><label>المركز *</label><select class="inp" name="center_id">${centerOptions(d.center_id, 'اختار المركز')}</select></div><div class="field"><label>اسم الجهاز *</label><input class="inp" name="name" list="dlDevN" value="${esc(d.name || '')}" placeholder="مثال: طابعة أفلام — المقطعية"><datalist id="dlDevN">${['طابعة أفلام', 'طابعة أفلام — المقطعية', 'طابعة أفلام — الرنين', 'طابعة أفلام — الأشعة العادية', 'طابعة أفلام — الماموجرام', 'طابعة ورق تقارير'].map(x => `<option value="${x}">`).join('')}</datalist></div></div>
+      <div class="grid3"><div class="field"><label>الماركة</label><input class="inp" name="brand" value="${esc(d.brand || '')}" placeholder="Fujifilm / Agfa"></div><div class="field"><label>الموديل</label><input class="inp" name="model" value="${esc(d.model || '')}"></div><div class="field"><label>السيريال</label><input class="inp ltr" style="text-align:right" name="serial" value="${esc(d.serial || '')}"></div></div>
       <div class="grid3"><div class="field"><label>الصيانة الدورية كل</label><select class="inp" name="pm_months">${[0, 1, 2, 3, 4, 6, 12].map(n => `<option value="${n}" ${Number(d.pm_months) === n ? 'selected' : ''}>${n ? n + ' شهر' : 'مفيش'}</option>`).join('')}</select></div><div class="field"><label>آخر صيانة</label><input type="date" class="inp" name="last_pm" value="${esc(d.last_pm || '')}"></div><div class="field"><label>الصيانة الجاية</label><input type="date" class="inp" name="next_pm" value="${esc(d.next_pm || '')}"><small>سيبها فاضية وتتحسب لوحدها</small></div></div>
       <div class="grid2"><div class="field"><label>تاريخ التركيب</label><input type="date" class="inp" name="installed_at" value="${esc(d.installed_at || '')}"></div><div class="field"><label>الحالة</label><label class="switch" style="height:44px"><input type="checkbox" name="active" ${d.active ? 'checked' : ''}><span class="tr"></span>الجهاز شغال في المركز</label></div></div>
       <div class="field"><label>ملاحظات</label><textarea class="inp" name="notes" rows="2">${esc(d.notes || '')}</textarea></div>
@@ -3389,6 +3439,152 @@ async function planModal(id = 0) {
   });
 }
 
+/* ===================================================== v1.4: center reports, printer QR, rewards === */
+const QRLIB = () => window.qrcode ? Promise.resolve() : loadScript('vendor/qrcode/qrcode.js');
+const qrSvg = (txt, cell = 5) => { const q = qrcode(0, 'M'); q.addData(txt); q.make(); return q.createSvgTag({ cellSize: cell, margin: 1, scalable: true }); };
+const absUrl = p => location.origin + p;
+function stickerHtml(s) {
+  return `<div class="stk"><div class="stk-h"><div class="stk-lg">${logoImg()}</div><div><b>${esc(S.boot.settings.company_name)}</b><span>${esc(s.sub || 'صيانة طابعات الأشعة')}</span></div></div>
+    <div class="stk-qr">${qrSvg(s.url)}</div>
+    <div class="stk-t"><b>${esc(s.title)}</b>${s.line ? `<span>${esc(s.line)}</span>` : ''}${s.serial ? `<span class="ltr">S/N ${esc(s.serial)}</span>` : ''}</div>
+    <div class="stk-f">📷 امسح الكود للإبلاغ عن عطل</div></div>`;
+}
+async function printStickers(list) {
+  if (!list.length) return toast('مفيش حاجة تتطبع', 'warn');
+  await QRLIB();
+  $('#printArea').innerHTML = `<style>@page{size:A4 portrait;margin:8mm}</style><div class="stk-grid">${list.map(stickerHtml).join('')}</div>`;
+  setTimeout(() => window.print(), 150);
+}
+async function centerLinkModal(id) {
+  const d = await api('/api/links?center=' + id).catch(e => { toast(e.message, 'err'); return null; }); if (!d) return;
+  await QRLIB();
+  const url = absUrl(d.path);
+  const msg = `السلام عليكم 👋\nده لينك البلاغات الخاص بـ *${d.center}* من ${S.boot.settings.company_name}.\nلو أي طابعة عطلت افتح اللينك واكتب المشكلة (وصوّرها لو تقدر) — البلاغ بيوصلنا فورًا وتقدر تتابع الفني لحد ما يوصلك:\n${url}`;
+  const m = modal({
+    title: 'لينك بلاغ الأعطال', sub: d.center, icon: 'link', tile: 't-gold',
+    body: `<div class="qr-box">${qrSvg(url, 6)}</div>
+      <div class="inp ltr" style="height:auto;padding:10px;word-break:break-all;font-size:12.5px;text-align:left">${esc(url)}</div>
+      <div class="note">${ic('info')}<div>المركز بيفتح اللينك أو يمسح الكود، يكتب العطل ويصوّره، والبلاغ يوصلك هنا في "المهام" كبلاغ محتاج فني — والمركز يتابع لحد ما الفني يوصل.</div></div>
+      ${d.devices.length ? `<div class="muted" style="font-weight:800;font-size:13px">ستيكرات طابعات المركز (${d.devices.length})</div><div class="mini-list">${d.devices.map(x => `<div class="mini-it"><div class="tile xs t-blue">${ic('printer')}</div><div style="flex:1"><b>${esc(x.name)}</b><span>${esc([x.brand, x.model].filter(Boolean).join(' '))}${x.serial ? ' • ' + esc(x.serial) : ''}</span></div></div>`).join('')}</div>` : ''}`,
+    foot: `<a class="btn btn-wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(msg)}">${ic('wa')} ابعته للمركز</a><button class="btn btn-soft" data-cp>${ic('copy')} نسخ</button><button class="btn btn-primary" data-pr>${ic('printer')} طباعة ستيكرات</button><span class="sp"></span><button class="btn btn-soft" data-close>إغلاق</button>`,
+  });
+  $('[data-cp]', m.el).onclick = () => copyText(url);
+  $('[data-pr]', m.el).onclick = () => printStickers([{ url, title: d.center, line: 'بلاغ أعطال المركز', sub: 'خدمة العملاء والصيانة' }, ...d.devices.map(x => ({ url: absUrl(x.path), title: x.name, line: [[x.brand, x.model].filter(Boolean).join(' '), d.center].filter(Boolean).join(' — '), serial: x.serial }))]);
+}
+async function deviceStickers(ids) {
+  const d = await api('/api/links?device=' + ids.join(',')).catch(e => { toast(e.message, 'err'); return null; }); if (!d) return;
+  printStickers(d.rows.map(x => ({ url: absUrl(x.path), title: x.name, line: [x.model, x.center].filter(Boolean).join(' — '), serial: x.serial })));
+}
+
+/* ---------- Employee: printer sticker scan → printer history ---------- */
+const scanDevKey = t => { const s = String(t || ''); const m = /\/r\/(d\d+\.[A-Za-z0-9_-]{10})/.exec(s) || /[?&]dev=(d\d+\.[A-Za-z0-9_-]{10})/.exec(s); return m ? m[1] : null; };
+async function empDeviceModal(key) {
+  const d = await api('/api/my/device?k=' + encodeURIComponent(key)).catch(e => { toast(e.message, 'err'); return null; }); if (!d) return;
+  const x = d.device;
+  const m = modal({
+    title: x.name, sub: [x.model_full, x.center].filter(Boolean).join(' — '), icon: 'printer', tile: 't-blue', size: 'lg',
+    body: `<div class="prof-stats"><div><b>${d.visits.length}</b><span>زيارة</span></div><div><b style="color:var(--orange)">${d.visits.filter(v => v.fault_desc || v.fault_code).length}</b><span>عطل</span></div><div><b style="font-size:14px">${d.visits[0] ? dShort(d.visits[0].date) : '—'}</b><span>آخر زيارة</span></div></div>
+      ${x.serial ? `<div class="chip c-navy ltr" style="align-self:flex-start">S/N ${esc(x.serial)}</div>` : ''}
+      ${d.tasks.length ? `<div class="note warn">${ic('send')}<div>فيه ${d.tasks.length} بلاغ مفتوح على الطابعة دي: ${d.tasks.map(t => esc(t.title)).join('، ')}</div></div>` : ''}
+      <div class="muted" style="font-weight:800;font-size:13px">${ic('history')} سجل الطابعة</div>
+      ${d.visits.length ? d.visits.map(v => `<div class="kb-card"><div class="kb-h">${v.fault_code ? `<span class="kb-code ltr">${esc(v.fault_code)}</span>` : ''}<b>${esc(v.fault_desc || v.work_type || 'زيارة')}</b></div><div class="kb-sol">${esc(v.details || '')}</div><div class="kb-by">${esc(v.emp_name || '')} • ${dShort(v.date)} ${t12(v.at)}</div></div>`).join('') : '<div class="empty" style="padding:14px">لسه مفيش زيارات متسجلة على الطابعة دي</div>'}
+      ${d.kb.length ? `<div class="muted" style="font-weight:800;font-size:13px">${ic('bulb')} حلول لأعطال نفس الموديل</div><div class="kb-list">${d.kb.slice(0, 4).map(r => KB.card(r)).join('')}</div>` : ''}`,
+    foot: `<button class="btn btn-green" data-v style="flex:1">${ic('wrench')} سجّل زيارة على الطابعة دي</button><button class="btn btn-soft" data-close>إغلاق</button>`,
+  });
+  $('[data-v]', m.el).onclick = () => { m.close(); visitForm(null, null, { id: x.id, name: x.name, center: x.center, model: x.model_full, serial: x.serial }); };
+}
+
+/* ---------- Rewards & recognition ---------- */
+const RSTY = { confetti: ['🎉', 'احتفال'], trophy: ['🏆', 'كأس'], stars: ['⭐', 'نجوم'], hearts: ['❤️', 'قلوب'] };
+const Celebrate = {
+  queue: [], on: false,
+  enqueue(list) { for (const r of list) if (!this.queue.some(x => x.id === r.id) && this.cur !== r.id) this.queue.push(r); if (!this.on) this.next(); },
+  next() { const r = this.queue.shift(); if (!r) { this.on = false; return; } this.show(r, true); },
+  chime() { try { const A = new (window.AudioContext || window.webkitAudioContext)(); [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => { const o = A.createOscillator(), g = A.createGain(); o.type = 'triangle'; o.frequency.value = f; g.gain.setValueAtTime(0.0001, A.currentTime + i * 0.12); g.gain.exponentialRampToValueAtTime(0.18, A.currentTime + i * 0.12 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, A.currentTime + i * 0.12 + 0.5); o.connect(g).connect(A.destination); o.start(A.currentTime + i * 0.12); o.stop(A.currentTime + i * 0.12 + 0.55); }); } catch {} },
+  show(r, real) {
+    this.on = true; this.cur = r.id;
+    const icon = { confetti: '🎉', trophy: '🏆', stars: '🌟', hearts: '💖' }[r.style] || '🎉';
+    const ov = document.createElement('div'); ov.className = 'cele ' + (r.style || 'confetti');
+    ov.innerHTML = `<canvas></canvas><div class="cele-rays"></div><div class="cele-card">
+      <div class="cele-ic">${icon}</div><div class="cele-k">${real === false ? 'معاينة' : 'مفاجأة من الإدارة'}</div><h2>${esc(r.title || 'شكرًا ليك')}</h2>
+      ${r.stars ? `<div class="cele-stars">${'<span>★</span>'.repeat(r.stars)}</div>` : ''}
+      <p>${esc(r.message || '')}</p>
+      ${r.amount ? `<div class="cele-amt">مكافأة <b data-amt="${r.amount}">0</b> ${esc((S.boot && S.boot.settings.currency) || 'ج.م')}</div>` : ''}
+      <div class="cele-by">— ${esc(r.by_name || 'الإدارة')}</div>
+      <button class="btn cele-btn">${real === false ? 'تمام' : 'شكرًا ❤️'}</button></div>`;
+    document.body.appendChild(ov);
+    requestAnimationFrame(() => ov.classList.add('in'));
+    if (navigator.vibrate) navigator.vibrate([80, 60, 80, 60, 160]);
+    this.chime();
+    $$('.cele-stars span', ov).forEach((s, i) => setTimeout(() => s.classList.add('on'), 700 + i * 260));
+    const amt = $('[data-amt]', ov); if (amt) { const to = +amt.dataset.amt, t0 = performance.now() + 900; const st = t => { const p = Math.max(0, Math.min(1, (t - t0) / 1300)); amt.textContent = fmtN(Math.round(to * (1 - Math.pow(1 - p, 3)))); if (p < 1) requestAnimationFrame(st); }; requestAnimationFrame(st); }
+    const stop = this.particles($('canvas', ov), r.style || 'confetti');
+    $('.cele-btn', ov).onclick = async () => {
+      stop(); ov.classList.remove('in'); ov.classList.add('out'); setTimeout(() => ov.remove(), 400);
+      if (real !== false) { try { await api('/api/my/rewards/seen', { id: r.id }); } catch {} if (S.home) S.home.rewards_new = (S.home.rewards_new || []).filter(x => x.id !== r.id); this.cur = null; setTimeout(() => this.next(), 450); }
+      else { this.on = false; this.cur = null; }
+    };
+  },
+  particles(cv, style) {
+    const ctx = cv.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1); let W, H, run = true, t0 = performance.now();
+    const size = () => { W = cv.width = innerWidth * dpr; H = cv.height = innerHeight * dpr; }; size(); addEventListener('resize', size);
+    const cols = ['#f7c12d', '#ffd75e', '#3fcf86', '#5b8cf0', '#ff6b7a', '#a78bfa', '#ffffff'];
+    const glyph = style === 'hearts' ? '❤' : style === 'stars' || style === 'trophy' ? '★' : null;
+    const P = Array.from({ length: style === 'confetti' ? 170 : 90 }, () => ({ x: Math.random() * W, y: -Math.random() * H * 0.9, vx: (Math.random() - 0.5) * 2.2 * dpr, vy: (2 + Math.random() * 3.2) * dpr, r: (5 + Math.random() * 7) * dpr, a: Math.random() * 6.3, va: (Math.random() - 0.5) * 0.25, c: cols[Math.floor(Math.random() * cols.length)] }));
+    const frame = t => {
+      if (!run) return; ctx.clearRect(0, 0, W, H); const age = (t - t0) / 1000;
+      for (const p of P) {
+        p.x += p.vx + Math.sin(age * 2 + p.a) * 0.6 * dpr; p.y += p.vy; p.a += p.va;
+        if (p.y > H + 20) { if (age < 5) { p.y = -20; p.x = Math.random() * W; } else continue; }
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.globalAlpha = Math.max(0, Math.min(1, 7 - age));
+        if (glyph) { ctx.fillStyle = style === 'hearts' ? (p.c === '#ffffff' ? '#ff8fa3' : p.c === '#3fcf86' ? '#ff6b7a' : p.c) : (p.c === '#5b8cf0' ? '#ffd75e' : p.c); ctx.font = `${p.r * 2.4}px sans-serif`; ctx.fillText(glyph, -p.r, p.r); }
+        else { ctx.fillStyle = p.c; ctx.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); }
+        ctx.restore();
+      }
+      if (age < 8) requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+    return () => { run = false; removeEventListener('resize', size); };
+  },
+};
+function rewardModal(empId = '') {
+  const isAdmin = S.boot.me.role === 'admin';
+  const presets = ['نجم الأسبوع 🏆', 'شغل ممتاز 👏', 'شكرًا على مجهودك ❤️', 'أسرع استجابة ⚡', 'تقييم المراكز ليك عالي ⭐'];
+  let stars = 5;
+  const m = modal({
+    title: 'مكافأة وتقدير', sub: 'بتظهر للموظف بأنيميشن أول ما يفتح البرنامج', icon: 'gift', tile: 't-gold', size: 'lg',
+    body: `<div class="grid2"><div class="field"><label>لمين؟</label><select class="inp" name="target"><option value="emp">موظف</option><option value="dept">قسم</option><option value="all">كل الموظفين</option></select></div>
+        <div class="field" data-t="emp"><label>الموظف *</label><select class="inp" name="emp_id">${empOptions(empId, 'اختار الموظف', true)}</select></div>
+        <div class="field hide" data-t="dept"><label>القسم</label><select class="inp" name="dept_id">${deptOptions('', 'اختار القسم')}</select></div></div>
+      <div class="field"><label>العنوان</label><input class="inp" name="title" value="${esc(presets[0])}"><div class="row wrap" style="gap:6px;margin-top:6px">${presets.map(p => `<button type="button" class="btn btn-xs btn-soft" data-pre="${esc(p)}">${esc(p)}</button>`).join('')}</div></div>
+      <div class="field"><div class="lbl-row"><label>رسالتك ليه *</label>${Mic.btn()}</div><textarea class="inp" name="message" rows="3" placeholder="اكتب أو اتكلم — مثال: شكرًا على مجهودك في مركز النور، العميل مبسوط جدًا"></textarea></div>
+      <div class="field"><label>النجوم</label><div class="star-pick">${[1, 2, 3, 4, 5].map(n => `<button type="button" data-st="${n}" class="on">★</button>`).join('')}<button type="button" class="btn btn-xs btn-soft" data-st="0">من غير نجوم</button></div></div>
+      ${isAdmin ? `<div class="field"><label>مكافأة مالية (${esc(cur())}) — اختياري</label><input class="inp" type="number" min="0" step="50" name="amount" placeholder="0"><small>بتتضاف لوحدها على كشف مرتب الشهر ده</small></div>` : ''}
+      <div class="field"><label>شكل الأنيميشن</label><div class="optcards" style="grid-template-columns:repeat(4,1fr)">${Object.entries(RSTY).map(([k, v], i) => `<label><input type="radio" name="style" value="${k}" ${i === 1 ? 'checked' : ''}><span class="oc"><span style="font-size:24px">${v[0]}</span>${v[1]}</span></label>`).join('')}</div></div>`,
+    foot: `<button class="btn btn-gold" data-send>${ic('gift')} ابعت المكافأة</button><button class="btn btn-soft" data-prev>${ic('eye')} معاينة</button><span class="sp"></span><button class="btn btn-soft" data-close>إلغاء</button>`,
+    onMount: mm => {
+      const tg = $('[name=target]', mm.box); tg.onchange = () => { $('[data-t=emp]', mm.box).classList.toggle('hide', tg.value !== 'emp'); $('[data-t=dept]', mm.box).classList.toggle('hide', tg.value !== 'dept'); };
+      $$('[data-pre]', mm.box).forEach(b => b.onclick = () => { $('[name=title]', mm.box).value = b.dataset.pre; });
+      $$('[data-st]', mm.box).forEach(b => b.onclick = () => { stars = +b.dataset.st; $$('.star-pick [data-st]', mm.box).forEach(x => { if (+x.dataset.st > 0) x.classList.toggle('on', +x.dataset.st <= stars); }); });
+    },
+  });
+  const vals = () => { const v = formVals(m.box); v.stars = stars; return v; };
+  $('[data-prev]', m.el).onclick = () => { const v = vals(); Celebrate.show({ id: 0, title: v.title, message: v.message || 'رسالتك هتظهر هنا', stars: v.stars, amount: +v.amount || 0, style: v.style, by_name: S.boot.me.name || S.boot.me.username }, false); };
+  $('[data-send]', m.el).onclick = ev => busy(ev.currentTarget, async () => { const v = vals(); const r = await api('/api/rewards/send', v); m.close(); toast(r.count > 1 ? `المكافأة اتبعتت لـ ${r.count} موظف 🎁` : 'المكافأة اتبعتت 🎁 — هتظهرله أول ما يفتح'); if (S.page === 'rewards') renderPage(true); });
+}
+PAGES.rewards = {
+  async render() {
+    const d = await api('/api/rewards');
+    return `<div class="toolbar"><div class="note" style="flex:1;min-width:240px">${ic('gift')}<div>ابعت تقدير أو نجوم أو مكافأة لأي موظف — بتظهرله على الموبايل بأنيميشن احتفال أول ما يفتح البرنامج، وبيوصله إشعار. والمكافأة المالية بتنزل على كشف المرتب لوحدها.</div></div><button class="btn btn-sm btn-gold" data-act="reward-new">${ic('gift')} مكافأة جديدة</button></div>
+      <div class="g-2" style="align-items:start">
+        <div class="card"><div class="card-h"><div class="tile sm t-gold">${ic('badgeCheck')}</div><div><h3>لوحة النجوم</h3><p>آخر 3 شهور</p></div></div>
+          ${d.board.length ? d.board.map((x, i) => `<div class="lb-row"><span class="rk">${i + 1}</span>${av(x.name, x.emp_id, 'sm', x.photo)}<div style="flex:1;min-width:0"><b style="font-size:13.5px;display:block">${esc(x.name)}</b><span class="muted" style="font-size:12px">${x.n} تقدير${x.amount ? ' • ' + money(x.amount) : ''}</span></div><div class="sc"><b style="color:var(--gold-ink)">${x.stars} ★</b><span>نجمة</span></div></div>`).join('') : '<div class="empty" style="padding:20px">لسه مفيش مكافآت</div>'}</div>
+        <div class="card"><div class="card-h"><div class="tile sm t-purple">${ic('history')}</div><div><h3>اللي اتبعت</h3><p>${d.rows.length} مكافأة</p></div></div>
+          <div class="mini-list" style="max-height:70vh">${d.rows.map(r => `<div class="mini-it">${av(r.emp_name, r.emp_id, 'sm', r.emp_photo)}<div style="flex:1;min-width:0"><b>${esc(r.emp_name)} — ${esc(r.title || '')}</b><span>${r.stars ? '★'.repeat(r.stars) + ' • ' : ''}${r.amount ? money(r.amount) + ' • ' : ''}${dShort(r.created_at.slice(0, 10))} ${t12(r.created_at)}</span></div><div class="end">${r.seen_at ? chip('اتشافت ' + t12(r.seen_at), 'green', 'checks') : chip('لسه متشافتش', 'slate', 'clock')}${S.boot.me.role === 'admin' ? `<button class="btn btn-xs btn-soft" style="color:var(--red)" data-act="reward-del" data-id="${r.id}">${ic('trash')}</button>` : ''}</div></div>`).join('') || '<div class="empty" style="padding:20px">—</div>'}</div></div>
+      </div>`;
+  },
+};
+
 /* ---------- Attendance edit & map ---------- */
 async function attModal({ id, emp, date }) {
   let rec = null;
@@ -3451,6 +3647,12 @@ const ACT = {
   reload: () => renderPage(false),
   kpi: el => { if (el.dataset.page === 'daily') { S.f.daily = { date: today(), status: el.dataset.st || 'all', dept: '', q: '' }; } location.hash = '#/' + el.dataset.page; },
   'set-status': el => { const k = el.dataset.k; S.f[k] = Object.assign(S.f[k] || {}, { [el.dataset.field || 'status']: el.dataset.v }); renderPage(true); },
+  /* ---- v1.4 ---- */
+  'center-link': el => busy(null, () => centerLinkModal(+el.dataset.id)),
+  'dev-qr': el => deviceStickers([+el.dataset.id]),
+  'dev-stickers': () => { const f = S.f.dev || {}; let L0 = (S.devCache || []).filter(x => x.active); if (f.center) L0 = L0.filter(x => String(x.center_id) === String(f.center)); deviceStickers(L0.map(x => x.id)); },
+  'reward-new': el => { if (el.dataset.closeFirst) closeModals(); rewardModal(el.dataset.id || ''); },
+  'reward-del': async el => { if (!await confirmBox('حذف المكافأة دي؟ (لو فيها مبلغ هيتشال من كشف المرتب)', { danger: true, ok: 'حذف' })) return; await busy(null, async () => { await api('/api/rewards/delete', { id: +el.dataset.id }); renderPage(true); }); },
   /* ---- v1.3 ---- */
   'logo-rm': async () => { if (!await confirmBox('إزالة لوجو الشركة؟', { ok: 'إزالة', danger: true })) return; await busy(null, async () => { await api('/api/settings/logo', { image: null }); await reloadBoot(); paintBrand(); toast('اتشال اللوجو'); renderPage(true); }); },
   'pl-range': el => { const t = today(), v = el.dataset.v; S.f.pl = Object.assign(S.f.pl || {}, v === 'today' ? { from: t, to: t } : v === 'past' ? { from: addDays(t, -7), to: addDays(t, -1) } : { from: t, to: addDays(t, 6) }); renderPage(true); },
@@ -3660,12 +3862,13 @@ function getPos(timeout = 15000) {
 }
 async function startEmp() {
   $('#app').innerHTML = `<div style="min-height:100vh;display:grid;place-items:center"><div class="row muted">${ic('refresh', 'spin')} جاري التحميل...</div></div>`;
-  const qs = new URLSearchParams(location.search), tab = qs.get('tab'), qr = qs.get('qr');
-  if (tab || qr) cleanUrlParams(['tab', 'qr']);
+  const qs = new URLSearchParams(location.search), tab = qs.get('tab'), qr = qs.get('qr'), dev = qs.get('dev');
+  if (tab || qr || dev) cleanUrlParams(['tab', 'qr', 'dev']);
   if (tab && ['home', 'visits', 'kb', 'chat', 'history', 'leaves', 'profile'].includes(tab)) S.etab = tab;
   await loadHome();
   EmpSync.connect();
   if (qr && S.home) qrPunch(qr);
+  if (dev && S.home) setTimeout(() => empDeviceModal(dev), 600);
   setTimeout(() => OQ.flush(), 2500);
 }
 async function loadHome(silent) {
@@ -3674,6 +3877,7 @@ async function loadHome(silent) {
   } catch (e) { if (!silent && S.token) $('#app').innerHTML = `<div class="emp"><div class="card empty" style="margin:30px 16px"><div class="tile t-red">${ic('alert')}</div><b>${esc(e.message)}</b><div style="margin-top:14px"><button class="btn btn-primary" onclick="loadHome()">${ic('refresh')} حاول تاني</button></div></div></div>`; return; }
   if (S.etab === 'chat' && S.home.chat_unread) EChat.msgs = null;
   renderEmp();
+  if ((S.home.rewards_new || []).length) setTimeout(() => Celebrate.enqueue(S.home.rewards_new), 500);
   Tracker.sync();
   if (!S.loc || Date.now() - S.loc.at > 60000) locate();
 }
@@ -3902,7 +4106,7 @@ const Scan = {
     });
     return null;
   },
-  async open() {
+  async open(accept = t => Scan.token(t), hint = 'وجّه الكاميرا على كود الـ QR اللي على شاشة المقر') {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.isSecureContext) return this.help(window.isSecureContext ? '' : 'الكاميرا بتشتغل على رابط https بس');
     let stream;
     try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false }); }
@@ -3911,7 +4115,7 @@ const Scan = {
     if ('BarcodeDetector' in window) { try { const f = await BarcodeDetector.getSupportedFormats(); if (f.includes('qr_code')) det = new BarcodeDetector({ formats: ['qr_code'] }); } catch {} }
     if (!det) { try { await loadScript('vendor/jsqr/jsQR.js'); } catch { stream.getTracks().forEach(t => t.stop()); return this.help(); } }
     const ov = document.createElement('div'); ov.className = 'scan';
-    ov.innerHTML = `<video playsinline muted autoplay></video><div class="fr"></div><button class="btn btn-icon x" style="background:rgba(255,255,255,.18);color:#fff">${ic('x')}</button><div class="bar"><b style="font-size:16px">وجّه الكاميرا على كود الـ QR اللي على شاشة المقر</b><span style="font-size:12.5px;opacity:.85">بيتقرا لوحده — الكود بيتغير كل 30 ثانية</span></div>`;
+    ov.innerHTML = `<video playsinline muted autoplay></video><div class="fr"></div><button class="btn btn-icon x" style="background:rgba(255,255,255,.18);color:#fff">${ic('x')}</button><div class="bar"><b style="font-size:16px">${hint}</b><span style="font-size:12.5px;opacity:.85">بيتقرا لوحده</span></div>`;
     document.body.appendChild(ov);
     const video = $('video', ov); video.srcObject = stream; try { await video.play(); } catch {}
     const cv = document.createElement('canvas'), ctx = cv.getContext('2d', { willReadFrequently: true });
@@ -3928,9 +4132,9 @@ const Scan = {
             else { const w = Math.min(720, video.videoWidth), h = Math.round(video.videoHeight * w / video.videoWidth); cv.width = w; cv.height = h; ctx.drawImage(video, 0, 0, w, h); const r = window.jsQR(ctx.getImageData(0, 0, w, h).data, w, h, { inversionAttempts: 'dontInvert' }); if (r) txt = r.data; }
           }
         } catch {}
-        const tok = txt ? Scan.token(txt) : null;
+        const tok = txt ? accept(txt) : null;
         if (tok) { if (navigator.vibrate) navigator.vibrate(90); return close(tok); }
-        if (txt && Date.now() - warned > 3000) { warned = Date.now(); toast('الكود ده مش كود الحضور بتاع المقر', 'warn'); }
+        if (txt && Date.now() - warned > 3000) { warned = Date.now(); toast('الكود ده مش الكود المطلوب', 'warn'); }
         setTimeout(loop, det ? 220 : 160);
       };
       loop();
@@ -3962,12 +4166,13 @@ function empVisitsHtml() {
   const fu = v.visits.filter(x => x.result !== 'done').length;
   return head + `
     <div class="ecard2"><button class="btn btn-gold" style="width:100%;height:58px;font-size:17px;border-radius:18px" data-eact="visit-new">${ic('wrench')} سجّل زيارة جديدة</button>
+      <button class="btn btn-soft" style="width:100%;height:46px;margin-top:8px" data-eact="scan-dev">${ic('camera')} امسح ستيكر الطابعة — سجلها وأعطالها</button>
       <div class="mstats" style="grid-template-columns:repeat(3,1fr);margin-top:12px"><div><b style="color:var(--heading)">${todays.length}</b><span>النهارده</span></div><div><b style="color:var(--green)">${v.visits.length}</b><span>آخر 30 يوم</span></div><div><b style="color:var(--purple)">${fu}</b><span>محتاجة متابعة</span></div></div>
       ${v.offline ? `<div class="note warn" style="margin-top:10px">${ic('signal')}<div>مفيش نت دلوقتي — تقدر تسجل الزيارة عادي وهتتبعت لوحدها أول ما النت يرجع.</div></div>` : ''}</div>
     ${doneT.length ? `<div class="ecard2"><h3>${ic('checkCircle')} مهام خلصتها النهارده</h3>${doneT.map(t => `<div class="cust-it"><div class="tile xs t-green">${ic('check')}</div><b>${esc(t.title)}<br><small class="muted">${esc(t.center)} • ${t12(t.done_at)}</small></b>${t.visit_id ? `<button class="btn btn-xs btn-soft" data-eact="visit-show" data-id="${t.visit_id}">${ic('eye')}</button>` : ''}</div>`).join('')}</div>` : ''}
     <div class="ecard2"><h3>${ic('list')} زياراتي</h3>${v.visits.length ? v.visits.slice(0, S.visAll ? 999 : 15).map(empVisitItem).join('') + (!S.visAll && v.visits.length > 15 ? `<button class="btn btn-soft btn-sm" style="width:100%;margin-top:8px" data-eact="vis-all">عرض كل الزيارات (${v.visits.length})</button>` : '') : `<div class="empty" style="padding:20px">${ic('wrench')}<div>${v.offline ? 'هتظهر لما النت يرجع' : 'لسه مسجلتش زيارات'}</div></div>`}</div></div>`;
 }
-async function visitForm(task = null, plan = null) {
+async function visitForm(task = null, plan = null, device = null) {
   let v; try { v = S.vis || await loadVis(); } catch (e) { return toast(e.message, 'err'); }
   const level = v.settings.photo_quality || 'low';
   const custody = (v.custody || (S.home && S.home.custody) || []).filter(c => c.balance > 0);
@@ -3977,11 +4182,12 @@ async function visitForm(task = null, plan = null) {
     title: task ? 'قفل المهمة بزيارة' : 'تسجيل زيارة مركز', sub: task ? task.title : plan ? 'من جدول زياراتك' : 'سجّل الشغل اللي عملته وسلّمته لمين', icon: 'wrench', tile: 't-red', size: 'lg',
     body: `${task ? `<div class="note">${ic('send')}<div>الزيارة دي هتتربط بالمهمة <b>${esc(task.title)}</b> وهتتقفل لوحدها بعد الحفظ.</div></div>` : ''}
       ${v.offline ? `<div class="note warn">${ic('signal')}<div>مفيش نت — الزيارة هتتحفظ على الموبايل وتتبعت لوحدها أول ما النت يرجع.</div></div>` : ''}
-      <div class="field"><label>المركز *</label><div class="inp-ico">${ic('hospital')}<input class="inp" name="center_name" list="dlCenters" placeholder="اكتب أو اختار اسم المركز" autocomplete="off" value="${esc(task ? task.center : plan ? plan.center : '')}"></div><datalist id="dlCenters">${v.centers.map(c => `<option value="${esc(c.name)}">${esc(c.area || '')}</option>`).join('')}</datalist><small>لو المركز مش في القائمة اكتب اسمه وهيتضاف تلقائي</small></div>
+      <div class="field"><label>المركز *</label><div class="inp-ico">${ic('hospital')}<input class="inp" name="center_name" list="dlCenters" placeholder="اكتب أو اختار اسم المركز" autocomplete="off" value="${esc(task ? task.center : plan ? plan.center : device ? device.center : '')}"></div><datalist id="dlCenters">${v.centers.map(c => `<option value="${esc(c.name)}">${esc(c.area || '')}</option>`).join('')}</datalist><small>لو المركز مش في القائمة اكتب اسمه وهيتضاف تلقائي</small></div>
       <div class="field"><label>نوع الشغل</label><div class="daypick">${(() => { const want = task ? (/دوري|وقائ/.test(task.title) ? /دوري/ : /تركيب/.test(task.title) ? /تركيب/ : /معايرة/.test(task.title) ? /معايرة/ : /عطل|إصلاح/) : null; let pick = want ? v.work_types.findIndex(t => want.test(t)) : 0; if (pick < 0) pick = 0; return v.work_types.map((t, i) => `<label><input type="radio" name="work_type" value="${esc(t)}" ${i === pick ? 'checked' : ''}><span>${esc(t)}</span></label>`).join(''); })()}</div></div>
+      ${device || (task && task.device_id) ? `<div class="chip c-blue" style="align-self:flex-start">${ic('printer')} ${esc(device ? [device.name, device.model, device.serial ? 'S/N ' + device.serial : ''].filter(Boolean).join(' — ') : (task.dev_name || 'الطابعة') + (task.dev_serial ? ' — S/N ' + task.dev_serial : ''))}</div>` : ''}
       <div class="field"><div class="lbl-row"><label>العطل / المشكلة</label>${Mic.btn()}</div><input class="inp" name="fault_desc" placeholder="مثال: خطوط بيضاء على الفيلم" value="${esc(task ? task.title : '')}" autocomplete="off"></div>
       <div class="grid2"><div class="field"><label>كود العطل</label><input class="inp ltr" style="text-align:right" name="fault_code" placeholder="لو ظهر كود (اختياري)" autocomplete="off"></div>
-        <div class="field"><label>موديل الطابعة</label><input class="inp" name="fault_model" list="dlModels" placeholder="مثال: Fuji DryPix" autocomplete="off"><datalist id="dlModels">${(v.kb_models || []).map(x => `<option value="${esc(x)}">`).join('')}</datalist></div></div>
+        <div class="field"><label>موديل الطابعة</label><input class="inp" name="fault_model" list="dlModels" placeholder="مثال: Fuji DryPix" autocomplete="off" value="${esc(device && device.model ? device.model : '')}"><datalist id="dlModels">${(v.kb_models || []).map(x => `<option value="${esc(x)}">`).join('')}</datalist></div></div>
       <div data-kbhint></div>
       <div class="field"><div class="lbl-row"><label>اللي اتعمل بالتفصيل (الحل) *</label>${Mic.btn()}</div><textarea class="inp" name="details" rows="3" placeholder="اكتب أو دوس على الميكروفون واتكلم — مثال: نظفت رأس الطباعة بالكحول وعملت Test Print"></textarea></div>
       <label class="switch"><input type="checkbox" name="save_kb" checked><span class="tr"></span>احفظ الحل في بنك الأعطال علشان زمايلك يستفيدوا 💡</label>
@@ -4043,7 +4249,7 @@ async function visitForm(task = null, plan = null) {
     let photo = null;
     if (file) photo = (await compressPhoto(file, { level, stamp: stampLines() })).dataUrl; // re-stamp with final data
     const c = centerObj(); const l = S.loc && S.loc.lat ? S.loc : null;
-    const body = { ...f, center_id: c ? c.id : null, lat: l ? l.lat : null, lng: l ? l.lng : null, acc: l ? l.acc : null, photo, parts, task_id: task ? task.id : null, plan_id: plan ? plan.id : null };
+    const body = { ...f, center_id: c ? c.id : null, lat: l ? l.lat : null, lng: l ? l.lng : null, acc: l ? l.acc : null, photo, parts, task_id: task ? task.id : null, plan_id: plan ? plan.id : null, device_id: device ? device.id : (task && task.device_id) || null };
     let r;
     try { r = await api('/api/my/visit', body); }
     catch (e) {
@@ -4112,10 +4318,12 @@ function empKbHtml() {
 }
 function empProfileHtml() {
   const h = S.home, e = h.emp, site = h.site;
+  if (!S.myRewards) api('/api/my/rewards').then(r => { S.myRewards = r.rows; if (S.etab === 'profile') renderEmp(); }).catch(() => { S.myRewards = []; });
   return empHeader('حسابي') + `<div class="emp-body">
     <div class="ecard2"><h3>${ic('user')} بياناتي</h3><div class="kv" style="font-size:14px;gap:8px 14px"><span>الكود</span><b class="ltr" style="text-align:right">${esc(e.code)}</b><span>الوظيفة</span><b>${esc(e.job || '—')}</b><span>القسم</span><b>${esc(e.dept || '—')}</b>
       <span>الوردية</span><b>${h.today.shift_name ? esc(h.today.shift_name) : '—'}</b><span>أيام الراحة</span><b>${restText(e.rest_days)}</b><span>موقع العمل</span><b>${site ? esc(site.name) : 'أي مكان'}</b><span>الشركة</span><b>${esc(h.settings.company_name)}</b></div></div>
     <div class="ecard2"><h3>${ic('key')} تغيير الرقم السري</h3><div class="stack" style="gap:10px" id="pinForm"><input class="inp" type="password" inputmode="numeric" name="old" placeholder="الرقم السري الحالي"><input class="inp" type="password" inputmode="numeric" name="new" placeholder="الرقم السري الجديد (4-8 أرقام)"><button class="btn btn-soft" data-eact="pin">${ic('check')} تغيير</button></div></div>
+    <div class="ecard2" data-myrew><h3>${ic('gift')} مكافآتي ${h.stars_total ? `<span class="chip c-gold" style="margin-inline-start:auto">${h.stars_total} ★</span>` : ''}</h3>${S.myRewards ? (S.myRewards.length ? S.myRewards.slice(0, 8).map(r => `<button class="cust-it" style="width:100%;text-align:right" data-eact="reward-replay" data-id="${r.id}"><span style="font-size:22px">${({ confetti: '🎉', trophy: '🏆', stars: '🌟', hearts: '💖' })[r.style] || '🎁'}</span><b>${esc(r.title || '')}<br><small class="muted">${r.stars ? '★'.repeat(r.stars) + ' • ' : ''}${dShort(r.created_at.slice(0, 10))}</small></b>${ic('chevL')}</button>`).join('') : '<div class="muted" style="font-size:13px;text-align:center;padding:8px">لسه مفيش — كمّل شغلك الحلو 💪</div>') : `<div class="muted" style="text-align:center">${ic('refresh', 'spin')}</div>`}</div>
     <div class="ecard2"><h3>${ic('bell')} الإشعارات</h3>${Push.card(h.push_on, 'هيوصلك إشعار لما الإدارة تبعتلك مهمة أو رسالة أو ترد على طلبك — حتى والبرنامج مقفول.')}</div>
     ${(h.custody || []).length ? `<div class="ecard2"><h3>${ic('brief')} عهدتي من قطع الغيار</h3>${h.custody.map(c => `<div class="cust-it"><div class="tile xs t-orange">${ic('wrench')}</div><b>${esc(c.name)}</b><span class="ltr" style="font-weight:900;font-size:15px;color:var(--${c.balance < 0 ? 'red' : 'heading'})">${fmtN(c.balance)}</span><span class="muted" style="font-size:12px">${esc(c.unit)}</span></div>`).join('')}<small class="muted" style="display:block;margin-top:6px">أي قطعة بتسجلها في زيارة بتتخصم من عهدتك لوحدها</small></div>` : ''}
     <button class="btn btn-soft" style="height:50px" data-etab="history">${ic('calCheck')} سجل حضوري وانصرافي</button>
@@ -4182,6 +4390,8 @@ document.addEventListener('click', async e => {
   if (k === 'visit-new') visitForm();
   if (k === 'task') taskAct(a);
   if (k === 'plan-new') planModal(0);
+  if (k === 'scan-dev') { const key = await Scan.open(scanDevKey, 'وجّه الكاميرا على ستيكر الـ QR اللي على الطابعة'); if (key) empDeviceModal(key); }
+  if (k === 'reward-replay') { const r = (S.myRewards || []).find(x => x.id === +a.dataset.id); if (r) Celebrate.show(r, false); }
   if (k === 'plan-edit') planModal(+a.dataset.id);
   if (k === 'plan-visit') { const id = +a.dataset.id; let p = (S.plans || []).find(x => x.id === id) || ((S.home && S.home.plans_today) || []).find(x => x.id === id); if (p) visitForm(null, p); }
   if (k === 'plan-del') {
@@ -4272,6 +4482,7 @@ const EmpSync = {
     }
     if (d.type === 'kb' && d.author) { toast(`💡 ${d.author} ضاف حل: ${d.code ? d.code + ' — ' : ''}${d.problem || ''}`, 'info', 'bulb'); }
     if (d.type === 'kb') { KB.data = null; if (S.etab === 'kb') KB.refresh(); }
+    if (d.type === 'reward') { S.myRewards = null; loadHome(true); }
     if (d.type === 'plan_remind') { toast(`⏰ تذكير: زيارة ${d.center}${d.time ? ' الساعة ' + t12(d.time) : ''}`, 'info', 'cal'); if (navigator.vibrate) navigator.vibrate([120, 60, 120]); }
     if (d.type === 'custody') { S.vis = null; toast('عهدتك من قطع الغيار اتحدثت', 'info', 'brief'); if (S.etab !== 'chat') loadHome(true); }
   },

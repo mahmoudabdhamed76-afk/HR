@@ -13,7 +13,7 @@ const _emit = process.emitWarning;
 process.emitWarning = function (w, ...rest) { if (String(w && w.message || w).includes('SQLite')) return; return _emit.call(process, w, ...rest); };
 const { DatabaseSync } = require('node:sqlite');
 
-const VERSION = '1.3.0';
+const VERSION = '1.4.0';
 const PORT = Number(process.env.PORT) || 8686;
 const HOST = process.env.HOST || '0.0.0.0';
 const APP_PATH = (process.env.APP_PATH || '').replace(/\/+$/, '');
@@ -120,6 +120,9 @@ CREATE TABLE IF NOT EXISTS kb (
   id INTEGER PRIMARY KEY AUTOINCREMENT, code TEXT, model TEXT, problem TEXT NOT NULL, solution TEXT NOT NULL, emp_id INTEGER, author TEXT,
   center_id INTEGER, center_name TEXT, visit_id INTEGER, votes INTEGER DEFAULT 0, views INTEGER DEFAULT 0, demo INTEGER DEFAULT 0, created_at TEXT, updated_at TEXT);
 CREATE TABLE IF NOT EXISTS kb_votes (kb_id INTEGER NOT NULL, who TEXT NOT NULL, at TEXT, PRIMARY KEY (kb_id, who));
+CREATE TABLE IF NOT EXISTS rewards (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, emp_id INTEGER NOT NULL, kind TEXT DEFAULT 'msg', title TEXT, message TEXT, stars INTEGER DEFAULT 0, amount REAL DEFAULT 0,
+  style TEXT DEFAULT 'confetti', adj_id INTEGER, by_name TEXT, created_at TEXT, seen_at TEXT, demo INTEGER DEFAULT 0);
 CREATE TABLE IF NOT EXISTS push_subs (
   id INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT NOT NULL, ref_id INTEGER NOT NULL, endpoint TEXT UNIQUE NOT NULL, p256dh TEXT NOT NULL,
   auth TEXT NOT NULL, ua TEXT, created_at TEXT, last_ok TEXT, fails INTEGER DEFAULT 0);
@@ -148,6 +151,11 @@ for (const sql of [
   "ALTER TABLE visits ADD COLUMN fault_model TEXT",
   "ALTER TABLE visits ADD COLUMN fault_desc TEXT",
   "ALTER TABLE visits ADD COLUMN plan_id INTEGER",
+  "ALTER TABLE tasks ADD COLUMN source TEXT",
+  "ALTER TABLE tasks ADD COLUMN reporter_name TEXT",
+  "ALTER TABLE tasks ADD COLUMN reporter_phone TEXT",
+  "ALTER TABLE tasks ADD COLUMN track_token TEXT",
+  "ALTER TABLE tasks ADD COLUMN photo TEXT",
 ]) { try { db.exec(sql); } catch { /* already exists */ } }
 
 const stmtCache = new Map();
@@ -662,6 +670,10 @@ function seedV13(techs, today, t) {
   tx(() => {
     cases.forEach((c, i) => { const e = techs[c[4] % techs.length], cen = cs[c[5] % cs.length], ts = addDays(today, -(3 + i * 5)) + ' 13:' + String(10 + i).padStart(2, '0') + ':00';
       run(K, c[0] || null, c[1], c[2], c[3], e, nm(e), cen.id, cen.name, c[6], ts, ts); });
+    run("INSERT INTO rewards (emp_id, kind, title, message, stars, amount, style, by_name, created_at, demo) VALUES (?, 'stars', ?, ?, 5, 0, 'trophy', 'مدير النظام', ?, 1)", techs[0], 'نجم الأسبوع 🏆', 'شكرًا على مجهودك الأسبوع ده — المراكز كلها بتشكر في شغلك، وأسرع وقت استجابة في الفريق. كمّل كده يا بطل!', t);
+    const c0 = cs[1 % cs.length];
+    run("INSERT INTO tasks (center_id, center_name, title, details, priority, emp_id, status, created_by, source, reporter_name, reporter_phone, track_token, created_at, updated_at) VALUES (?,?,?,?,?,NULL,'new',?,'center',?,?,?,?,?)",
+      c0.id, c0.name, 'الطابعة مش بتسحب الفيلم', 'الطابعة مش بتسحب الفيلم وبتطلع صوت تكتكة، والشغل واقف', 'urgent', 'أ. ياسمين (المركز)', 'أ. ياسمين', '01012345678', crypto.randomBytes(12).toString('base64url'), t, t);
     const P = "INSERT INTO plans (emp_id, center_id, center_name, date, time, note, remind_min, status, created_by, demo, created_at, updated_at) VALUES (?,?,?,?,?,?,30,'planned',?,1,?,?)";
     [[0, 0, 0, '10:00', 'متابعة الطابعة بعد تغيير الرول'], [0, 2, 1, '12:30', 'صيانة دورية'], [1, 3, 0, '11:00', 'توريد أفلام وفحص'], [1, 1, 2, '09:30', ''], [0, 4, 3, '13:00', 'معايرة كثافة']].forEach(x => {
       const e = techs[x[0]], cen = cs[x[1] % cs.length]; run(P, e, cen.id, cen.name, addDays(today, x[2]), x[3], x[4] || null, nm(e), t, t);
@@ -673,15 +685,15 @@ function seedV12(empIds, techs, today, rnd, t) {
   tx(() => {
     for (const e of all('SELECT id, job FROM employees WHERE demo = 1')) run('UPDATE employees SET salary = ? WHERE id = ?', salaries[e.job] || 7500, e.id);
     // devices at each demo center
-    const brands = ['GE', 'Siemens', 'Philips', 'Fujifilm', 'Carestream', 'Agfa', 'Canon'];
-    const kinds = [['جهاز مقطعية CT', 3], ['جهاز رنين MRI', 3], ['جهاز أشعة X-Ray', 6], ['طابعة أفلام', 3], ['جهاز ماموجرام', 6], ['نظام CR', 6]];
+    const printers = [['Fujifilm', 'DryPix 6000'], ['Fujifilm', 'DryPix Smart'], ['Agfa', 'Drystar 5302'], ['Carestream', 'DryView 5950'], ['Konica', 'Drypro 873'], ['Agfa', 'Drystar 5503']];
+    const kinds = [['طابعة أفلام — المقطعية', 3], ['طابعة أفلام — الرنين', 3], ['طابعة أفلام — الأشعة العادية', 3], ['طابعة أفلام — الماموجرام', 4], ['طابعة أفلام — الاستقبال', 6]];
     for (const c of all('SELECT * FROM centers WHERE demo = 1')) {
       const n = 2 + Math.floor(rnd() * 2);
       for (let i = 0; i < n; i++) {
         const k = kinds[Math.floor(rnd() * kinds.length)];
         const last = addDays(today, -Math.floor(rnd() * (k[1] * 30 + 25)));
         run('INSERT INTO devices (center_id, name, brand, model, serial, installed_at, pm_months, last_pm, next_pm, active, demo, created_at) VALUES (?,?,?,?,?,?,?,?,?,1,1,?)',
-          c.id, k[0], brands[Math.floor(rnd() * brands.length)], 'M-' + (100 + Math.floor(rnd() * 900)), 'SN' + (100000 + Math.floor(rnd() * 899999)), addDays(today, -(400 + Math.floor(rnd() * 900))), k[1], last, addMonths(last, k[1]), t);
+          c.id, k[0], ...printers[Math.floor(rnd() * printers.length)], 'SN' + (100000 + Math.floor(rnd() * 899999)), addDays(today, -(400 + Math.floor(rnd() * 900))), k[1], last, addMonths(last, k[1]), t);
       }
     }
     // link demo visits to devices + rating links / ratings
@@ -906,6 +918,9 @@ function myHome(emp) {
     last_ping: (one('SELECT at FROM locations WHERE emp_id = ? ORDER BY id DESC LIMIT 1', emp.id) || {}).at || null,
     decided: all("SELECT id, type, status, from_date, to_date, reply, decided_at FROM leaves WHERE emp_id = ? AND status <> 'pending' AND decided_at >= ? ORDER BY decided_at DESC LIMIT 3", emp.id, addDays(now.date, -3)),
     tasks: myTasks(emp.id), custody: custodyOf(emp.id),
+    rewards_new: all('SELECT id, kind, title, message, stars, amount, style, by_name, created_at FROM rewards WHERE emp_id = ? AND seen_at IS NULL ORDER BY id', emp.id),
+    stars_total: one('SELECT COALESCE(SUM(stars),0) AS n FROM rewards WHERE emp_id = ?', emp.id).n,
+    logo: logoVer(),
     plans_today: all(PLAN_SQL + " WHERE p.emp_id = ? AND p.date = ? ORDER BY COALESCE(p.time, '99')", emp.id, now.date).map(planOut),
     punch_mode: SETTINGS.punch_mode, signature_required: SETTINGS.signature_required,
     push_on: !!one("SELECT id FROM push_subs WHERE kind = 'emp' AND ref_id = ? LIMIT 1", emp.id),
@@ -1131,7 +1146,7 @@ route('POST', '/api/employees/delete', 'user', (b, a) => {
     run('DELETE FROM messages WHERE emp_id = ?', id); run('DELETE FROM locations WHERE emp_id = ?', id);
     run('DELETE FROM part_moves WHERE emp_id = ?', id); run('DELETE FROM advances WHERE emp_id = ?', id); run('DELETE FROM payroll_adj WHERE emp_id = ?', id);
     run("DELETE FROM push_subs WHERE kind = 'emp' AND ref_id = ?", id); run('UPDATE tasks SET emp_id = NULL WHERE emp_id = ?', id);
-    run('DELETE FROM plans WHERE emp_id = ?', id); run('UPDATE kb SET emp_id = NULL WHERE emp_id = ?', id);
+    run('DELETE FROM plans WHERE emp_id = ?', id); run('UPDATE kb SET emp_id = NULL WHERE emp_id = ?', id); run('DELETE FROM rewards WHERE emp_id = ?', id);
     run('DELETE FROM employees WHERE id = ?', id);
   });
   photos.forEach(deletePhoto);
@@ -1335,7 +1350,7 @@ route('POST', '/api/users/delete', 'user', (b, a) => {
   run("DELETE FROM sessions WHERE kind = 'user' AND ref_id = ?", id); run('DELETE FROM users WHERE id = ?', id); return { ok: true };
 });
 
-const BACKUP_TABLES = ['settings', 'users', 'departments', 'shifts', 'sites', 'employees', 'roster', 'attendance', 'leaves', 'holidays', 'centers', 'visits', 'messages', 'locations', 'devices', 'tasks', 'parts', 'part_moves', 'advances', 'payroll_adj', 'plans', 'kb', 'kb_votes'];
+const BACKUP_TABLES = ['settings', 'users', 'departments', 'shifts', 'sites', 'employees', 'roster', 'attendance', 'leaves', 'holidays', 'centers', 'visits', 'messages', 'locations', 'devices', 'tasks', 'parts', 'part_moves', 'advances', 'payroll_adj', 'plans', 'kb', 'kb_votes', 'rewards'];
 function makeBackup(withPhotos) {
   const out = { app: 'emdadx-attendance', version: VERSION, at: nowLocal().ts, tables: {} };
   for (const t of BACKUP_TABLES) out.tables[t] = all(`SELECT * FROM ${t}`);
@@ -1401,7 +1416,7 @@ route('POST', '/api/demo/clear', 'user', (b, a) => {
       run('DELETE FROM roster WHERE emp_id = ?', id); run("DELETE FROM sessions WHERE kind = 'emp' AND ref_id = ?", id);
       run('DELETE FROM part_moves WHERE emp_id = ?', id); run('DELETE FROM advances WHERE emp_id = ?', id); run('DELETE FROM payroll_adj WHERE emp_id = ?', id);
       run('DELETE FROM tasks WHERE emp_id = ?', id); run("DELETE FROM push_subs WHERE kind = 'emp' AND ref_id = ?", id);
-      run('DELETE FROM plans WHERE emp_id = ?', id);
+      run('DELETE FROM plans WHERE emp_id = ?', id); run('DELETE FROM rewards WHERE emp_id = ?', id);
     }
     run('DELETE FROM kb WHERE demo = 1'); run('DELETE FROM kb_votes WHERE kb_id NOT IN (SELECT id FROM kb)');
     run('DELETE FROM employees WHERE demo = 1');
@@ -2365,6 +2380,149 @@ route('POST', '/api/kb/vote', 'any', (b, a) => {
   return { ok: true, votes: n, voted: !had };
 });
 
+/* ---------- Public links: center fault-report link + printer QR stickers ---------- */
+function linkSecret() { if (!SETTINGS._link_secret) setSecret('_link_secret', crypto.randomBytes(24).toString('hex')); return SETTINGS._link_secret; }
+const linkSig = msg => crypto.createHmac('sha256', linkSecret()).update(msg).digest('base64url').slice(0, 10);
+const centerKey = id => `c${id}.${linkSig('c|' + id)}`;
+const deviceKey = id => `d${id}.${linkSig('d|' + id)}`;
+function parseLinkKey(k) {
+  const m = /^([cd])(\d+)\.([A-Za-z0-9_-]{10})$/.exec(String(k || '')); if (!m || linkSig(m[1] + '|' + m[2]) !== m[3]) return null;
+  if (m[1] === 'c') { const c = one('SELECT * FROM centers WHERE id = ?', Number(m[2])); return c ? { center: c, device: null } : null; }
+  const d = one('SELECT * FROM devices WHERE id = ?', Number(m[2])); if (!d) return null;
+  return { device: d, center: one('SELECT * FROM centers WHERE id = ?', d.center_id) };
+}
+const linkPath = key => APP_PATH + '/r/' + key;
+route('GET', '/api/links', 'user', (b, a, c) => {
+  const q = c.url.searchParams;
+  if (q.get('device')) { const ids = q.get('device').split(',').map(Number).filter(Boolean).slice(0, 300);
+    return { rows: ids.map(id => one(DEV_SQL + ' WHERE d.id = ?', id)).filter(Boolean).map(d => ({ id: d.id, name: d.name, model: [d.brand, d.model].filter(Boolean).join(' '), serial: d.serial, center: d.center, path: linkPath(deviceKey(d.id)) })) }; }
+  const cen = one('SELECT * FROM centers WHERE id = ?', Number(q.get('center'))); if (!cen) fail(404, 'المركز مش موجود');
+  return { center: cen.name, path: linkPath(centerKey(cen.id)), devices: all('SELECT id, name, brand, model, serial FROM devices WHERE center_id = ? AND active = 1 ORDER BY name', cen.id).map(d => ({ ...d, path: linkPath(deviceKey(d.id)) })) };
+});
+route('POST', '/api/links/reset', 'user', (b, a) => { needAdmin(a); setSecret('_link_secret', crypto.randomBytes(24).toString('hex')); audit(a.who, 'links.reset', ''); return { ok: true }; });
+route('POST', '/api/public/report', null, (b, a, c) => {
+  rateLimit(c.ip + '|report');
+  const L = parseLinkKey(b.key); if (!L || !L.center) fail(404, 'اللينك ده غير صالح.. اطلب لينك جديد من شركة الصيانة');
+  const problem = str(b.problem, 600); if (!problem) fail(400, 'اكتب المشكلة');
+  const name = str(b.name, 80); if (!name) fail(400, 'اكتب اسمك');
+  const phone = str(b.phone, 30);
+  const urgent = b.urgent ? 'urgent' : 'normal';
+  const ph = b.photo ? savePhoto(checkPhoto(b.photo)) : null;
+  const now = nowLocal(), tok = crypto.randomBytes(12).toString('base64url');
+  const dev = L.device;
+  const title = (dev ? `${dev.name}${dev.serial ? ' (' + dev.serial + ')' : ''}: ` : '') + problem.split('\n')[0].slice(0, 110);
+  const id = Number(run(`INSERT INTO tasks (center_id, center_name, device_id, title, details, priority, emp_id, status, created_by, source, reporter_name, reporter_phone, track_token, photo, created_at, updated_at)
+    VALUES (?,?,?,?,?,?,NULL,'new',?,'center',?,?,?,?,?,?)`, L.center.id, L.center.name, dev ? dev.id : null, title, problem, urgent, name + ' (المركز)', name, phone, tok, ph ? ph.rel : null, now.ts, now.ts).lastInsertRowid);
+  broadcast('task', { id, name: L.center.name, status: 'report', label: 'بلّغ عن عطل', title: problem.slice(0, 60) });
+  pushAdmins({ title: `${urgent === 'urgent' ? '🚨' : '📞'} بلاغ عطل من ${L.center.name}`, body: `${problem.slice(0, 90)} — ${name}${phone ? ' ' + phone : ''}`, url: './#/tasks', tag: 'report' + id });
+  audit(name, 'task.report', { center: L.center.name, id });
+  return { ok: true, track: tok };
+});
+route('GET', '/api/public/track', null, (b, a, c) => {
+  const t = one(TASK_SQL + ' WHERE t.track_token = ?', String(c.url.searchParams.get('t') || '-')); if (!t) fail(404, 'البلاغ مش موجود');
+  return { status: t.status, title: t.title, center: t.center || t.c_name || t.center_name, emp: t.emp_name ? t.emp_name.split(' ').slice(0, 2).join(' ') : null, emp_phone: t.emp_id && ['accepted', 'onway', 'arrived'].includes(t.status) ? t.emp_phone : null,
+    created_at: t.created_at, accepted_at: t.accepted_at, onway_at: t.onway_at, arrived_at: t.arrived_at, done_at: t.done_at, company: SETTINGS.company_name, phone: SETTINGS.push_contact || null,
+    report: t.visit_id ? (one('SELECT rate_token FROM visits WHERE id = ?', t.visit_id) || {}).rate_token : null };
+});
+route('GET', '/api/my/device', 'emp', (b, a, c) => {
+  const L = parseLinkKey(c.url.searchParams.get('k')); if (!L || !L.device) fail(404, 'الستيكر ده مش لطابعة متسجلة');
+  const d = L.device;
+  const visits = all(VISIT_SQL + ' WHERE v.device_id = ? ORDER BY v.at DESC LIMIT 40', d.id).map(visitOut);
+  const model = [d.brand, d.model].filter(Boolean).join(' ');
+  const kbr = (model || d.name) ? kbSearch(model + ' ' + d.name, 8, kbWho(a)) : [];
+  return { device: { ...d, center: L.center ? L.center.name : '', center_lat: L.center ? L.center.lat : null, model_full: model }, visits, tasks: all(TASK_SQL + " WHERE t.device_id = ? AND t.status IN ('new','accepted','onway','arrived')", d.id).map(taskOut), kb: kbr };
+});
+function reportPageHtml(L, key) {
+  const c = L.center, d = L.device, base = APP_PATH;
+  const logo = SETTINGS.company_logo ? `<img src="${base}/logo?v=${logoVer()}" alt="">` : htmlEsc(String(SETTINGS.company_name || 'E').slice(0, 1));
+  return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0a2357"><title>بلاغ عطل — ${htmlEsc(c.name)}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box;margin:0;padding:0}html{-webkit-text-size-adjust:100%}body{font-family:Cairo,Tahoma,Arial,sans-serif;background:#eef3fa;color:#0d1b3a;padding:16px 14px 40px;line-height:1.7}
+.w{max-width:560px;margin:0 auto}.card{background:#fff;border-radius:22px;box-shadow:0 20px 50px -25px rgba(10,35,87,.4);overflow:hidden;margin-bottom:14px}
+.h{background:linear-gradient(120deg,#0a2357,#1b4aa6);color:#fff;padding:20px 22px;display:flex;align-items:center;gap:14px;position:relative}.h::after{content:'';position:absolute;bottom:0;right:0;width:140px;height:5px;background:#f7c12d}
+.lg{width:54px;height:54px;border-radius:16px;background:#f7c12d;color:#0a2357;display:grid;place-items:center;font-weight:900;font-size:22px;flex-shrink:0;overflow:hidden}.lg img{width:100%;height:100%;object-fit:contain;background:#fff;padding:4px}
+.h b{font-size:18px;display:block}.h span{color:#cfe0ff;font-size:13px}.b{padding:18px 20px}
+.dev{background:#f5f8fe;border-radius:14px;padding:10px 14px;margin-bottom:14px;font-size:14px}.dev b{color:#0a2357}
+label{display:block;font-weight:800;font-size:13.5px;margin:12px 0 5px;color:#0a2357}
+input,textarea{width:100%;font:inherit;font-size:16px;border:1.5px solid #e2e9f4;border-radius:14px;padding:11px 14px;background:#fff;color:#0d1b3a;outline:none}input:focus,textarea:focus{border-color:#1b4aa6}
+.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
+.urg{display:flex;align-items:center;gap:10px;margin-top:12px;font-weight:700;background:#fdecee;color:#b4232f;border-radius:14px;padding:10px 14px}.urg input{width:22px;height:22px;flex:none}
+.ph{display:flex;align-items:center;gap:10px;border:2px dashed #e2e9f4;border-radius:14px;padding:12px;margin-top:6px;cursor:pointer;color:#6b7a99;font-weight:700}.ph img{width:70px;height:70px;object-fit:cover;border-radius:10px}
+.btn{display:block;width:100%;border:0;border-radius:16px;background:linear-gradient(135deg,#1b4aa6,#0a2357);color:#fff;font:inherit;font-weight:900;font-size:17px;padding:14px;margin-top:18px;cursor:pointer}.btn:disabled{opacity:.6}
+.err{color:#dc3545;font-weight:700;margin-top:10px;display:none}.ok{text-align:center;padding:26px 20px}
+.steps{margin-top:14px;text-align:right}.st{display:flex;gap:12px;align-items:flex-start;padding:8px 0;position:relative}.st i{width:22px;height:22px;border-radius:50%;border:3px solid #e2e9f4;background:#fff;flex-shrink:0;margin-top:2px}
+.st.on i{background:#14955a;border-color:#14955a;box-shadow:0 0 0 4px #e5f6ed}.st.cur i{background:#f7c12d;border-color:#f7c12d;box-shadow:0 0 0 4px #fff6d9;animation:p 1.4s infinite}@keyframes p{50%{transform:scale(1.15)}}
+.st b{display:block;font-size:14.5px}.st span{font-size:12.5px;color:#6b7a99}.st:not(:last-child)::after{content:'';position:absolute;right:10px;top:30px;bottom:-6px;width:3px;background:#e2e9f4}
+.tech{margin-top:10px;font-size:13px;color:#6b7a99;text-align:center}.tech a{color:#1b4aa6;font-weight:800}.mut{color:#6b7a99;font-size:13px}</style></head><body><div class="w">
+<div class="card"><div class="h"><div class="lg">${logo}</div><div><b>${htmlEsc(SETTINGS.company_name)}</b><span>بلاغ عطل — ${htmlEsc(c.name)}</span></div></div>
+<div class="b" id="main">
+${d ? `<div class="dev">🖨️ <b>${htmlEsc(d.name)}</b>${d.brand || d.model ? ' — ' + htmlEsc([d.brand, d.model].filter(Boolean).join(' ')) : ''}${d.serial ? `<br><span class="mut">S/N ${htmlEsc(d.serial)}</span>` : ''}</div>` : ''}
+<form id="f"><label>إيه المشكلة؟ *</label><textarea name="problem" rows="3" placeholder="مثال: الطابعة بتطلع خطوط على الفيلم / ظهر كود E-104" required></textarea>
+<div class="row"><div><label>اسمك *</label><input name="name" required autocomplete="name"></div><div><label>موبايلك</label><input name="phone" inputmode="tel" autocomplete="tel"></div></div>
+<label>صورة للمشكلة أو للشاشة (اختياري)</label><label class="ph" id="phl"><input type="file" accept="image/*" id="phin" hidden><span id="pht">📷 صوّر الفيلم أو رسالة العطل</span></label>
+<label class="urg"><input type="checkbox" name="urgent"> عاجل — الشغل واقف</label>
+<button class="btn" id="sb">إرسال البلاغ</button><div class="err" id="er"></div></form></div></div>
+<p class="mut" style="text-align:center">البلاغ بيوصل لشركة الصيانة فورًا وتقدر تتابعه من الصفحة دي</p>
+${d ? `<p class="mut" style="text-align:center;margin-top:10px">للفنيين: <a href="${base}/?emp&dev=${encodeURIComponent(key)}" style="color:#1b4aa6;font-weight:800">افتح سجل الطابعة في البرنامج</a></p>` : ''}
+</div><script>
+(function(){var KEY=${JSON.stringify(key)},B=${JSON.stringify(base)},photo=null,LS='rep_'+KEY;
+function $(i){return document.getElementById(i)}function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function t12(ts){if(!ts)return'';var h=+ts.slice(11,13),m=ts.slice(14,16);return(h%12||12)+':'+m+(h<12?' ص':' م')}
+$('phin').onchange=function(e){var f=e.target.files[0];if(!f)return;var img=new Image(),u=URL.createObjectURL(f);img.onload=function(){var s=Math.min(1,1100/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=img.width*s;c.height=img.height*s;c.getContext('2d').drawImage(img,0,0,c.width,c.height);var q=.6,d=c.toDataURL('image/jpeg',q);while(d.length>560000&&q>.25){q-=.1;d=c.toDataURL('image/jpeg',q)}photo=d;$('pht').innerHTML='<img src="'+d+'"> الصورة جاهزة';URL.revokeObjectURL(u)};img.src=u};
+$('f').onsubmit=function(e){e.preventDefault();var f=e.target,b=$('sb');b.disabled=true;b.textContent='جاري الإرسال...';$('er').style.display='none';
+fetch(B+'/api/public/report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:KEY,problem:f.problem.value,name:f.name.value,phone:f.phone.value,urgent:f.urgent.checked,photo:photo})}).then(function(r){return r.json()}).then(function(j){if(j.error)throw new Error(j.error);try{localStorage.setItem(LS,j.track);localStorage.setItem('rep_name',f.name.value);localStorage.setItem('rep_phone',f.phone.value)}catch(x){}track(j.track,true)}).catch(function(er){$('er').textContent=er.message||'حصلت مشكلة';$('er').style.display='block';b.disabled=false;b.textContent='إرسال البلاغ'})};
+try{$('f').name.value=localStorage.getItem('rep_name')||'';$('f').phone.value=localStorage.getItem('rep_phone')||''}catch(x){}
+var timer=null;function track(t,first){fetch(B+'/api/public/track?t='+encodeURIComponent(t)).then(function(r){return r.json()}).then(function(j){if(j.error){try{localStorage.removeItem(LS)}catch(x){}return}
+var S=[['created_at','البلاغ وصل للشركة','اتسجل '+t12(j.created_at)],['emp','اتحدد فني',j.emp?'م. '+esc(j.emp):'جاري تحديد أقرب فني'],['accepted_at','الفني قبل البلاغ',t12(j.accepted_at)],['onway_at','الفني في الطريق ليك 🚗',t12(j.onway_at)],['arrived_at','الفني وصل',t12(j.arrived_at)],['done_at','المشكلة اتحلت ✅',t12(j.done_at)]];
+var lastOn=-1;S.forEach(function(s,i){if(j[s[0]])lastOn=i});
+var h='<div class="ok"><div style="font-size:44px">'+(j.status==='done'?'✅':j.status==='cancelled'?'⚪':'📨')+'</div><b style="font-size:19px;color:#0a2357">'+(j.status==='done'?'المشكلة اتحلت':j.status==='cancelled'?'البلاغ اتقفل':(first?'البلاغ وصل ✓':'متابعة البلاغ'))+'</b><div class="mut">'+esc(j.title)+'</div><div class="steps">';
+S.forEach(function(s,i){h+='<div class="st '+(i<=lastOn?'on':(i===lastOn+1&&j.status!=='done'&&j.status!=='cancelled'?'cur':''))+'"><i></i><div><b>'+s[1]+'</b><span>'+(i<=lastOn||i===1?s[2]:'')+'</span></div></div>'});
+h+='</div>'+(j.emp_phone?'<div class="tech">تقدر تكلم الفني: <a href="tel:'+esc(j.emp_phone)+'">'+esc(j.emp_phone)+'</a></div>':'')+(j.report?'<a class="btn" href="'+B+'/v/'+j.report+'">تقرير الزيارة وتقييم الخدمة ⭐</a>':'')+'<button class="btn" style="background:#eef3fa;color:#0a2357" onclick="localStorage.removeItem(\\''+LS+'\\');location.reload()">بلاغ جديد</button></div>';
+$('main').innerHTML=h;clearTimeout(timer);if(j.status!=='done'&&j.status!=='cancelled')timer=setTimeout(function(){track(t)},20000)}).catch(function(){timer=setTimeout(function(){track(t)},30000)})}
+try{var old=localStorage.getItem(LS);if(old)track(old)}catch(x){}})();
+</script></body></html>`;
+}
+
+/* ---------- Rewards & recognition (animated card on the employee's phone) ---------- */
+route('POST', '/api/rewards/send', 'user', (b, a) => {
+  const now = nowLocal();
+  let emps = [];
+  if (b.target === 'all') emps = all('SELECT id, name FROM employees WHERE active = 1');
+  else if (b.target === 'dept') emps = all('SELECT id, name FROM employees WHERE active = 1 AND dept_id = ?', num(b.dept_id));
+  else emps = (Array.isArray(b.emp_ids) ? b.emp_ids : [b.emp_id]).map(Number).filter(Boolean).map(id => one('SELECT id, name FROM employees WHERE id = ?', id)).filter(Boolean);
+  if (!emps.length) fail(400, 'اختار الموظف');
+  const title = str(b.title, 80) || 'شكرًا ليك';
+  const message = str(b.message, 600); if (!message) fail(400, 'اكتب الرسالة');
+  const stars = Math.max(0, Math.min(5, Math.round(Number(b.stars) || 0)));
+  let amount = Math.max(0, Math.min(1e6, Number(b.amount) || 0));
+  if (amount && a.user.role !== 'admin') amount = 0;
+  const style = ['confetti', 'trophy', 'stars', 'hearts'].includes(b.style) ? b.style : 'confetti';
+  const kind = amount ? 'bonus' : stars ? 'stars' : 'msg';
+  tx(() => { for (const e of emps) {
+    let adj = null;
+    if (amount) adj = Number(run('INSERT INTO payroll_adj (emp_id, month, kind, amount, note, by_name, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)', e.id, now.date.slice(0, 7), 'bonus', amount, 'مكافأة: ' + title, a.who, now.ts).lastInsertRowid);
+    run('INSERT INTO rewards (emp_id, kind, title, message, stars, amount, style, adj_id, by_name, created_at) VALUES (?,?,?,?,?,?,?,?,?,?)', e.id, kind, title, message, stars, amount, style, adj, a.who, now.ts);
+  } });
+  for (const e of emps) { notifyEmp(e.id, 'reward', {}); pushEmp(e.id, { title: '🎁 عندك مفاجأة من الإدارة', body: 'افتح البرنامج علشان تشوفها', url: './?emp', tag: 'reward' }); }
+  audit(a.who, 'reward.send', { n: emps.length, title, stars, amount }); broadcast('reward', {});
+  return { ok: true, count: emps.length };
+});
+route('GET', '/api/rewards', 'user', () => ({
+  rows: all('SELECT r.*, e.name AS emp_name, e.photo AS emp_photo, e.code AS emp_code FROM rewards r JOIN employees e ON e.id = r.emp_id ORDER BY r.id DESC LIMIT 500'),
+  board: all("SELECT e.id AS emp_id, e.name, e.photo, COALESCE(SUM(r.stars),0) AS stars, COUNT(r.id) AS n, COALESCE(SUM(r.amount),0) AS amount FROM employees e LEFT JOIN rewards r ON r.emp_id = e.id AND r.created_at >= ? WHERE e.active = 1 GROUP BY e.id HAVING n > 0 ORDER BY stars DESC, n DESC", addDays(nowLocal().date, -90)),
+}));
+route('POST', '/api/rewards/delete', 'user', (b, a) => {
+  needAdmin(a); const r = one('SELECT * FROM rewards WHERE id = ?', Number(b.id)); if (!r) fail(404, 'مش موجودة');
+  run('DELETE FROM rewards WHERE id = ?', r.id); if (r.adj_id) run('DELETE FROM payroll_adj WHERE id = ?', r.adj_id);
+  broadcast('reward', {}); return { ok: true };
+});
+route('GET', '/api/my/rewards', 'emp', (b, a) => ({ rows: all('SELECT * FROM rewards WHERE emp_id = ? ORDER BY id DESC LIMIT 100', a.emp.id), stars: one('SELECT COALESCE(SUM(stars),0) AS n FROM rewards WHERE emp_id = ?', a.emp.id).n }));
+route('POST', '/api/my/rewards/seen', 'emp', (b, a) => {
+  const r = one('SELECT * FROM rewards WHERE id = ? AND emp_id = ?', Number(b.id), a.emp.id); if (!r) fail(404, 'مش موجودة');
+  if (!r.seen_at) { run('UPDATE rewards SET seen_at = ? WHERE id = ?', nowLocal().ts, r.id); broadcast('reward_seen', { name: a.emp.name, title: r.title }); }
+  return { ok: true };
+});
+
 /* ---------- QR kiosk (rotating code on a screen at the site) ---------- */
 function kioskSecret() { if (!SETTINGS._kiosk_secret) setSecret('_kiosk_secret', crypto.randomBytes(24).toString('hex')); return SETTINGS._kiosk_secret; }
 const hmac = (msg, n = 16) => crypto.createHmac('sha256', kioskSecret()).update(msg).digest('base64url').slice(0, n);
@@ -2483,6 +2641,13 @@ const server = http.createServer(async (req, res) => {
       fs.createReadStream(f).pipe(res);
     });
   }
+  const rm = /^\/r\/([cd]\d+\.[A-Za-z0-9_-]{10})$/.exec(p);
+  if (rm && req.method === 'GET') {
+    const L = parseLinkKey(rm[1]);
+    if (!L || !L.center) { res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' }); return res.end('<h2 style="font-family:Tahoma;text-align:center;margin-top:60px" dir="rtl">اللينك ده غير صالح.. اطلب لينك جديد من شركة الصيانة</h2>'); }
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
+    return res.end(reportPageHtml(L, rm[1]));
+  }
   const vm = /^\/v\/([A-Za-z0-9_-]{8,40})(\/(photo|sign))?$/.exec(p);
   if (vm && req.method === 'GET') {
     const v = one(VISIT_SQL + ' WHERE v.rate_token = ?', vm[1]);
@@ -2506,7 +2671,7 @@ const server = http.createServer(async (req, res) => {
     if (p === '/api/photo' && req.method === 'GET') {
       const a = getAuth(req, url); if (!a) fail(401, 'سجل دخول الأول');
       const rel = url.searchParams.get('f') || ''; const f = photoFile(rel); if (!f) fail(404, 'الصورة مش موجودة');
-      if (a.kind === 'emp' && a.emp.photo !== rel && !one('SELECT id FROM visits WHERE emp_id = ? AND photo = ? UNION SELECT id FROM attendance WHERE emp_id = ? AND (in_photo = ? OR out_photo = ?) LIMIT 1', a.emp.id, rel, a.emp.id, rel, rel)) fail(403, 'غير مسموح');
+      if (a.kind === 'emp' && a.emp.photo !== rel && !one('SELECT id FROM visits WHERE emp_id = ? AND photo = ? UNION SELECT id FROM attendance WHERE emp_id = ? AND (in_photo = ? OR out_photo = ?) UNION SELECT id FROM tasks WHERE emp_id = ? AND photo = ? LIMIT 1', a.emp.id, rel, a.emp.id, rel, rel, a.emp.id, rel)) fail(403, 'غير مسموح');
       return fs.stat(f, (err, st) => {
         if (err || !st.isFile()) return sendJson(res, 404, { error: 'الصورة مش موجودة' });
         res.writeHead(200, { 'Content-Type': f.endsWith('.svg') ? 'image/svg+xml' : f.endsWith('.webp') ? 'image/webp' : 'image/jpeg', 'Content-Length': st.size, 'Cache-Control': 'private, max-age=31536000, immutable' });
