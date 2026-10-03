@@ -1066,8 +1066,10 @@ img,video,canvas,iframe{max-width:100%}
 .cele-btn{margin-top:18px;height:52px;padding:0 34px;font-size:17px;border-radius:18px;background:#fff;color:#0a2357;font-weight:900;box-shadow:0 14px 34px -12px rgba(0,0,0,.6)}
 
 /* ================= v1.5: live routes board ================= */
-.routes{position:relative;overflow:hidden;border-radius:26px;padding:18px 20px 16px;margin-bottom:18px;color:#fff;background:radial-gradient(700px 260px at 85% -20%,rgba(91,140,240,.45),transparent 70%),linear-gradient(115deg,#0a2357 0%,#123a86 60%,#1d55c0 100%);box-shadow:0 24px 50px -24px rgba(10,35,87,.75)}
-[data-theme=dark] .routes{background:radial-gradient(700px 260px at 85% -20%,rgba(91,140,240,.3),transparent 70%),linear-gradient(115deg,#0b1d4a 0%,#10306f 60%,#1a4aa8 100%)}
+.routes{position:relative;overflow:hidden;border-radius:26px;padding:18px 20px 16px;margin-bottom:18px;color:#fff;background:linear-gradient(180deg,#0b2a6b 0%,#0a2357 45%,#071a44 100%);box-shadow:0 24px 50px -24px rgba(10,35,87,.75);isolation:isolate}
+.rt-sky{position:absolute;inset:0;z-index:-1;background:radial-gradient(600px 220px at 90% -10%,rgba(91,140,240,.5),transparent 70%),radial-gradient(400px 200px at 0% 0%,rgba(247,193,45,.18),transparent 70%);pointer-events:none}
+.rt-sky::after{content:'';position:absolute;left:0;right:0;bottom:0;height:90px;opacity:.13;background:linear-gradient(90deg,transparent 0 3%,#9fb7e6 3% 6%,transparent 6% 9%,#9fb7e6 9% 11%,transparent 11% 15%,#9fb7e6 15% 19%,transparent 19% 24%,#9fb7e6 24% 26%,transparent 26% 31%,#9fb7e6 31% 35%,transparent 35% 41%,#9fb7e6 41% 44%,transparent 44% 52%,#9fb7e6 52% 55%,transparent 55% 61%,#9fb7e6 61% 66%,transparent 66% 72%,#9fb7e6 72% 74%,transparent 74% 80%,#9fb7e6 80% 85%,transparent 85% 91%,#9fb7e6 91% 94%,transparent 94%);clip-path:polygon(0 60%,3% 60%,3% 20%,6% 20%,6% 60%,9% 60%,9% 40%,11% 40%,11% 70%,15% 70%,15% 10%,19% 10%,19% 60%,24% 60%,24% 35%,26% 35%,26% 65%,31% 65%,31% 25%,35% 25%,35% 70%,41% 70%,41% 45%,44% 45%,44% 75%,52% 75%,52% 30%,55% 30%,55% 70%,61% 70%,61% 15%,66% 15%,66% 60%,72% 60%,72% 40%,74% 40%,74% 70%,80% 70%,80% 20%,85% 20%,85% 65%,91% 65%,91% 35%,94% 35%,94% 70%,100% 70%,100% 100%,0 100%)}
+[data-theme=dark] .routes{background:linear-gradient(180deg,#0a2154 0%,#081b45 45%,#05112e 100%)}
 .routes::after{content:'';position:absolute;bottom:0;right:0;width:200px;height:5px;background:var(--gold)}
 .rt-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
 .rt-title{display:flex;align-items:center;gap:10px}
@@ -1077,66 +1079,99 @@ img,video,canvas,iframe{max-width:100%}
 .rt-meta>span,.rt-link{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:5px 11px;font-size:13px;font-weight:800;color:#e6eeff}
 .rt-meta svg.i{width:16px;height:16px;color:var(--gold)}
 .rt-link:hover{background:rgba(255,255,255,.18)}
-.rt-lanes{display:flex;flex-direction:column;gap:10px}
-.rt-lane{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:10px 14px 8px;cursor:pointer;transition:background .2s}
-.rt-lane:hover{background:rgba(255,255,255,.11)}
-.rt-lane.urgent{border-color:rgba(255,107,122,.55)}
-.rt-top{display:flex;align-items:center;gap:10px}
-.rt-who{flex:1;min-width:0}
-.rt-who b{display:block;font-size:14.5px;line-height:1.3}
+.rt-lanes{display:flex;flex-direction:column;gap:12px}
+.rt-lane{background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:12px 14px 8px;cursor:pointer;transition:background .2s,transform .4s,opacity .4s;opacity:0;transform:translateY(8px)}
+.rt-lane.in{opacity:1;transform:none}.rt-lane.bye{opacity:0;transform:scale(.97)}
+.rt-lane:hover{background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.06))}
+.rt-lane.urgent{border-color:rgba(255,107,122,.6);box-shadow:0 0 0 1px rgba(255,107,122,.25) inset}
+.rt-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rt-who{flex:1;min-width:140px}
+.rt-who b{display:block;font-size:15px;line-height:1.3}
 .rt-who span{display:block;font-size:12px;color:#b9c8ec;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt-steps{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:800}
+.rt-steps span{padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.08);color:#8fa6d6}
+.rt-steps span.done{background:rgba(60,207,134,.2);color:#6ff0ad}
+.rt-steps span.cur{background:var(--gold);color:#0a2357;box-shadow:0 0 12px rgba(247,193,45,.6)}
+.rt-steps i{width:10px;height:2px;background:rgba(255,255,255,.2);border-radius:2px}
 .rt-stat{font-size:12.5px;font-weight:800;border-radius:999px;padding:4px 12px;white-space:nowrap;background:rgba(255,255,255,.12)}
 .rt-stat.go{background:rgba(247,193,45,.18);color:#ffd75e}.rt-stat.ok{background:rgba(60,207,134,.2);color:#6ff0ad}
 .rt-stat.warn{background:rgba(255,169,64,.2);color:#ffc06a}.rt-stat.wait,.rt-stat.plan{color:#cfe0ff}
-.rt-road{display:flex;align-items:flex-end;gap:10px;margin-top:4px}
-.rt-home{width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.12);display:grid;place-items:center;flex-shrink:0;margin-bottom:4px}
-.rt-home svg.i{width:18px;height:18px;color:#cfe0ff}
-.rt-way{flex:1;position:relative;height:78px;min-width:0}
-.rt-way::before{content:'';position:absolute;left:0;right:0;bottom:10px;height:10px;border-radius:6px;background:rgba(3,12,36,.55)}
-.rt-way::after{content:'';position:absolute;left:6px;right:6px;bottom:14px;height:2px;background:repeating-linear-gradient(90deg,rgba(255,215,94,.7) 0 12px,transparent 12px 24px);opacity:.7}
-.st-onway:not(.stale) .rt-way::after{animation:roadmv 1s linear infinite}
-@keyframes roadmv{to{background-position:24px 0}}
-.rt-trail{position:absolute;right:0;bottom:10px;height:10px;border-radius:6px;background:linear-gradient(270deg,rgba(247,193,45,.25),rgba(247,193,45,.85));box-shadow:0 0 14px rgba(247,193,45,.55);transition:width 1.2s ease;width:0}
-.rt-man{position:absolute;bottom:14px;right:0;width:42px;height:64px;transition:right 1.2s ease}
-.walker{width:42px;height:64px;overflow:visible;transform:scaleX(-1);filter:drop-shadow(0 4px 6px rgba(0,0,0,.35))}
-.walker line{stroke:#fff;stroke-width:4.2;stroke-linecap:round}
-.walker .w-head{fill:#ffd75e}.walker .w-bag{fill:var(--gold);stroke:#0a2357;stroke-width:1.4}
+.rt-road{display:flex;align-items:flex-end;gap:10px;margin-top:18px}
+.rt-home{width:36px;height:36px;border-radius:12px;background:rgba(255,255,255,.12);display:grid;place-items:center;flex-shrink:0;margin-bottom:6px}
+.rt-home svg.i{width:19px;height:19px;color:#cfe0ff}
+.rt-way{flex:1;position:relative;height:120px;min-width:0}
+.rt-deco{position:absolute;left:0;right:0;bottom:24px;height:22px;opacity:.35;background:repeating-linear-gradient(90deg,transparent 0 46px,rgba(159,183,230,.9) 46px 48px,transparent 48px 96px);-webkit-mask:linear-gradient(0deg,#000,transparent);mask:linear-gradient(0deg,#000,transparent)}
+.rt-way::before{content:'';position:absolute;left:0;right:0;bottom:8px;height:16px;border-radius:9px;background:linear-gradient(180deg,#1a2a4f,#0d1834);box-shadow:inset 0 2px 0 rgba(255,255,255,.06),0 6px 14px -6px rgba(0,0,0,.6)}
+.rt-way::after{content:'';position:absolute;left:8px;right:8px;bottom:15px;height:2px;background:repeating-linear-gradient(90deg,rgba(255,215,94,.85) 0 14px,transparent 14px 28px);opacity:.75}
+.st-onway:not(.stale) .rt-way::after,.moving .rt-way::after{animation:roadmv .8s linear infinite}
+.st-onway:not(.stale) .rt-deco{animation:roadmv2 3s linear infinite}
+@keyframes roadmv{to{background-position:28px 0}}
+@keyframes roadmv2{to{background-position:96px 0}}
+.rt-trail{position:absolute;right:0;bottom:8px;height:16px;border-radius:9px;background:linear-gradient(270deg,rgba(247,193,45,.3),rgba(247,193,45,.95));box-shadow:0 0 18px rgba(247,193,45,.55);transition:width .5s linear;width:0;overflow:hidden}
+.rt-trail span{position:absolute;left:8px;top:0;font-size:10.5px;font-weight:900;color:#0a2357;line-height:16px}
+.st-free .rt-trail{background:rgba(255,255,255,.12);box-shadow:none}
+.rt-man{position:absolute;bottom:20px;right:0;width:50px;height:96px;transition:right .5s linear;z-index:2}
+.rt-face{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:3}
+.rt-face .av{width:30px;height:30px;font-size:11.5px;border:2px solid #ffd75e;box-shadow:0 4px 10px rgba(0,0,0,.4)}
+.walker{position:absolute;bottom:0;left:1px;width:48px;height:74px;overflow:visible;transform:scaleX(-1);filter:drop-shadow(0 4px 6px rgba(0,0,0,.35))}
+.walker line{stroke:#f2d3b1;stroke-width:4.4;stroke-linecap:round}
+.walker .w-leg line{stroke:#24407f;stroke-width:5}
+.walker .w-shirt{fill:#f7c12d}
+.walker .w-shoe{stroke:#0d1834;stroke-width:4;stroke-linecap:round}
+.walker .w-bag{fill:#dc3545;stroke:#7a1621;stroke-width:1.2}.walker .w-bagh{fill:none;stroke:#7a1621;stroke-width:1.5}
 .walker .w-leg,.walker .w-arm{transform-box:view-box}
 .walker .w-leg{transform-origin:20px 35px}.walker .w-arm{transform-origin:20px 18px}
-.st-onway:not(.stale) .walker .l1,.rt-empty .walker .l1{animation:legA .7s ease-in-out infinite}
-.st-onway:not(.stale) .walker .l2,.rt-empty .walker .l2{animation:legB .7s ease-in-out infinite}
-.st-onway:not(.stale) .walker .a1{animation:legB .7s ease-in-out infinite}
-.st-onway:not(.stale) .walker .a2{animation:legA .7s ease-in-out infinite}
-.st-onway:not(.stale) .walker .w-all{animation:bobw .35s ease-in-out infinite}
-@keyframes legA{0%,100%{transform:rotate(28deg)}50%{transform:rotate(-28deg)}}
-@keyframes legB{0%,100%{transform:rotate(-28deg)}50%{transform:rotate(28deg)}}
+.st-onway:not(.stale) .walker .l1,.moving .walker .l1,.rt-empty .walker .l1{animation:legA .62s ease-in-out infinite}
+.st-onway:not(.stale) .walker .l2,.moving .walker .l2,.rt-empty .walker .l2{animation:legB .62s ease-in-out infinite}
+.st-onway:not(.stale) .walker .a1,.moving .walker .a1{animation:armB .62s ease-in-out infinite}
+.st-onway:not(.stale) .walker .a2,.moving .walker .a2{animation:armA .62s ease-in-out infinite}
+.st-onway:not(.stale) .walker .w-all,.moving .walker .w-all,.rt-empty .walker .w-all{animation:bobw .31s ease-in-out infinite}
+.st-onway:not(.stale) .rt-face,.moving .rt-face{animation:bobf .31s ease-in-out infinite}
+@keyframes legA{0%,100%{transform:rotate(30deg)}50%{transform:rotate(-30deg)}}
+@keyframes legB{0%,100%{transform:rotate(-30deg)}50%{transform:rotate(30deg)}}
+@keyframes armA{0%,100%{transform:rotate(25deg)}50%{transform:rotate(-25deg)}}
+@keyframes armB{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
 @keyframes bobw{50%{transform:translateY(-2px)}}
-.rt-empty .walker .w-all{animation:bobw .35s ease-in-out infinite}
+@keyframes bobf{50%{transform:translate(-50%,-2px)}}
+.st-accepted .walker .w-all,.st-plan .walker .w-all{animation:breathe 2.4s ease-in-out infinite}
+@keyframes breathe{50%{transform:translateY(-1px) scale(1.01)}}
 .st-arrived .walker .a1{transform:rotate(-150deg)}.st-arrived .walker .a2{transform:rotate(150deg)}
-.st-arrived .walker .w-all{animation:hop 1.6s ease-in-out infinite}
-@keyframes hop{0%,60%,100%{transform:none}30%{transform:translateY(-6px)}}
-.stale .walker line{stroke:#8b9abd}.stale .walker .w-head{fill:#8b9abd}
-.rt-zz{position:absolute;top:-6px;left:-6px;font-weight:900;color:#b9c8ec;font-size:13px;display:none}
+.st-arrived .walker .w-all,.st-arrived .rt-face{animation:hop 1.6s ease-in-out infinite}
+@keyframes hop{0%,60%,100%{translate:0 0}30%{translate:0 -7px}}
+.stale .walker line,.stale .walker .w-shirt{stroke:#8b9abd;fill:#8b9abd}.stale .rt-face{filter:grayscale(1);opacity:.7}
+.rt-bub{position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:#fff;color:#0a2357;font-size:11px;font-weight:900;border-radius:10px;padding:2px 8px;white-space:nowrap;box-shadow:0 6px 14px -4px rgba(0,0,0,.45);z-index:4}
+.rt-bub:empty{display:none}
+.rt-bub::after{content:'';position:absolute;bottom:-4px;left:50%;margin-left:-4px;border:4px solid transparent;border-top-color:#fff;border-bottom:0}
+.st-arrived .rt-bub{background:#3fcf86;color:#fff}.st-arrived .rt-bub::after{border-top-color:#3fcf86}
+.rt-ping{position:absolute;bottom:-6px;left:50%;width:40px;height:14px;margin-left:-20px;border-radius:50%;border:2px solid #ffd75e;opacity:0;pointer-events:none}
+.pinged .rt-ping{animation:pingr 1.6s ease-out 2}
+@keyframes pingr{0%{transform:scale(.3);opacity:1}100%{transform:scale(2.2);opacity:0}}
+.rt-zz{position:absolute;top:-8px;right:-8px;font-weight:900;color:#b9c8ec;font-size:13px;display:none}
 .stale .rt-zz{display:block;animation:zz 2s ease-in-out infinite}.rt-zz i{font-style:normal;font-size:10px;margin-inline-start:2px}
 @keyframes zz{50%{transform:translateY(-4px);opacity:.5}}
-.rt-dest{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;width:86px;text-align:center}
+.rt-dest{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;width:92px;text-align:center;margin-bottom:4px}
 .rt-dest>span{font-size:11.5px;font-weight:800;color:#e6eeff;line-height:1.25;max-height:2.6em;overflow:hidden}
-.rt-bld{width:44px;height:44px;position:relative}
+.rt-bld{width:58px;height:54px;position:relative}
 .rt-bld svg{width:100%;height:100%;overflow:visible}
-.rt-bld .b-wall{fill:#e8eefb}.rt-bld .b-roof{fill:none;stroke:#e8eefb;stroke-width:3;stroke-linejoin:round}.rt-bld .b-door{fill:#1b4aa6}.rt-bld .b-win{fill:#9fb7e6}.rt-bld .b-cross{stroke:#dc3545;stroke-width:3;stroke-linecap:round}
-.st-arrived .rt-bld .b-win{fill:#ffd75e}.st-arrived .rt-bld{filter:drop-shadow(0 0 10px rgba(247,193,45,.75))}
-.rt-burst{position:absolute;inset:-10px;border-radius:50%;border:3px solid var(--gold);opacity:0;pointer-events:none}
+.rt-bld .b-wall{fill:#e8eefb}.rt-bld .b-door{fill:#1b4aa6}.rt-bld .b-win{fill:#9fb7e6}.rt-bld .b-sign{fill:#fff;stroke:#dc3545;stroke-width:1.5}.rt-bld .b-cross{stroke:#dc3545;stroke-width:2.6;stroke-linecap:round}
+.st-onway .rt-bld .b-win{animation:winb 2s ease-in-out infinite}
+@keyframes winb{50%{fill:#cfe0ff}}
+.st-arrived .rt-bld .b-win{fill:#ffd75e}.st-arrived .rt-bld{filter:drop-shadow(0 0 12px rgba(247,193,45,.8))}
+.st-free .rt-bld{opacity:.5}
+.rt-burst{position:absolute;inset:-12px;border-radius:50%;border:3px solid var(--gold);opacity:0;pointer-events:none}
 .rt-lane.just .rt-burst{animation:burst 1.2s ease-out 2}
-@keyframes burst{0%{transform:scale(.4);opacity:1}100%{transform:scale(1.6);opacity:0}}
+@keyframes burst{0%{transform:scale(.4);opacity:1}100%{transform:scale(1.7);opacity:0}}
+.rt-foot{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;color:#9fb3dd;font-weight:700;margin-top:2px;min-height:16px}
+.rt-foot [data-r=eta]{color:#ffd75e;font-variant-numeric:tabular-nums;direction:rtl}
 .rt-empty{display:flex;align-items:center;gap:16px;background:rgba(255,255,255,.06);border:1px dashed rgba(255,255,255,.2);border-radius:18px;padding:14px 18px}
-.rt-empty .rt-man{position:relative;right:auto;bottom:auto;flex-shrink:0}
+.rt-empty .rt-man{position:relative;right:auto;bottom:auto;flex-shrink:0;height:64px}
 .rt-empty b{display:block;font-size:15px}.rt-empty span{font-size:12.5px;color:#b9c8ec;line-height:1.7}
 .rt-idle{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:10px}
 .rt-idle:empty{display:none}
 .muted2{font-size:12px;color:#b9c8ec;font-weight:700}
 .rt-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border-radius:999px;padding:2px 10px 2px 3px;font-size:12px;font-weight:700;cursor:pointer}
 .rt-chip .av{width:22px;height:22px;font-size:10px}
-@media (max-width:700px){.routes{padding:14px 12px;border-radius:22px}.rt-title h2{font-size:17px}.rt-meta{margin-inline-start:0;width:100%}.rt-top{flex-wrap:wrap}.rt-stat{order:3;width:100%;white-space:normal;text-align:center}.rt-dest{width:64px}.rt-way{height:62px}}
+@media (max-width:700px){.routes{padding:14px 12px;border-radius:22px}.rt-title h2{font-size:17px}.rt-meta{margin-inline-start:0;width:100%}.rt-stat{order:4;width:100%;white-space:normal;text-align:center}.rt-steps{order:3}.rt-dest{width:66px}.rt-bld{width:46px;height:44px}.rt-way{height:114px}}
 </style>
 </head>
 <body>
@@ -1803,7 +1838,7 @@ document.addEventListener('visibilitychange', () => {
   else if (S.kind === 'emp') {
     if (!EmpSync.es || EmpSync.es.readyState === 2) EmpSync.connect();
     api('/api/time').then(setClock).catch(() => {});
-    if (S.etab === 'home') loadHome(true); else Tracker.tick();
+    EmpPoll.tick(); Tracker.tick();
     if (S.etab === 'chat') EChat.load().then(() => EChat.paint(false)).catch(() => {});
   }
 });
@@ -3496,15 +3531,16 @@ async function planModal(id = 0) {
   const p = id ? (S.plans || []).find(x => x.id === id) || {} : { date: today(), remind_min: 30 };
   const m = modal({
     title: id ? 'تعديل الميعاد' : 'جدولة زيارة مركز', sub: 'البرنامج هيفكرك بإشعار قبل الميعاد', icon: 'cal', tile: 't-blue',
-    body: `<div class="field"><label>المركز *</label><div class="inp-ico">${ic('hospital')}<input class="inp" name="center_name" list="dlPlC" value="${esc(p.center || '')}" placeholder="اكتب أو اختار المركز" autocomplete="off"></div><datalist id="dlPlC">${v.centers.map(c => `<option value="${esc(c.name)}">${esc(c.area || '')}</option>`).join('')}</datalist></div>
+    body: `${centerPicker(v.centers, p.center_id, p.center)}
       <div class="grid2"><div class="field"><label>اليوم *</label><input type="date" class="inp" name="date" min="${today()}" value="${esc(p.date || today())}"></div><div class="field"><label>الساعة</label><input type="time" class="inp" name="time" value="${esc(p.time || '')}"></div></div>
       <div class="field"><label>فكّرني</label><select class="inp" name="remind_min">${[[0, 'في الميعاد بالظبط'], [15, 'قبلها بربع ساعة'], [30, 'قبلها بنص ساعة'], [60, 'قبلها بساعة'], [120, 'قبلها بساعتين'], [1440, 'قبلها بيوم']].map(o => `<option value="${o[0]}" ${Number(p.remind_min ?? 30) === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select></div>
       ${id ? '' : `<div class="grid2"><div class="field"><label>التكرار</label><select class="inp" name="repeat"><option value="none">مرة واحدة</option><option value="weekly">كل أسبوع</option><option value="monthly">كل شهر</option></select></div><div class="field"><label>عدد المرات</label><select class="inp" name="count">${[2, 3, 4, 6, 8, 12].map(n => `<option ${n === 4 ? 'selected' : ''}>${n}</option>`).join('')}</select></div></div>`}
       <div class="field"><div class="lbl-row"><label>ملاحظة</label>${Mic.btn()}</div><input class="inp" name="note" value="${esc(p.note || '')}" placeholder="مثال: صيانة دورية للطابعة"></div>`,
     foot: `<button class="btn btn-primary" data-save style="flex:1">${ic('check')} حفظ</button><button class="btn btn-soft" data-close>إلغاء</button>`,
   });
+  const PCP = bindCenterPicker(m.box, v.centers);
   $('[data-save]', m.el).onclick = ev => busy(ev.currentTarget, async () => {
-    const f = formVals(m.box); const c = v.centers.find(x => x.name.trim() === (f.center_name || '').trim());
+    const f = formVals(m.box); const c = PCP.obj(); f.center_name = PCP.name(); if (!f.center_name) throw new Error('اختار المركز');
     const r = await api('/api/my/plans/save', { ...f, id, center_id: c ? c.id : null });
     m.close(); toast(r.count > 1 ? `اتجدول ${r.count} مواعيد ✓` : 'الميعاد اتحفظ ✓ — هفكرك قبله'); await loadPlans(); await loadHome(true);
   });
@@ -3657,89 +3693,124 @@ PAGES.rewards = {
 };
 
 /* ---------- Live routes board (animated technicians walking to their centers, from real GPS) ---------- */
-const WALKER = `<svg class="walker" viewBox="0 0 40 62" aria-hidden="true"><g class="w-all"><circle cx="20" cy="8" r="6.5" class="w-head"/>
-  <g class="w-arm a2"><line x1="20" y1="18" x2="20" y2="31"/></g><g class="w-leg l2"><line x1="20" y1="35" x2="20" y2="55"/></g>
-  <line x1="20" y1="15" x2="20" y2="36" class="w-body"/>
-  <g class="w-leg l1"><line x1="20" y1="35" x2="20" y2="55"/></g><g class="w-arm a1"><line x1="20" y1="18" x2="20" y2="31"/><rect x="15.5" y="30" width="9" height="7" rx="1.5" class="w-bag"/></g></g></svg>`;
-const BLDG = `<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="12" width="34" height="32" rx="3" class="b-wall"/><rect x="18" y="32" width="12" height="12" rx="1.5" class="b-door"/><path d="M21 19h6M24 16v6" class="b-cross"/><rect x="11" y="26" width="5" height="4" rx="1" class="b-win"/><rect x="32" y="26" width="5" height="4" rx="1" class="b-win"/><path d="M4 13 24 4l20 9" class="b-roof"/></svg>`;
+const WALKER = `<svg class="walker" viewBox="0 0 40 62" aria-hidden="true"><g class="w-all">
+  <g class="w-arm a2"><line x1="20" y1="18" x2="20" y2="31"/></g><g class="w-leg l2"><line x1="20" y1="35" x2="20" y2="55"/><path d="M20 55h5" class="w-shoe"/></g>
+  <path d="M14 16h12l-1 21H15z" class="w-shirt"/>
+  <g class="w-leg l1"><line x1="20" y1="35" x2="20" y2="55"/><path d="M20 55h5" class="w-shoe"/></g><g class="w-arm a1"><line x1="20" y1="18" x2="20" y2="31"/><rect x="14.5" y="30" width="11" height="8" rx="2" class="w-bag"/><path d="M18 30v-2h4v2" class="w-bagh"/></g></g></svg>`;
+const BLDG = `<svg viewBox="0 0 64 60" aria-hidden="true"><rect x="8" y="18" width="48" height="40" rx="4" class="b-wall"/><rect x="25" y="40" width="14" height="18" rx="2" class="b-door"/><rect x="26" y="6" width="12" height="12" rx="3" class="b-sign"/><path d="M32 8.5v7M28.5 12h7" class="b-cross"/>
+  <rect x="13" y="25" width="8" height="7" rx="1.5" class="b-win"/><rect x="43" y="25" width="8" height="7" rx="1.5" class="b-win"/><rect x="13" y="37" width="8" height="7" rx="1.5" class="b-win"/><rect x="43" y="37" width="8" height="7" rx="1.5" class="b-win"/></svg>`;
 const Routes = {
-  data: null, el: null, disp: {}, timer: null, ticker: null, loading: false,
-  async load() { if (this.loading) return; this.loading = true; try { this.data = await api('/api/live/routes', undefined, { noTrack: true }); this.paint(); } catch {} finally { this.loading = false; } },
-  refreshSoon: debounce(function () { if (S.kind === 'user' && S.page === 'dashboard') Routes.load(); }, 1500),
+  data: null, el: null, disp: {}, timer: null, ticker: null, loading: false, recv: 0, lastPing: {},
+  async load() { if (this.loading) return; this.loading = true; try { const d = await api('/api/live/routes', undefined, { noTrack: true }); this.recv = srvNow().getTime(); this.data = d; this.paint(); } catch {} finally { this.loading = false; } },
+  refreshSoon: debounce(function () { if (S.kind === 'user' && S.page === 'dashboard') Routes.load(); }, 900),
   km: m => m === null || m === undefined ? '—' : m < 1000 ? `${Math.round(m / 10) * 10} م` : `${(m / 1000).toFixed(m < 10000 ? 1 : 0)} كم`,
   key: l => 'e' + l.emp_id,
-  statText(l) {
-    if (l.state === 'arrived') return { t: `وصل ✓${l.at ? ' ' + t12(l.at) : ''}`, c: 'ok' };
-    if (l.stale && l.state === 'onway') return { t: `التحديث واقف من ${l.age_min === null ? '—' : dur(l.age_min)} • آخر مكان على بعد ${this.km(l.dist)}`, c: 'warn' };
-    if (l.state === 'onway') return { t: `في الطريق • باقي ${this.km(l.dist)}${l.eta_min ? ` • حوالي ${dur(l.eta_min)}` : ''}`, c: 'go' };
-    if (l.state === 'accepted') return { t: `قبل المهمة ولسه متحركش • على بعد ${this.km(l.dist)}`, c: 'wait' };
-    if (l.dist === null || l.dist === undefined) return { t: `${l.state === 'plan' ? `في جدوله ${l.time ? 'الساعة ' + t12(l.time) : 'النهارده'}` : l.state === 'accepted' ? 'قبل المهمة' : 'في الطريق'} • لسه مفيش موقع النهارده`, c: 'wait' };
-    if (l.state === 'plan') return { t: `في جدوله ${l.time ? 'الساعة ' + t12(l.time) : 'النهارده'} • على بعد ${this.km(l.dist)}`, c: 'plan' };
-    return { t: '', c: '' };
+  tsMs: ts => ts ? Date.parse(ts.replace(' ', 'T') + 'Z') : 0,
+  agoTxt(ms) { const s = Math.max(0, Math.round(ms / 1000)); return s < 60 ? `${s} ث` : s < 3600 ? `${Math.floor(s / 60)} د` : `${Math.floor(s / 3600)} س`; },
+  steps(l) {
+    const order = { accepted: 0, onway: 1, arrived: 2 }; const k = order[l.state];
+    if (k === undefined) return '';
+    return `<div class="rt-steps">${['قبل', 'في الطريق', 'وصل'].map((t, i) => `<span class="${i < k ? 'done' : i === k ? 'cur' : ''}">${t}</span>`).join('<i></i>')}</div>`;
   },
   laneHtml(l) {
     return `<div class="rt-lane" data-k="${this.key(l)}" data-act="track-emp" data-id="${l.emp_id}" title="افتح خط سيره على الخريطة">
-      <div class="rt-top">${av(l.name, l.emp_id, 'sm', l.photo)}<div class="rt-who"><b>${esc(l.name)}</b><span data-r="title"></span></div><div class="rt-stat" data-r="stat"></div></div>
+      <div class="rt-top"><div class="rt-who"><b>${esc(l.name)}</b><span data-r="title"></span></div><div data-r="steps"></div><div class="rt-stat" data-r="stat"></div></div>
       <div class="rt-road"><div class="rt-home" title="نقطة البداية">${ic('building')}</div>
-        <div class="rt-way"><div class="rt-trail"></div><div class="rt-man">${WALKER}<span class="rt-zz">z<i>z</i></span></div></div>
-        <div class="rt-dest"><div class="rt-bld">${BLDG}<span class="rt-burst"></span></div><span data-r="dest"></span></div></div></div>`;
+        <div class="rt-way"><div class="rt-deco"></div><div class="rt-trail"><span data-r="pct"></span></div>
+          <div class="rt-man"><div class="rt-bub" data-r="bub"></div><div class="rt-face">${av(l.name, l.emp_id, 'sm', l.photo)}</div>${WALKER}<span class="rt-ping"></span><span class="rt-zz">z<i>z</i></span></div></div>
+        <div class="rt-dest"><div class="rt-bld">${BLDG}<span class="rt-burst"></span></div><span data-r="dest"></span></div></div>
+      <div class="rt-foot"><span data-r="upd"></span><span data-r="eta"></span></div></div>`;
   },
   frame() {
-    const t = new Date(srvNow()); const n = this.data ? this.data.lanes : [];
-    const go = n.filter(l => l.state === 'onway').length, arr = n.filter(l => l.state === 'arrived').length;
-    return `<div class="rt-head"><div class="rt-title"><span class="live"><i></i>مباشر</span><h2>الفنيين في الطريق</h2></div>
-      <div class="rt-meta"><span>${ic('clock')}<b class="num" data-clock-sec></b></span><span data-r="counts">${go} في الطريق • ${arr} وصلوا</span><a class="rt-link" href="#/tracking">${ic('route')} الخريطة</a></div></div>
+    return `<div class="rt-sky"></div><div class="rt-head"><div class="rt-title"><span class="live"><i></i>مباشر</span><h2>الفنيين في الطريق</h2></div>
+      <div class="rt-meta"><span>${ic('clock')}<b class="num" data-clock-sec></b></span><span data-r="counts"></span><a class="rt-link" href="#/tracking">${ic('route')} الخريطة</a></div></div>
       <div class="rt-lanes" data-r="lanes"></div><div class="rt-idle" data-r="idle"></div>`;
   },
   mount(holder) {
     if (!this.el) { this.el = document.createElement('section'); this.el.className = 'routes'; this.el.innerHTML = this.frame(); }
     holder.replaceWith(this.el); this.paint(); tickClock();
-    if (!this.data) this.load();
-    clearInterval(this.timer); this.timer = setInterval(() => { if (S.kind === 'user' && S.page === 'dashboard' && document.visibilityState === 'visible') this.load(); }, 45000);
-    clearInterval(this.ticker); this.ticker = setInterval(() => this.tick(), 1000);
+    if (!this.data || srvNow().getTime() - this.recv > 8000) this.load();
+    clearInterval(this.timer); this.timer = setInterval(() => { if (S.kind === 'user' && S.page === 'dashboard' && document.visibilityState === 'visible') this.load(); }, 10000);
+    clearInterval(this.ticker); this.ticker = setInterval(() => this.tick(), 500);
+  },
+  statText(l) {
+    if (l.state === 'arrived') return { t: `وصل المركز ✓${l.at ? ' ' + t12(l.at) : ''}`, c: 'ok' };
+    if (l.state === 'free') return { t: l.stale ? 'التحديث واقف' : l.place === 'center' ? 'في مركز' : l.place === 'site' ? 'في المقر' : (l.speed >= 4 ? `بيتحرك • ${l.speed} كم/س` : 'في الشغل'), c: l.stale ? 'warn' : l.place === 'center' ? 'ok' : 'wait' };
+    if (l.dist === null || l.dist === undefined) return { t: l.state === 'plan' ? `في جدوله ${l.time ? t12(l.time) : 'النهارده'} • مفيش موقع` : 'مفيش موقع لسه', c: 'wait' };
+    if (l.stale && l.state === 'onway') return { t: `التحديث واقف • آخر مكان على بعد ${this.km(l.dist)}`, c: 'warn' };
+    if (l.state === 'onway') return { t: `في الطريق • باقي ${this.km(l.dist)}`, c: 'go' };
+    if (l.state === 'accepted') return { t: `قبل المهمة • على بعد ${this.km(l.dist)}`, c: 'wait' };
+    if (l.state === 'plan') return { t: `في جدوله ${l.time ? t12(l.time) : 'النهارده'} • على بعد ${this.km(l.dist)}`, c: 'plan' };
+    return { t: '', c: '' };
   },
   paint() {
     const el = this.el; if (!el || !this.data) return;
     const d = this.data, box = $('[data-r=lanes]', el);
-    const go = d.lanes.filter(l => l.state === 'onway').length, arr = d.lanes.filter(l => l.state === 'arrived').length;
-    $('[data-r=counts]', el).textContent = d.lanes.length ? `${go} في الطريق • ${arr} وصلوا${d.more ? ` • +${d.more}` : ''}` : 'محدش في الطريق';
+    const go = d.lanes.filter(l => l.state === 'onway').length, arr = d.lanes.filter(l => l.state === 'arrived').length, fr = d.lanes.filter(l => l.state === 'free').length;
+    $('[data-r=counts]', el).textContent = d.lanes.length ? `${go} في الطريق • ${arr} وصلوا${fr ? ` • ${fr} في الشغل` : ''}` : 'محدش في الشغل دلوقتي';
     const keys = new Set(d.lanes.map(l => this.key(l)));
-    $$('.rt-lane', box).forEach(x => { if (!keys.has(x.dataset.k)) x.remove(); });
+    $$('.rt-lane', box).forEach(x => { if (!keys.has(x.dataset.k)) { x.classList.add('bye'); setTimeout(() => x.remove(), 400); } });
     if (!d.lanes.length) {
-      box.innerHTML = `<div class="rt-empty"><div class="rt-man idle">${WALKER}</div><div><b>مفيش فنيين في الطريق دلوقتي</b><span>أول ما فني يقبل مهمة ويدوس "في الطريق" هتشوفه ماشي هنا لحد ما يوصل المركز — حسب موقعه الحقيقي</span></div></div>`;
+      if (!$('.rt-empty', box)) box.innerHTML = `<div class="rt-empty"><div class="rt-man idle">${WALKER}</div><div><b>محدش في الطريق دلوقتي</b><span>أول ما فني يسجل حضور أو يقبل مهمة هتشوفه هنا ماشي لحد المركز — حسب موقعه الحقيقي، والبرنامج بيبعت موقعه كل 30 ثانية وهو في الطريق</span></div></div>`;
     } else { const e0 = $('.rt-empty', box); if (e0) e0.remove(); }
     d.lanes.forEach((l, i) => {
-      let x = $(`.rt-lane[data-k="${this.key(l)}"]`, box);
-      if (!x) { box.insertAdjacentHTML('beforeend', this.laneHtml(l)); x = box.lastElementChild; this.disp[this.key(l)] = l.progress || 0; }
+      const k = this.key(l);
+      let x = $(`.rt-lane[data-k="${k}"]`, box);
+      const fresh = !x;
+      if (fresh) { box.insertAdjacentHTML('beforeend', this.laneHtml(l)); x = box.lastElementChild; this.disp[k] = 0; requestAnimationFrame(() => x.classList.add('in')); }
       const prevState = x.dataset.state;
-      x.dataset.state = l.state; x.className = `rt-lane st-${l.state}${l.stale ? ' stale' : ''}${l.priority === 'urgent' ? ' urgent' : ''}`;
+      x.dataset.state = l.state;
+      x.className = `rt-lane in st-${l.state}${l.stale ? ' stale' : ''}${l.priority === 'urgent' ? ' urgent' : ''}${l.state === 'free' && l.speed >= 4 && !l.stale ? ' moving' : ''}`;
       x.style.order = i;
-      if (prevState && prevState !== 'arrived' && l.state === 'arrived') { x.classList.add('just'); setTimeout(() => x.classList.remove('just'), 2600); }
+      if (prevState && prevState !== 'arrived' && l.state === 'arrived') { x.classList.add('just'); setTimeout(() => x.classList.remove('just'), 2600); toast(`🎉 ${l.name} وصل ${l.dest.name}`, 'ok', 'pin'); }
+      if (!fresh && l.last_at && this.lastPing[k] && l.last_at !== this.lastPing[k]) { x.classList.remove('pinged'); void x.offsetWidth; x.classList.add('pinged'); }
+      this.lastPing[k] = l.last_at;
       const st = this.statText(l);
       $('[data-r=title]', x).textContent = (l.kind === 'plan' ? '📅 ' : l.priority === 'urgent' ? '🚨 ' : '') + (l.title || '');
       const s2 = $('[data-r=stat]', x); s2.textContent = st.t; s2.className = 'rt-stat ' + st.c;
+      $('[data-r=steps]', x).innerHTML = this.steps(l);
       $('[data-r=dest]', x).textContent = l.dest.name;
-      const k = this.key(l); const cur = this.disp[k] ?? 0;
-      this.disp[k] = l.state === 'arrived' ? 1 : (l.progress > cur || Math.abs(l.progress - cur) > 0.15 ? l.progress : cur);
-      this.place(x, this.disp[k]);
+      l._base = l.state === 'arrived' ? 1 : (l.progress || 0); l._t0 = this.tsMs(l.last_at) || srvNow().getTime();
+      if (fresh) { this.disp[k] = 0; setTimeout(() => this.place(x, this.est(l)), 60); } else this.place(x, this.est(l));
     });
     const idle = d.idle || [];
-    $('[data-r=idle]', el).innerHTML = idle.length ? `<span class="muted2">في الشغل من غير مهمة:</span>${idle.slice(0, 10).map(e => `<span class="rt-chip" data-act="track-emp" data-id="${e.emp_id}">${av(e.name, e.emp_id, 'xs', e.photo)}${esc(e.name.split(' ')[0])}</span>`).join('')}${idle.length > 10 ? `<span class="rt-chip">+${idle.length - 10}</span>` : ''}` : '';
+    $('[data-r=idle]', el).innerHTML = idle.length ? `<span class="muted2">في الشغل من غير موقع:</span>${idle.slice(0, 12).map(e => `<span class="rt-chip" data-act="track-emp" data-id="${e.emp_id}">${av(e.name, e.emp_id, 'xs', e.photo)}${esc(e.name.split(' ')[0])}</span>`).join('')}` : '';
+    this.tick();
+  },
+  est(l) {
+    if (l.state === 'arrived') return 1;
+    if (l.state === 'free') return l.progress ?? 0.5;
+    let p = l._base || 0;
+    if (l.state === 'onway' && !l.stale && l.start) {
+      const v = (l.speed && l.speed >= 4 ? l.speed : 20) / 3.6, dt = Math.max(0, (srvNow().getTime() - l._t0) / 1000);
+      p = Math.min(Math.min(0.97, (l._base || 0) + 0.3), (l._base || 0) + v * dt / l.start);
+    }
+    return p;
   },
   place(x, p) {
     p = Math.max(0, Math.min(1, p));
     const man = $('.rt-man', x), trail = $('.rt-trail', x);
-    man.style.right = `calc(${(p * 100).toFixed(2)}% - ${(p * 42).toFixed(1)}px)`;
+    man.style.right = `calc(${(p * 100).toFixed(2)}% - ${(p * 50).toFixed(1)}px)`;
     trail.style.width = `${(p * 100).toFixed(2)}%`;
+    const pc = $('[data-r=pct]', x); if (pc) pc.textContent = x.dataset.state === 'free' ? '' : Math.round(p * 100) + '%';
   },
   tick() {
     if (!this.el || !this.el.isConnected || !this.data) return;
+    const now = srvNow().getTime();
     for (const l of this.data.lanes) {
-      if (l.state !== 'onway' || l.stale || !l.start) continue;
-      const v = (l.speed && l.speed >= 4 ? l.speed : 18) / 3.6; const k = this.key(l);
-      const cap = Math.min(0.97, (l.progress || 0) + 0.12);
-      const nv = Math.min(cap, (this.disp[k] || 0) + v / l.start);
-      if (nv !== this.disp[k]) { this.disp[k] = nv; const x = $(`.rt-lane[data-k="${k}"]`, this.el); if (x) this.place(x, nv); }
+      const x = $(`.rt-lane[data-k="${this.key(l)}"]`, this.el); if (!x) continue;
+      const p = this.est(l); this.place(x, p);
+      const upd = $('[data-r=upd]', x); if (upd) upd.textContent = l.last_at ? `📍 آخر تحديث من ${this.agoTxt(now - this.tsMs(l.last_at))}` : '📍 مفيش موقع النهارده';
+      let etaTxt = '', bub = '';
+      if (l.state === 'onway' && l.start && l.dist !== null) {
+        const remain = Math.max(0, (1 - p) * l.start), v = (l.speed && l.speed >= 4 ? l.speed : 20) / 3.6, sec = Math.round(remain / v);
+        etaTxt = l.stale ? '' : `⏱ يوصل خلال ${sec >= 3600 ? Math.floor(sec / 3600) + ' س ' : ''}${String(Math.floor(sec % 3600 / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+        bub = l.stale ? '⏸' : `${this.km(remain)}`;
+      } else if (l.state === 'arrived') bub = '✓';
+      else if (l.state === 'accepted') bub = '⏳';
+      else if (l.state === 'plan') bub = l.time ? t12(l.time) : '📅';
+      const eta = $('[data-r=eta]', x); if (eta) eta.textContent = etaTxt;
+      const b = $('[data-r=bub]', x); if (b && b.textContent !== bub) b.textContent = bub;
     }
   },
 };
@@ -4031,6 +4102,7 @@ async function startEmp() {
   setTimeout(() => OQ.flush(), 2500);
 }
 async function loadHome(silent) {
+  EmpPoll.dirty = false;
   try {
     S.home = await api('/api/my/home'); setClock(S.home.now);
   } catch (e) { if (!silent && S.token) $('#app').innerHTML = `<div class="emp"><div class="card empty" style="margin:30px 16px"><div class="tile t-red">${ic('alert')}</div><b>${esc(e.message)}</b><div style="margin-top:14px"><button class="btn btn-primary" onclick="loadHome()">${ic('refresh')} حاول تاني</button></div></div></div>`; return; }
@@ -4113,7 +4185,7 @@ function empHomeHtml() {
     <div class="clockcard"><div class="bigt num" data-bigclock></div><div class="dt">${dLong(nowParts().date)}</div>
       <span class="shift ${shCls}">${sh}</span>${state}${perms}
       <div class="punch-wrap">${btn}${h.punch_mode === 'qr_or_gps' && !(r.in_at && r.out_at && !open) ? `<button class="btn btn-soft btn-sm" data-eact="scan" style="margin-top:4px">${ic('camera')} أو امسح كود المقر</button>` : ''}<button class="locpill wait" id="locPill" data-eact="locate"></button></div>
-      ${open && h.settings.track === '1' ? `<div class="trackpill ok" id="trackPill"></div>` : ''}</div>
+      ${(open || Tracker.going()) && h.settings.track === '1' ? `<div class="trackpill ok" id="trackPill"></div>` : ''}</div>
     ${h.settings.chat === '1' ? `<button class="ebanner msgb ${h.chat_unread ? '' : 'hide'}" data-msg-banner data-etab="chat"><div class="tile sm t-green">${ic('chat')}</div><div class="grow"><b>عندك <span data-msg-count>${h.chat_unread}</span> رسالة جديدة من الإدارة</b><span>دوس هنا علشان تقراها</span></div>${ic('chevL')}</button>` : ''}
     ${(h.decided || []).filter(l => !seenDecided().includes(l.id)).map(l => `<div class="note ${l.status === 'approved' ? '' : 'warn'}">${ic(l.status === 'approved' ? 'checkCircle' : 'alert')}<div style="flex:1"><b>${LT[l.type]}</b> ${l.status === 'approved' ? 'اتوافق عليها ✓' : 'اترفضت'} (${dShort(l.from_date)})${l.reply ? `<br><span class="muted">الرد: ${esc(l.reply)}</span>` : ''}</div><button class="btn btn-ghost btn-icon btn-sm" data-eact="dec-ok" data-id="${l.id}">${ic('x')}</button></div>`).join('')}
     ${curT ? eTaskCard(curT) : ''}${(h.plans_today || []).some(p => p.state === 'planned') ? `<div class="ecard2"><h3>${ic('cal')} زياراتك المخططة النهارده</h3>${h.plans_today.map(p => `<div class="cust-it"><b class="pl-time ltr">${p.time ? t12(p.time) : '—'}</b><b>${esc(p.center)}${p.note ? `<br><small class="muted">${esc(p.note)}</small>` : ''}</b>${p.state === 'planned' ? `<button class="btn btn-xs btn-green" data-eact="plan-visit" data-id="${p.id}">${ic('wrench')} سجّل</button>` : chip(PLS[p.state][0], PLS[p.state][1])}</div>`).join('')}</div>` : ''}${pushNudge}
@@ -4168,6 +4240,7 @@ async function taskAct(a) {
     if (act === 'arrive') { try { const p = await getPos(12000); S.loc = p; Object.assign(body, { lat: p.lat, lng: p.lng, acc: p.acc }); } catch {} }
     const r = await api('/api/my/task', body);
     const i = S.home.tasks.findIndex(x => x.id === id); if (i >= 0) S.home.tasks[i] = r.task;
+    if (act === 'onway' || act === 'accept') { Tracker.lastOk = 0; setTimeout(() => { Tracker.sync(); Tracker.tick(true); }, 300); }
     if (navigator.vibrate) navigator.vibrate(40);
     toast({ accept: 'تمام — المهمة اتقبلت', onway: 'الإدارة عرفت إنك في الطريق', arrive: r.task.arrive_dist !== null && r.task.arrive_dist !== undefined ? `اتسجل وصولك (على بُعد ${meters(r.task.arrive_dist)} من المركز)` : 'اتسجل وصولك للمركز', decline: 'اتبعت اعتذارك للإدارة' }[act], act === 'decline' ? 'warn' : 'ok', 'send');
     renderEmp();
@@ -4331,6 +4404,20 @@ function empVisitsHtml() {
     ${doneT.length ? `<div class="ecard2"><h3>${ic('checkCircle')} مهام خلصتها النهارده</h3>${doneT.map(t => `<div class="cust-it"><div class="tile xs t-green">${ic('check')}</div><b>${esc(t.title)}<br><small class="muted">${esc(t.center)} • ${t12(t.done_at)}</small></b>${t.visit_id ? `<button class="btn btn-xs btn-soft" data-eact="visit-show" data-id="${t.visit_id}">${ic('eye')}</button>` : ''}</div>`).join('')}</div>` : ''}
     <div class="ecard2"><h3>${ic('list')} زياراتي</h3>${v.visits.length ? v.visits.slice(0, S.visAll ? 999 : 15).map(empVisitItem).join('') + (!S.visAll && v.visits.length > 15 ? `<button class="btn btn-soft btn-sm" style="width:100%;margin-top:8px" data-eact="vis-all">عرض كل الزيارات (${v.visits.length})</button>` : '') : `<div class="empty" style="padding:20px">${ic('wrench')}<div>${v.offline ? 'هتظهر لما النت يرجع' : 'لسه مسجلتش زيارات'}</div></div>`}</div></div>`;
 }
+function centerPicker(centers, selId, selName) {
+  const L0 = centers.slice().sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+  const match = (selId && L0.find(c => c.id === selId)) || (selName && L0.find(c => c.name.trim() === String(selName).trim())) || null;
+  const isNew = !match && !!selName;
+  return `<div class="field"><label>المركز *</label><select class="inp" data-csel><option value="">اختار المركز (${L0.length} مركز متسجل)</option>${L0.map(c => `<option value="${c.id}" ${match && match.id === c.id ? 'selected' : ''}>${esc(c.name)}${c.area ? ' — ' + esc(c.area) : ''}</option>`).join('')}<option value="__new" ${isNew ? 'selected' : ''}>➕ مركز مش في القائمة</option></select>
+    <input class="inp ${isNew ? '' : 'hide'}" data-cnew placeholder="اكتب اسم المركز الجديد" value="${esc(isNew ? selName : '')}" style="margin-top:8px"></div>`;
+}
+function bindCenterPicker(root, centers, onChange) {
+  const sel = $('[data-csel]', root), nw = $('[data-cnew]', root);
+  sel.addEventListener('change', () => { nw.classList.toggle('hide', sel.value !== '__new'); if (sel.value === '__new') nw.focus(); onChange && onChange(); });
+  nw.addEventListener('input', () => onChange && onChange());
+  const obj = () => centers.find(c => String(c.id) === sel.value) || null;
+  return { obj, name: () => { const c = obj(); return c ? c.name : sel.value === '__new' ? nw.value.trim() : ''; } };
+}
 async function visitForm(task = null, plan = null, device = null) {
   let v; try { v = S.vis || await loadVis(); } catch (e) { return toast(e.message, 'err'); }
   const level = v.settings.photo_quality || 'low';
@@ -4341,7 +4428,7 @@ async function visitForm(task = null, plan = null, device = null) {
     title: task ? 'قفل المهمة بزيارة' : 'تسجيل زيارة مركز', sub: task ? task.title : plan ? 'من جدول زياراتك' : 'سجّل الشغل اللي عملته وسلّمته لمين', icon: 'wrench', tile: 't-red', size: 'lg',
     body: `${task ? `<div class="note">${ic('send')}<div>الزيارة دي هتتربط بالمهمة <b>${esc(task.title)}</b> وهتتقفل لوحدها بعد الحفظ.</div></div>` : ''}
       ${v.offline ? `<div class="note warn">${ic('signal')}<div>مفيش نت — الزيارة هتتحفظ على الموبايل وتتبعت لوحدها أول ما النت يرجع.</div></div>` : ''}
-      <div class="field"><label>المركز *</label><div class="inp-ico">${ic('hospital')}<input class="inp" name="center_name" list="dlCenters" placeholder="اكتب أو اختار اسم المركز" autocomplete="off" value="${esc(task ? task.center : plan ? plan.center : device ? device.center : '')}"></div><datalist id="dlCenters">${v.centers.map(c => `<option value="${esc(c.name)}">${esc(c.area || '')}</option>`).join('')}</datalist><small>لو المركز مش في القائمة اكتب اسمه وهيتضاف تلقائي</small></div>
+      ${centerPicker(v.centers, task ? task.center_id : plan ? plan.center_id : null, task ? task.center : plan ? plan.center : device ? device.center : '')}
       <div class="field"><label>نوع الشغل</label><div class="daypick">${(() => { const want = task ? (/دوري|وقائ/.test(task.title) ? /دوري/ : /تركيب/.test(task.title) ? /تركيب/ : /معايرة/.test(task.title) ? /معايرة/ : /عطل|إصلاح/) : null; let pick = want ? v.work_types.findIndex(t => want.test(t)) : 0; if (pick < 0) pick = 0; return v.work_types.map((t, i) => `<label><input type="radio" name="work_type" value="${esc(t)}" ${i === pick ? 'checked' : ''}><span>${esc(t)}</span></label>`).join(''); })()}</div></div>
       ${device || (task && task.device_id) ? `<div class="chip c-blue" style="align-self:flex-start">${ic('printer')} ${esc(device ? [device.name, device.model, device.serial ? 'S/N ' + device.serial : ''].filter(Boolean).join(' — ') : (task.dev_name || 'الطابعة') + (task.dev_serial ? ' — S/N ' + task.dev_serial : ''))}</div>` : ''}
       <div class="field"><div class="lbl-row"><label>العطل / المشكلة</label>${Mic.btn()}</div><input class="inp" name="fault_desc" placeholder="مثال: خطوط بيضاء على الفيلم" value="${esc(task ? task.title : '')}" autocomplete="off"></div>
@@ -4361,8 +4448,8 @@ async function visitForm(task = null, plan = null, device = null) {
       <button type="button" class="locpill wait" data-vloc>${ic('locate')}<span>جاري تحديد موقعك...</span></button>`,
     foot: `<button class="btn btn-green" data-save style="flex:1;height:50px;font-size:16px">${ic('check')} ${task ? 'حفظ وقفل المهمة' : 'حفظ الزيارة'}</button><button class="btn btn-soft" data-close>إلغاء</button>`,
   });
-  const el = m.box, cIn = $('[name=center_name]', el), pill = $('[data-vloc]', el), pin = $('#vPhotoIn', el);
-  const centerObj = () => v.centers.find(c => c.name.trim() === cIn.value.trim());
+  const el = m.box, pill = $('[data-vloc]', el), pin = $('#vPhotoIn', el);
+  const CP = bindCenterPicker(el, v.centers, () => updPill()); const centerObj = CP.obj;
   const hint = $('[data-kbhint]', el);
   const kbLook = debounce(async () => {
     const q = [$('[name=fault_code]', el).value, $('[name=fault_desc]', el).value].join(' ').trim();
@@ -4385,8 +4472,8 @@ async function visitForm(task = null, plan = null, device = null) {
   };
   const getLoc = () => { S.loc = { busy: true }; updPill(); getPos().then(p => { S.loc = p; updPill(); }).catch(e => { S.loc = { err: e.message, at: Date.now() }; updPill(); }); };
   if (!S.loc || S.loc.err || Date.now() - (S.loc.at || 0) > 60000) getLoc(); else updPill();
-  pill.onclick = getLoc; cIn.addEventListener('input', updPill);
-  const stampLines = () => { const p = capturedAt || nowParts(); const c = cIn.value.trim() || 'زيارة صيانة'; const wt = ($('[name=work_type]:checked', el) || {}).value || ''; return [c, `${S.home.emp.name}${wt ? ' • ' + wt : ''}`, `${p.date}  ${t12(p.time)}${S.loc && S.loc.lat ? `  •  ${S.loc.lat.toFixed(5)}, ${S.loc.lng.toFixed(5)}` : ''}`]; };
+  pill.onclick = getLoc;
+  const stampLines = () => { const p = capturedAt || nowParts(); const c = CP.name() || 'زيارة صيانة'; const wt = ($('[name=work_type]:checked', el) || {}).value || ''; return [c, `${S.home.emp.name}${wt ? ' • ' + wt : ''}`, `${p.date}  ${t12(p.time)}${S.loc && S.loc.lat ? `  •  ${S.loc.lat.toFixed(5)}, ${S.loc.lng.toFixed(5)}` : ''}`]; };
   pin.onchange = async () => {
     const f = pin.files && pin.files[0]; if (!f) return;
     const box = $('[data-pbox]', el);
@@ -4400,7 +4487,8 @@ async function visitForm(task = null, plan = null, device = null) {
   };
   $('[data-save]', m.el).onclick = ev => busy(ev.currentTarget, async () => {
     const f = formVals(el);
-    if (!f.center_name) throw new Error('اختار المركز أو اكتب اسمه');
+    f.center_name = CP.name();
+    if (!f.center_name) throw new Error('اختار المركز من القائمة');
     if (!f.details) throw new Error('اكتب تفاصيل الشغل اللي اتعمل');
     if (!f.receiver_name) throw new Error('اكتب اسم اللي استلم منك الشغل');
     if (v.settings.photo_required === '1' && !file) throw new Error('لازم تصوّر صورة إثبات للشغل');
@@ -4537,7 +4625,7 @@ function successSheet(r, loc) {
 }
 document.addEventListener('click', async e => {
   const t = e.target.closest('[data-etab]');
-  if (t && S.kind === 'emp') { e.preventDefault(); S.etab = t.dataset.etab; renderEmp(); window.scrollTo(0, 0); return; }
+  if (t && S.kind === 'emp') { e.preventDefault(); S.etab = t.dataset.etab; EmpPoll.dirty = false; renderEmp(); window.scrollTo(0, 0); return; }
   const a = e.target.closest('[data-eact]'); if (!a || S.kind !== 'emp') return;
   const k = a.dataset.eact;
   if (k === 'punch') doPunch(a);
@@ -4573,7 +4661,30 @@ document.addEventListener('click', async e => {
   if (k === 'visit-show') { let v = (S.vis && S.vis.visits || []).find(x => String(x.id) === a.dataset.id); if (!v) { try { await loadVis(); v = S.vis.visits.find(x => String(x.id) === a.dataset.id); } catch {} } if (v) visitModal(v, false); }
   if (k === 'leave-cancel') { if (!await confirmBox('إلغاء الطلب ده؟', { ok: 'إلغاء الطلب', danger: true })) return; busy(null, async () => { await api('/api/my/leave/cancel', { id: +a.dataset.id }); toast('تم إلغاء الطلب'); await loadHome(true); }); }
 });
-setInterval(() => { if (S.kind === 'emp' && S.etab === 'home' && document.visibilityState === 'visible' && !modals.length) loadHome(true); }, 90000);
+/* silent background refresh every 5 seconds — only repaints when something actually changed, never while typing */
+const EmpPoll = {
+  pending: false, busy: false, dirty: false,
+  quiet() { const ae = document.activeElement; return !modals.length && !this.dirty && S.etab !== 'chat' && !$('.cele') && !$('.scan') && !(ae && $('#app') && $('#app').contains(ae) && /INPUT|SELECT|TEXTAREA/.test(ae.tagName)); },
+  async tick() {
+    if (S.kind !== 'emp' || !S.token || !S.home || this.busy || document.visibilityState !== 'visible') return;
+    this.busy = true;
+    try {
+      const r = await api('/api/my/home?v=' + encodeURIComponent(S.home.v || ''));
+      if (r.same) { setClock(r.now); if (this.pending) this.apply(); return; }
+      S.home = r; setClock(r.now); this.apply();
+    } catch {} finally { this.busy = false; }
+  },
+  apply() {
+    updEmpBadges();
+    if (!this.quiet()) { this.pending = true; return; }
+    this.pending = false;
+    const y = window.scrollY; renderEmp(); if (Math.abs(window.scrollY - y) > 2) window.scrollTo(0, y);
+    Tracker.sync();
+    if ((S.home.rewards_new || []).length) Celebrate.enqueue(S.home.rewards_new);
+  },
+};
+setInterval(() => EmpPoll.tick(), 5000);
+document.addEventListener('input', e => { if (S.kind === 'emp' && $('#app') && $('#app').contains(e.target)) EmpPoll.dirty = true; });
 
 /* ------------------------------------------- Employee: chat + live link --- */
 function seenDecided() { try { return JSON.parse(LS.get('em_att_seen_dec', '[]')) || []; } catch { return []; } }
@@ -4633,17 +4744,17 @@ const EmpSync = {
     if (d.type === 'chat') EChat.onIncoming(d.msg);
     if (d.type === 'chat_read') EChat.onRead();
     if (d.type === 'chat_deleted' && EChat.msgs) { EChat.msgs = EChat.msgs.filter(m => m.id !== d.id); if (S.etab === 'chat') EChat.paint(false); }
-    if (d.type === 'leave_decided') { toast(`${LT[d.leave_type] || 'طلبك'}: ${d.status === 'approved' ? 'اتوافق عليه ✓' : 'اترفض'}`, d.status === 'approved' ? 'ok' : 'warn', 'clipboard'); if (navigator.vibrate) navigator.vibrate(60); if (S.etab !== 'chat') loadHome(true); }
-    if (d.type === 'settings' || d.type === 'profile') { EChat.msgs = null; if (S.etab !== 'chat' || d.type === 'settings') loadHome(true); }
+    if (d.type === 'leave_decided') { toast(`${LT[d.leave_type] || 'طلبك'}: ${d.status === 'approved' ? 'اتوافق عليه ✓' : 'اترفض'}`, d.status === 'approved' ? 'ok' : 'warn', 'clipboard'); if (navigator.vibrate) navigator.vibrate(60); if (S.etab !== 'chat') EmpPoll.tick(); }
+    if (d.type === 'settings' || d.type === 'profile') { EChat.msgs = null; if (S.etab !== 'chat' || d.type === 'settings') EmpPoll.tick(); }
     if (d.type === 'task') {
       if (d.title) { toast('مهمة جديدة: ' + d.title, 'info', 'send'); if (navigator.vibrate) navigator.vibrate([100, 50, 100]); }
-      if (S.etab !== 'chat') loadHome(true);
+      if (S.etab !== 'chat') EmpPoll.tick();
     }
     if (d.type === 'kb' && d.author) { toast(`💡 ${d.author} ضاف حل: ${d.code ? d.code + ' — ' : ''}${d.problem || ''}`, 'info', 'bulb'); }
     if (d.type === 'kb') { KB.data = null; if (S.etab === 'kb') KB.refresh(); }
-    if (d.type === 'reward') { S.myRewards = null; loadHome(true); }
+    if (d.type === 'reward') { S.myRewards = null; EmpPoll.tick(); }
     if (d.type === 'plan_remind') { toast(`⏰ تذكير: زيارة ${d.center}${d.time ? ' الساعة ' + t12(d.time) : ''}`, 'info', 'cal'); if (navigator.vibrate) navigator.vibrate([120, 60, 120]); }
-    if (d.type === 'custody') { S.vis = null; toast('عهدتك من قطع الغيار اتحدثت', 'info', 'brief'); if (S.etab !== 'chat') loadHome(true); }
+    if (d.type === 'custody') { S.vis = null; toast('عهدتك من قطع الغيار اتحدثت', 'info', 'brief'); if (S.etab !== 'chat') EmpPoll.tick(); }
   },
 };
 
@@ -4651,19 +4762,21 @@ const EmpSync = {
 // Sends the phone location every N minutes between check-in and check-out while the app is open.
 const Tracker = {
   timer: null, lastOk: 0, err: null, busy: false,
-  on() { const h = S.home; return !!(h && h.open && h.settings.track === '1'); },
-  ivMs() { return (Number(S.home && S.home.settings.track_interval) || 15) * 60000; },
+  going() { const h = S.home; return !!(h && h.settings.track === '1' && (h.tasks || []).some(t => t.status === 'onway' || t.status === 'accepted')); },
+  on() { const h = S.home; return !!(h && h.settings.track === '1' && (h.open || this.going())); },
+  ivMs() { return this.going() ? 30000 : (Number(S.home && S.home.settings.track_interval) || 15) * 60000; },
   sync() {
     if (!this.on()) return this.stop();
     if (S.home.last_ping) this.lastOk = Math.max(this.lastOk || 0, Date.parse(S.home.last_ping.replace(' ', 'T') + 'Z'));
-    if (!this.timer) this.timer = setInterval(() => this.tick(), 30000);
+    const per = this.going() ? 10000 : 30000;
+    if (!this.timer || this.per !== per) { clearInterval(this.timer); this.per = per; this.timer = setInterval(() => this.tick(), per); }
     this.tick(); this.paint();
   },
   stop() { clearInterval(this.timer); this.timer = null; },
   async tick(force) {
     if (!this.on() || this.busy || document.visibilityState !== 'visible') return;
     const now = srvNow().getTime();
-    if (!force && this.lastOk && now - this.lastOk < this.ivMs() - 20000) { this.paint(); return; }
+    if (!force && this.lastOk && now - this.lastOk < this.ivMs() - (this.going() ? 5000 : 20000)) { this.paint(); return; }
     this.busy = true;
     try {
       const p = await getPos(20000); S.loc = p;
@@ -4679,7 +4792,7 @@ const Tracker = {
     const iv = Number(S.home.settings.track_interval) || 15;
     if (this.err) { el.className = 'trackpill warn'; el.innerHTML = `${ic('alert')}<span>مقدرناش نبعت موقعك للإدارة: ${esc(this.err)}</span>`; return; }
     el.className = 'trackpill ok';
-    el.innerHTML = `${ic('radar')}<span>موقعك بيتبعت للإدارة كل ${iv} دقيقة أثناء الشغل${this.lastOk ? ` • آخر تحديث ${t12(new Date(this.lastOk).toISOString().slice(11, 19))}` : ''} — خلّي البرنامج مفتوح</span>`;
+    el.innerHTML = `${ic('radar')}<span>${this.going() ? 'إنت في الطريق لمهمة — موقعك بيتبعت كل 30 ثانية' : `موقعك بيتبعت للإدارة كل ${iv} دقيقة أثناء الشغل`}${this.lastOk ? ` • آخر تحديث ${t12(new Date(this.lastOk).toISOString().slice(11, 19))}` : ''} — خلّي البرنامج مفتوح</span>`;
   },
 };
 

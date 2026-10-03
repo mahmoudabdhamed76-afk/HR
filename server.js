@@ -13,7 +13,7 @@ const _emit = process.emitWarning;
 process.emitWarning = function (w, ...rest) { if (String(w && w.message || w).includes('SQLite')) return; return _emit.call(process, w, ...rest); };
 const { DatabaseSync } = require('node:sqlite');
 
-const VERSION = '1.5.0';
+const VERSION = '1.6.0';
 const PORT = Number(process.env.PORT) || 8686;
 const HOST = process.env.HOST || '0.0.0.0';
 const APP_PATH = (process.env.APP_PATH || '').replace(/\/+$/, '');
@@ -933,7 +933,12 @@ function myHome(emp) {
     push_on: !!one("SELECT id FROM push_subs WHERE kind = 'emp' AND ref_id = ? LIMIT 1", emp.id),
   };
 }
-route('GET', '/api/my/home', 'emp', (b, a) => myHome(a.emp));
+route('GET', '/api/my/home', 'emp', (b, a, c) => {
+  const h = myHome(a.emp); const { now, ...rest } = h;
+  const v = crypto.createHash('sha1').update(JSON.stringify(rest)).digest('base64url').slice(0, 16);
+  if (c.url.searchParams.get('v') === v) return { same: true, now, v };
+  return { ...h, v };
+});
 route('POST', '/api/my/punch', 'emp', (b, a) => {
   const emp = a.emp; const now = nowLocal();
   const type = b.type === 'out' ? 'out' : 'in';
@@ -1618,11 +1623,12 @@ function logLocation(emp, now, lat, lng, acc, battery, kind) {
 route('POST', '/api/my/ping', 'emp', (b, a) => {
   const emp = a.emp; const now = nowLocal();
   if (!trackAllowed(emp)) return { ok: false, off: true };
-  if (!openRecord(emp.id, now)) return { ok: false, closed: true };          // only during working hours
+  const onway = one("SELECT id FROM tasks WHERE emp_id = ? AND status IN ('accepted','onway') LIMIT 1", emp.id);
+  if (!openRecord(emp.id, now) && !onway) return { ok: false, closed: true };          // only during working hours (or while heading to a task)
   const lat = num(b.lat), lng = num(b.lng);
   if (lat === null || lng === null || Math.abs(lat) > 90 || Math.abs(lng) > 180) fail(400, 'موقع غير صالح');
   const last = one('SELECT at FROM locations WHERE emp_id = ? ORDER BY id DESC LIMIT 1', emp.id);
-  if (last && tsMin(now.ts) - tsMin(last.at) < 1) return { ok: true, skipped: true, at: last.at };
+  if (last && tsMin(now.ts) - tsMin(last.at) < (onway ? 0.3 : 1)) return { ok: true, skipped: true, at: last.at };
   const bat = num(b.battery);
   logLocation(emp, now, lat, lng, num(b.acc), bat === null ? null : Math.max(0, Math.min(100, Math.round(bat))), 'ping');
   return { ok: true, at: now.ts, interval: trackInterval() };
@@ -2541,12 +2547,13 @@ route('GET', '/api/live/routes', 'user', () => {
     if (l && dest.lat !== null && dest.lat !== undefined) {
       const cur = Math.round(haversine(l.lat, l.lng, dest.lat, dest.lng));
       const pts = from ? all('SELECT lat, lng, at FROM locations WHERE emp_id = ? AND at >= ? ORDER BY at, id', e.id, from) : [];
+      if (from) { const before = one('SELECT lat, lng, at FROM locations WHERE emp_id = ? AND at < ? AND at >= ? ORDER BY at DESC, id DESC LIMIT 1', e.id, from, minToTs(tsMin(from) - 90)); if (before) pts.unshift(before); }
       let start = pts.length ? Math.round(haversine(pts[0].lat, pts[0].lng, dest.lat, dest.lng)) : cur;
       for (const p of pts) start = Math.max(start, Math.round(haversine(p.lat, p.lng, dest.lat, dest.lng)));
       start = Math.max(start, cur, 1);
       const recent = all('SELECT lat, lng, at FROM locations WHERE emp_id = ? AND at >= ? ORDER BY at DESC, id DESC LIMIT 2', e.id, day0);
       let speed = null;
-      if (recent.length === 2) { const dt = tsMin(recent[0].at) - tsMin(recent[1].at); if (dt >= 1 && dt <= iv * 3) speed = Math.min(90, Math.round(haversine(recent[0].lat, recent[0].lng, recent[1].lat, recent[1].lng) / 1000 / (dt / 60))); }
+      if (recent.length === 2) { const dt = tsMin(recent[0].at) - tsMin(recent[1].at); if (dt >= 0.3 && dt <= iv * 3) speed = Math.min(90, Math.round(haversine(recent[0].lat, recent[0].lng, recent[1].lat, recent[1].lng) / 1000 / (dt / 60))); }
       const near = cur <= Math.max(dest.radius || 250, 150);
       if (st === 'arrived' || (near && st !== 'plan')) { lane.state = 'arrived'; lane.progress = 1; }
       else lane.progress = Math.max(0, Math.min(0.98, 1 - cur / start));
@@ -2569,8 +2576,21 @@ route('GET', '/api/live/routes', 'user', () => {
     mk({ id: p.emp_id, name: p.emp_name, photo: p.emp_photo }, { name: p.c_name || p.center_name, lat: p.c_lat, lng: p.c_lng, radius: c.radius }, 'plan', null, { kind: 'plan', plan_id: p.id, title: p.note || 'زيارة من جدوله', time: p.time });
   }
   const limit = minToTs(nowM - Number(SETTINGS.open_hours || 16) * 60);
-  const idle = all('SELECT e.id AS emp_id, e.name, e.photo FROM attendance a JOIN employees e ON e.id = a.emp_id WHERE a.out_at IS NULL AND a.in_at >= ? AND e.active = 1 ORDER BY e.name', limit).filter(x => !used.has(x.emp_id));
-  return { now, interval: iv, lanes: lanes.slice(0, 8), more: Math.max(0, lanes.length - 8), idle };
+  const working = all('SELECT e.id AS emp_id, e.name, e.photo, e.site_id, e.track_enabled FROM attendance a JOIN employees e ON e.id = a.emp_id WHERE a.out_at IS NULL AND a.in_at >= ? AND e.active = 1 ORDER BY e.name', limit).filter(x => !used.has(x.emp_id));
+  const centersL = all('SELECT id, name, lat, lng, radius FROM centers WHERE active = 1 AND lat IS NOT NULL');
+  const idle = [];
+  for (const w of working) {
+    const l = lastLoc(w.emp_id);
+    if (!l || lanes.length >= 8) { idle.push({ emp_id: w.emp_id, name: w.name, photo: w.photo }); continue; }
+    const recent = all('SELECT lat, lng, at FROM locations WHERE emp_id = ? AND at >= ? ORDER BY at DESC, id DESC LIMIT 2', w.emp_id, day0);
+    let speed = null; if (recent.length === 2) { const dt = tsMin(recent[0].at) - tsMin(recent[1].at); if (dt >= 0.3 && dt <= iv * 3) speed = Math.min(90, Math.round(haversine(recent[0].lat, recent[0].lng, recent[1].lat, recent[1].lng) / 1000 / (dt / 60))); }
+    const near = nearestCenter(l.lat, l.lng, centersL); const site = w.site_id ? one('SELECT * FROM sites WHERE id = ?', w.site_id) : null;
+    const atSite = site && site.lat !== null && haversine(l.lat, l.lng, site.lat, site.lng) <= (site.radius || 250);
+    const age = Math.round(nowM - tsMin(l.at));
+    lanes.push({ emp_id: w.emp_id, name: w.name, photo: w.photo, state: 'free', kind: 'free', dest: { name: near ? near.name : atSite ? site.name : 'في الشغل' }, place: near ? 'center' : atSite ? 'site' : 'road',
+      title: near ? `في ${near.name}` : atSite ? `في ${site.name}` : (speed && speed >= 4 ? 'بيتحرك' : 'في الشغل'), progress: near || atSite ? 1 : 0.5, speed, dist: null, last_at: l.at, age_min: age, stale: age > iv * 2 + 5 });
+  }
+  return { now, interval: iv, lanes: lanes.slice(0, 10), more: Math.max(0, lanes.length - 10), idle };
 });
 
 /* ---------- QR kiosk (rotating code on a screen at the site) ---------- */

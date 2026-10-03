@@ -1,6 +1,6 @@
 {
   "name": "emdadx-attendance",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "EmdadX Attendance - Arabic RTL attendance management (GPS check-in, shifts, leaves, reports). Zero dependencies.",
   "main": "server.js",
   "private": true,
