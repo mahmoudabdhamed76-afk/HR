@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<script>try{var t=localStorage.getItem('em_att_theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.theme=t}catch(e){}</script>
+<script>try{var t=localStorage.getItem('em_att_theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'),dd=document.documentElement;dd.dataset.theme=t==='blue'?'dark':t;if(t==='blue')dd.dataset.skin='blue';dd.dataset.font=localStorage.getItem('em_att_font')||'readex'}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>/* iPhone: stop Safari from zooming the page when a field is focused (pinch-zoom still works on iOS) */
 if(/iPhone|iPad|iPod/.test(navigator.userAgent)){var vp=document.querySelector('meta[name=viewport]');if(vp)vp.setAttribute('content','width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover')}</script>
@@ -13,9 +13,7 @@ if(/iPhone|iPad|iPod/.test(navigator.userAgent)){var vp=document.querySelector('
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vendor/fonts/fonts.css">
 <style>
 :root{
   --navy:#0a2357; --navy-2:#11337a; --navy-3:#1b4aa6; --blue:#2563d9; --sky:#eaf1fc; --sky-2:#f5f8fe;
@@ -27,7 +25,7 @@ if(/iPhone|iPad|iPod/.test(navigator.userAgent)){var vp=document.querySelector('
   --r:20px; --r-sm:13px;
   --sh:0 1px 2px rgba(10,35,87,.05),0 10px 28px -14px rgba(10,35,87,.20);
   --sh-lg:0 30px 70px -24px rgba(10,35,87,.45);
-  --font:'Cairo','Segoe UI',Tahoma,Arial,sans-serif;
+  --font:'Readex Pro','Cairo','Segoe UI',Tahoma,Arial,sans-serif;
   --heading:#0a2357; --title-2:#1b4aa6; --input:#fff; --th:#f5f8fd; --hover:#f9fbff; --glass:rgba(238,243,250,.86);
   --login-bg:linear-gradient(160deg,#f7faff 0%,#eaf1fb 100%); --primary:#0a2357; --primary-b:#0a2357;
   --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
@@ -56,6 +54,38 @@ html{color-scheme:light}
 [data-theme=dark] .map{filter:brightness(.85) contrast(1.05)}
 [data-theme=dark] .tile{box-shadow:inset 0 -5px 10px rgba(0,0,0,.15)}
 [data-theme=dark] input[type=date].inp::-webkit-calendar-picker-indicator,[data-theme=dark] input[type=time].inp::-webkit-calendar-picker-indicator{filter:invert(.85)}
+/* ---------- fonts (v1.8): Readex Pro is the clearer default; the old Cairo stays as an option ---------- */
+:root[data-font=cairo]{--font:'Cairo','Segoe UI',Tahoma,Arial,sans-serif}
+:root[data-font=almarai]{--font:'Almarai','Cairo','Segoe UI',Tahoma,Arial,sans-serif}
+:root[data-font=plex]{--font:'IBM Plex Sans Arabic','Cairo','Segoe UI',Tahoma,Arial,sans-serif}
+:root:not([data-font=cairo]) body{letter-spacing:0;line-height:1.65}
+:root[data-font=readex] body,:root:not([data-font]) body{font-size:14px}
+/* ---------- second night mode (v1.8): "ليلي أزرق" — royal blue + gold, like the task-card screenshots ---------- */
+:root[data-skin=blue]{
+  --bg:#070b16; --card:#0f1831; --input:#0b1329; --sky:#15244f; --sky-2:#111d42; --line:#21346a; --line-2:#182852;
+  --ink:#f2f6ff; --ink-2:#d0daf4; --muted:#9db0d8; --heading:#fff; --title-2:#6fd6f7; --th:#111d42; --hover:#15244d;
+  --glass:rgba(7,11,22,.86); --login-bg:radial-gradient(900px 500px at 90% -10%,rgba(45,91,201,.45),transparent 70%),linear-gradient(170deg,#0b1430 0%,#070b16 100%);
+  --primary:#2f60d6; --primary-b:#5d8dff; --navy-3:#3d6fe0;
+  --gold:#f3c34a; --gold-2:#ffd86c; --gold-bg:rgba(243,195,74,.14); --gold-ink:#f7cb52;
+  --blue:#63b8ff; --blue-bg:rgba(99,184,255,.14); --cyan:#5fd8f5;
+  --sh:inset 0 1px 0 rgba(140,170,255,.06),0 16px 34px -18px rgba(0,0,0,.95); --sh-lg:0 30px 70px -24px rgba(0,0,0,.95);
+}
+[data-skin=blue] body{background:radial-gradient(1200px 520px at 100% -8%,rgba(43,88,200,.20),transparent 65%),var(--bg) fixed}
+[data-skin=blue] .card,[data-skin=blue] .kpi,[data-skin=blue] .ecard,[data-skin=blue] .ecard2,[data-skin=blue] .clockcard,[data-skin=blue] .modal{background:linear-gradient(165deg,#13214a 0%,#0e1733 55%,#0c142c 100%);border:1px solid rgba(110,150,255,.13)}
+[data-skin=blue] .side{background:linear-gradient(185deg,#1b3584 0%,#11245e 50%,#0a1638 100%);border-inline-start:1px solid #1d2f63}
+[data-skin=blue] .btn-primary{background:linear-gradient(135deg,#3f74ea,#2348b4);box-shadow:0 12px 24px -12px rgba(47,96,214,.9)}
+[data-skin=blue] .btn-soft{background:#121d3f;border-color:#22366d}
+[data-skin=blue] .hero{background:linear-gradient(115deg,#2c5ccc 0%,#1f3f9c 55%,#152b6e 100%);border:1px solid rgba(140,175,255,.18)}
+[data-skin=blue] .emp-top{background:linear-gradient(140deg,#2e5fd0 0%,#1f3f9e 55%,#142a68 100%)}
+[data-skin=blue] .emp-top::after{background:radial-gradient(circle,rgba(243,195,74,.30),transparent 65%)}
+[data-skin=blue] .etabs{background:#0c1530;border-top:1px solid #1d2f63;box-shadow:0 -12px 34px -12px rgba(0,0,0,.9)}
+[data-skin=blue] .etabs button.on{color:var(--gold)}
+[data-skin=blue] .routes{background:linear-gradient(180deg,#132a6c 0%,#0c1b4b 45%,#070f2c 100%)}
+[data-skin=blue] .clockcard .bigt{color:#fff;text-shadow:0 0 22px rgba(95,216,245,.25)}
+[data-skin=blue] .seg button.on{background:#1d3270}
+[data-skin=blue] .tile{box-shadow:inset 0 -5px 10px rgba(0,0,0,.18),0 10px 18px -10px rgba(0,0,0,.8)}
+[data-skin=blue] .inp{border-color:#22366d}
+[data-skin=blue] .inp:focus{border-color:#4f80f0;box-shadow:0 0 0 4px rgba(79,128,240,.18)}
 body,.card,.kpi,.ecard,.modal,.inp,.btn-soft,.sbtn,.datenav,.clockchip,.etabs,.bnav,.clockcard,.ecard2,.acard{transition:background-color .3s,border-color .3s,color .3s}
 .theme-btn svg.i{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
 .theme-btn:active svg.i{transform:rotate(90deg)}
@@ -1268,6 +1298,143 @@ img,video,canvas,iframe{max-width:100%}
 .stlog-it span{font-size:12px;color:var(--muted)}
 .stlog-it .m{font-weight:900;color:var(--heading);font-size:13px;white-space:nowrap}
 @media (max-width:700px){.stb-grid{grid-template-columns:1fr}.st-timer{font-size:18px}}
+
+/* ================= v1.8: appearance sheet (night modes + font) ================= */
+.ap-sec{display:flex;flex-direction:column;gap:10px}
+.ap-h{display:flex;align-items:center;gap:7px;font-weight:800;font-size:13.5px;color:var(--ink-2)}
+.ap-h svg.i{width:17px;height:17px;color:var(--gold-ink)}
+.ap-themes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ap-th{display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 8px 11px;border-radius:16px;border:2px solid var(--line);background:var(--card);position:relative;font-weight:800;font-size:13px;color:var(--ink);transition:border-color .2s,box-shadow .2s}
+.ap-th.on{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-bg)}
+.ap-th em{position:absolute;top:-9px;inset-inline-start:8px;font-style:normal;background:var(--gold);color:#0a2357;font-size:10.5px;font-weight:800;padding:0 8px;border-radius:8px;line-height:18px}
+.ap-prev{width:100%;height:60px;border-radius:12px;position:relative;overflow:hidden;display:block;border:1px solid rgba(127,140,170,.25)}
+.ap-prev i{position:absolute;display:block;border-radius:6px}
+.ap-prev i:nth-child(1){top:7px;left:7px;right:7px;height:15px}
+.ap-prev i:nth-child(2){top:28px;right:7px;width:58%;height:24px}
+.ap-prev i:nth-child(3){top:28px;left:7px;width:24%;height:24px;border-radius:8px}
+.p-light{background:#eef3fa}.p-light i:nth-child(1){background:linear-gradient(90deg,#1b4aa6,#0a2357)}.p-light i:nth-child(2){background:#fff;box-shadow:0 2px 6px rgba(10,35,87,.15)}.p-light i:nth-child(3){background:#f7c12d}
+.p-dark{background:#0a1120}.p-dark i:nth-child(1){background:linear-gradient(90deg,#1d55c0,#0f2b66)}.p-dark i:nth-child(2){background:#111b31;border:1px solid #25365e}.p-dark i:nth-child(3){background:#f7c12d}
+.p-blue{background:#070b16}.p-blue i:nth-child(1){background:linear-gradient(90deg,#2e5fd0,#142a68)}.p-blue i:nth-child(2){background:linear-gradient(160deg,#1a2d63,#0c142c);border:1px solid #2a3f7a}.p-blue i:nth-child(3){background:#f3c34a;box-shadow:0 0 10px rgba(243,195,74,.5)}
+.ap-fonts{display:flex;flex-direction:column;gap:8px}
+.ap-fn{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;border:2px solid var(--line);background:var(--card);text-align:right;color:var(--ink);transition:border-color .2s,box-shadow .2s}
+.ap-fn b{display:block;font-size:15.5px;color:var(--heading);font-weight:700;line-height:1.4}
+.ap-fn b small{font-size:11.5px;color:var(--muted);font-weight:500;margin-inline-start:6px}
+.ap-fn span{display:block;font-size:13.5px;color:var(--ink-2)}
+.ap-ck{width:24px;height:24px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;flex-shrink:0;color:transparent}
+.ap-ck svg.i{width:14px;height:14px;stroke-width:3}
+.ap-fn.on{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-bg)}
+.ap-fn.on .ap-ck{background:var(--gold);border-color:var(--gold);color:#0a2357}
+
+/* ================= v1.8: new task — the icon beats like a heart + rings ================= */
+.task-banner{background:linear-gradient(110deg,#2d5bc9 0%,#203f9f 55%,#16296c 100%);border:1px solid rgba(140,175,255,.25);border-radius:24px;padding:16px;gap:14px}
+.task-banner .tile{width:54px;height:54px;border-radius:18px;background:linear-gradient(145deg,#ffd666,#f0b93a);color:#0d1b3a}
+.task-banner .tile svg.i{width:25px;height:25px}
+.task-banner b{font-size:16px}
+.task-banner span{font-size:13.5px}
+.tile.beat{position:relative;overflow:visible;animation:tbeat 1.6s ease-in-out infinite}
+.tile.beat::before,.tile.beat::after{content:'';position:absolute;inset:-1px;border-radius:inherit;border:2.5px solid #f6c84c;opacity:0;animation:tring 1.6s ease-out infinite;pointer-events:none}
+.tile.beat::after{animation-delay:.8s}
+.tile.beat svg.i{animation:tsend 1.6s ease-in-out infinite}
+.tcard .tile.beat::before,.tcard .tile.beat::after{border-color:var(--blue)}
+.etabs .bdg.beat{animation:bdgbeat 1.6s ease-in-out infinite;box-shadow:0 0 0 0 rgba(99,160,255,.7)}
+@keyframes tbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.13)}28%{transform:scale(.97)}42%{transform:scale(1.07)}60%{transform:scale(1)}}
+@keyframes tring{0%{transform:scale(1);opacity:.95}100%{transform:scale(1.8);opacity:0}}
+@keyframes tsend{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(2px,-2px) rotate(-10deg)}50%{transform:translate(-1px,1px) rotate(4deg)}}
+@keyframes bdgbeat{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(99,160,255,.7)}30%{transform:scale(1.25)}70%{box-shadow:0 0 0 8px rgba(99,160,255,0)}}
+
+/* ================= v1.8: arrival tracking card (map + route + ETA) ================= */
+.arr{position:relative;height:460px;border-radius:28px;overflow:hidden;background:#0b1430;color:#fff;isolation:isolate;border:1px solid rgba(120,160,255,.22);box-shadow:0 26px 50px -26px rgba(0,0,0,.9);text-align:right}
+.arr.big{height:min(70vh,640px);border-radius:22px}
+.arr-map{position:absolute;inset:0;z-index:0;background:#0d1733}
+.arr-map.leaflet-container{background:#0d1733 repeating-linear-gradient(45deg,rgba(255,255,255,.02) 0 14px,transparent 14px 28px);font-family:var(--font)}
+.arr .leaflet-tile-pane,[data-theme=dark] .arr .leaflet-tile-pane{filter:brightness(.74) saturate(.92) contrast(1.06)}
+.arr-shade{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(6,12,30,.9) 0%,rgba(6,12,30,.55) 15%,rgba(6,12,30,0) 32%,rgba(6,12,30,0) 64%,rgba(6,12,30,.5) 80%,rgba(6,12,30,.88) 100%)}
+.arr.big .arr-shade{background:linear-gradient(180deg,rgba(6,12,30,.88) 0%,rgba(6,12,30,0) 22%,rgba(6,12,30,0) 74%,rgba(6,12,30,.8) 100%)}
+.arr-top{position:absolute;top:0;left:0;right:0;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 16px 0;pointer-events:none}
+.arr-top>*{pointer-events:auto}
+.arr-who{display:flex;align-items:center;gap:12px;min-width:0}
+.arr-av{position:relative;flex-shrink:0}
+.arr-av .av{border:2px solid rgba(255,255,255,.92);box-shadow:0 8px 18px -8px rgba(0,0,0,.8);border-radius:18px}
+.arr-av .sdot{position:absolute;bottom:-4px;right:-4px;width:17px;height:17px;border:3px solid #0b1430}
+.arr-who b{display:block;font-size:19px;font-weight:700;line-height:1.35;text-shadow:0 2px 8px rgba(0,0,0,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.arr-who span{display:block;font-size:13.5px;color:#d3ddf7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 6px rgba(0,0,0,.7)}
+.arr-btns{display:flex;gap:9px;flex-shrink:0}
+.arr-b{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;color:#fff;box-shadow:0 10px 20px -10px rgba(0,0,0,.9);transition:transform .15s}
+.arr-b:active{transform:scale(.92)}
+.arr-b svg.i{width:22px;height:22px}
+.arr-b.call{background:radial-gradient(circle at 30% 25%,#5fd884,#22a24f);box-shadow:0 10px 22px -10px rgba(34,162,79,.9)}
+.arr-b.msg,.arr-b.exp{background:rgba(20,33,74,.92);border:1px solid rgba(140,175,255,.3)}
+.arr-exp{position:absolute;z-index:4;left:14px;bottom:2px;display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:#cfe0ff;padding:2px 4px}
+.arr-exp svg.i{width:13px;height:13px}
+.arr-b.exp svg.i{width:18px;height:18px}
+.arr-bot{position:absolute;left:12px;right:12px;bottom:24px;z-index:3;display:flex;align-items:center;padding:12px 14px;border-radius:22px;background:rgba(10,18,42,.84);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(140,175,255,.2)}
+.arr-st{flex:1;display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.arr-st span{display:block;font-size:12.5px;color:#c9d5f3;font-weight:500;white-space:nowrap}
+.arr-st b{display:block;font-size:27px;font-weight:700;color:#5fd8f5;line-height:1.2;white-space:nowrap;text-shadow:0 0 16px rgba(95,216,245,.35)}
+.arr-st b small{font-size:13px;margin-inline-start:4px;color:#a3e8f9;font-weight:600}
+.arr-ico{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;background:#18295c;color:#7fdcf7;flex-shrink:0;border:1px solid rgba(140,175,255,.25)}
+.arr-ico svg.i{width:25px;height:25px}
+.arr-ico.car{background:none;border:0;color:#f2f6ff;width:44px}
+.arr-ico.car svg{width:38px;height:38px}
+.arr-sep{width:1px;align-self:stretch;background:rgba(160,185,255,.22);margin:2px 12px;flex-shrink:0}
+.arr-attr{position:absolute;bottom:5px;left:0;right:16px;text-align:right;font-size:9px;color:rgba(200,215,245,.5);z-index:3;pointer-events:none}
+.arr.big .arr-attr{text-align:center;right:0}
+.arr-msg{position:absolute;top:104px;left:22px;right:22px;z-index:3;background:rgba(10,18,42,.86);border:1px solid rgba(140,175,255,.25);border-radius:16px;padding:12px 14px;text-align:center;font-size:13.5px;font-weight:600;color:#dbe5ff}
+.arr-dots{animation:arrdots 1s linear infinite}
+@keyframes arrdots{to{stroke-dashoffset:-14}}
+.arr-glow{filter:drop-shadow(0 0 7px rgba(70,150,255,.95))}
+.am-w{background:none!important;border:0!important}
+.am-emp{position:relative;width:64px;height:64px}
+.am-face{position:absolute;left:6px;top:0;width:52px;height:52px;border-radius:50%;padding:3px;background:linear-gradient(135deg,#d6f2ff,#4aa8ff);box-shadow:0 8px 18px -6px rgba(0,0,0,.85),0 0 0 5px rgba(74,168,255,.22)}
+.am-face .av{width:46px;height:46px;border-radius:50%;font-size:15px}
+.am-dot{position:absolute;left:24px;top:50px;width:16px;height:16px;border-radius:50%;background:#59c3ff;border:3px solid #fff;animation:amping 1.8s infinite}
+@keyframes amping{0%{box-shadow:0 0 0 0 rgba(89,195,255,.75)}100%{box-shadow:0 0 0 18px rgba(89,195,255,0)}}
+.am-bub{--bc:#f6cf55;position:absolute;bottom:72px;left:50%;transform:translateX(-50%);white-space:nowrap;background:var(--bc);color:#0d1b3a;border-radius:16px;padding:6px 15px 7px;text-align:center;box-shadow:0 10px 22px -10px rgba(0,0,0,.9);font-family:var(--font);direction:rtl;transform-origin:50% 100%;animation:bubin .5s cubic-bezier(.2,.9,.3,1.3)}
+.am-bub::after{content:'';position:absolute;top:100%;left:50%;margin-left:-8px;border:8px solid transparent;border-top-color:var(--bc);border-bottom:0}
+.am-bub b{display:block;font-size:15px;font-weight:700;line-height:1.35}
+.am-bub span{display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:700;line-height:1.35}
+.am-bub svg.carf{width:21px;height:21px}
+.am-bub.ok{--bc:#45d088}.am-bub.warn{--bc:#ffb14f}.am-bub.wait{--bc:#e8eefc}
+.am-emp.below .am-bub{bottom:auto;top:74px}
+.am-emp.below .am-bub::after{top:auto;bottom:100%;border-top:0;border-bottom:8px solid var(--bc)}
+.am-emp.to-r .am-bub{left:-6px;transform:none}.am-emp.to-r .am-bub::after{left:38px}
+.am-emp.to-l .am-bub{left:auto;right:-6px;transform:none}.am-emp.to-l .am-bub::after{left:auto;right:30px;margin-left:0}
+.am-dest.to-l span{left:auto;right:-4px;transform:none}.am-dest.to-r span{left:-4px;transform:none}
+.am-dest.up span{top:auto;bottom:62px}
+.am-bub:empty{display:none}
+@keyframes bubin{from{scale:.4;opacity:0}}
+.am-dest{position:relative;width:40px;height:52px;filter:drop-shadow(0 8px 10px rgba(0,0,0,.55))}
+.am-dest svg{width:40px;height:52px;display:block;animation:pindrop .7s cubic-bezier(.2,.9,.3,1.4)}
+.am-dest::before{content:'';position:absolute;left:50%;bottom:-7px;width:26px;height:12px;margin-left:-13px;border-radius:50%;background:radial-gradient(closest-side,#ffd34d,rgba(255,211,77,0));animation:destglow 1.8s ease-in-out infinite}
+.am-dest span{position:absolute;top:60px;left:50%;transform:translateX(-50%);white-space:nowrap;background:rgba(8,14,34,.9);color:#fff;font-weight:700;font-size:14px;padding:5px 14px;border-radius:12px;border:1px solid rgba(140,175,255,.3);font-family:var(--font);direction:rtl}
+@keyframes pindrop{from{transform:translateY(-26px);opacity:0}}
+@keyframes destglow{50%{transform:scale(1.5);opacity:.6}}
+.arr-gm{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--muted);align-self:center}
+.arr-gm svg.i{width:15px;height:15px}
+.tcard .arr{margin:2px -4px}
+.arr-modal .modal-b{padding:4px 14px 16px}
+/* dashboard board: map cards / walking lanes switch */
+.rt-view{display:inline-flex;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:3px;gap:2px}
+.rt-view button{display:inline-flex;align-items:center;gap:5px;color:#d5e1ff;font-weight:800;font-size:12.5px;padding:3px 10px;border-radius:9px}
+.rt-view button.on{background:#f7c12d;color:#0a2357}
+.rt-view svg.i{width:15px;height:15px}
+.arr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr));gap:14px;margin-bottom:6px}
+.routes.v-map .rt-lanes{display:none}
+.routes:not(.v-map) .arr-grid{display:none}
+.arr-none{grid-column:1/-1;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.07);border:1px dashed rgba(255,255,255,.2);border-radius:20px;padding:16px 18px}
+.arr-none b{display:block;font-size:15px}
+.arr-none span{display:block;font-size:13px;color:#c5d3f3;line-height:1.7}
+.rt-chip small{color:#b9c9ee;font-weight:600;margin-inline-start:4px}
+@media (max-width:520px){
+  .arr{height:455px;border-radius:24px}
+  .arr-st b{font-size:24px}
+  .arr-ico{width:44px;height:44px}.arr-ico svg.i{width:22px;height:22px}
+  .arr-ico.car{width:36px}.arr-ico.car svg{width:32px;height:32px}
+  .arr-sep{margin:2px 8px}
+  .arr-who b{font-size:17px}
+  .arr-b{width:46px;height:46px}
+}
+@media (prefers-reduced-motion:reduce){.tile.beat,.tile.beat::before,.tile.beat::after,.tile.beat svg.i,.arr-dots,.am-dot,.etabs .bdg.beat{animation:none!important}}
 </style>
 </head>
 <body>
@@ -1317,6 +1484,7 @@ const I = {
   login: '<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>',
   logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
   check: '<path d="M20 6 9 17l-5-5"/>',
+  expand: '<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>',
   checkCircle: '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
   x: '<path d="M18 6 6 18M6 6l12 12"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
@@ -1382,20 +1550,47 @@ const I = {
 const ic = (n, cls = '') => `<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${I[n] || ''}</svg>`;
 
 /* ------------------------------------------------------------ Theme --- */
+/* 3 looks: نهاري / ليلي كحلي (the original night mode) / ليلي أزرق (v1.8) + a font picker. Saved per device. */
+const THEMES = { light: { t: 'نهاري', meta: '#0a2357' }, dark: { t: 'ليلي كحلي', meta: '#0a1120' }, blue: { t: 'ليلي أزرق', meta: '#070b16', tag: 'جديد' } };
+const FONTS = {
+  readex: { t: 'ريدكس', fam: "'Readex Pro'", note: 'الأوضح — الافتراضي' },
+  almarai: { t: 'المراعي', fam: "'Almarai'", note: 'عريض وواضح' },
+  plex: { t: 'بلكس', fam: "'IBM Plex Sans Arabic'", note: 'رسمي ومريح' },
+  cairo: { t: 'القاهرة', fam: "'Cairo'", note: 'الخط القديم' },
+};
 const Theme = {
   get() { return LS.get('em_att_theme'); },
   sys() { return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; },
-  cur() { return this.get() || this.sys(); },
+  cur() { const t = this.get(); return THEMES[t] ? t : this.sys(); },
+  font() { const f = LS.get('em_att_font'); return FONTS[f] ? f : 'readex'; },
+  dark() { return this.cur() !== 'light'; },
   apply() {
-    const t = this.cur(); document.documentElement.dataset.theme = t;
-    const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = t === 'dark' ? '#0a1120' : '#0a2357';
-    $$('.theme-btn').forEach(b => { b.innerHTML = ic(t === 'dark' ? 'sun' : 'moon'); b.title = t === 'dark' ? 'الوضع النهاري' : 'الوضع الليلي'; });
+    const t = this.cur(), d = document.documentElement;
+    d.dataset.theme = t === 'blue' ? 'dark' : t;
+    if (t === 'blue') d.dataset.skin = 'blue'; else delete d.dataset.skin;
+    d.dataset.font = this.font();
+    const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = THEMES[t].meta;
+    $$('.theme-btn').forEach(b => { b.innerHTML = ic(this.dark() ? 'sun' : 'moon'); b.title = 'الوضع الليلي والخط'; });
+    window.dispatchEvent(new Event('em-theme'));
   },
-  toggle() { LS.set('em_att_theme', this.cur() === 'dark' ? 'light' : 'dark'); this.apply(); },
+  set(t) { if (THEMES[t]) { LS.set('em_att_theme', t); this.apply(); } },
+  setFont(f) { if (FONTS[f]) { LS.set('em_att_font', f); this.apply(); } },
+  toggle() { this.set(this.dark() ? 'light' : 'dark'); },
 };
 Theme.apply();
 try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (!Theme.get()) Theme.apply(); }); } catch {}
-const themeBtn = (cls = 'btn-soft') => `<button class="btn ${cls} btn-icon theme-btn" data-act="theme" title="${Theme.cur() === 'dark' ? 'الوضع النهاري' : 'الوضع الليلي'}">${ic(Theme.cur() === 'dark' ? 'sun' : 'moon')}</button>`;
+const themeBtn = (cls = 'btn-soft') => `<button class="btn ${cls} btn-icon theme-btn" data-act="theme" title="الوضع الليلي والخط">${ic(Theme.dark() ? 'sun' : 'moon')}</button>`;
+function appearanceSheet() {
+  const body = () => `<div class="ap-sec"><div class="ap-h">${ic('moon')} الوضع</div><div class="ap-themes">${Object.entries(THEMES).map(([k, v]) => `<button type="button" class="ap-th ${Theme.cur() === k ? 'on' : ''}" data-ap-theme="${k}"><span class="ap-prev p-${k}"><i></i><i></i><i></i></span><b>${v.t}</b>${v.tag ? `<em>${v.tag}</em>` : ''}</button>`).join('')}</div></div>
+    <div class="ap-sec"><div class="ap-h">${ic('edit')} الخط</div><div class="ap-fonts">${Object.entries(FONTS).map(([k, v]) => `<button type="button" class="ap-fn ${Theme.font() === k ? 'on' : ''}" data-ap-font="${k}" style="font-family:${v.fam},sans-serif"><span class="ap-ck">${ic('check')}</span><div><b>${v.t} <small>${v.note}</small></b><span>عندك مهمة جديدة من الإدارة • 9:51 ص</span></div></button>`).join('')}</div></div>`;
+  const m = modal({ title: 'المظهر', sub: 'الوضع الليلي ونوع الخط — بيتحفظوا على الجهاز ده', icon: 'sun', tile: 't-gold', size: 'sm', body: body(), foot: `<button class="btn btn-primary" data-close style="flex:1">تمام</button>` });
+  const b = $('.modal-b', m.el);
+  b.addEventListener('click', e => {
+    const th = e.target.closest('[data-ap-theme]'), fn = e.target.closest('[data-ap-font]');
+    if (th) Theme.set(th.dataset.apTheme); else if (fn) Theme.setFont(fn.dataset.apFont); else return;
+    b.innerHTML = body(); if (navigator.vibrate) navigator.vibrate(15);
+  });
+}
 
 /* ----------------------------------------------------------- Photos --- */
 const photoUrl = rel => rel ? `${BASE}/api/photo?f=${encodeURIComponent(rel)}&token=${encodeURIComponent(S.token || '')}` : '';
@@ -1753,7 +1948,7 @@ function deviceId() { let d = LS.get('em_att_device'); if (!d) { d = 'D' + Date.
 async function logout(silent) {
   if (!silent) { try { await api('/api/logout', {}, { noLogout: true }); } catch {} }
   Sync.close(); EmpSync.close(); Tracker.stop();
-  S.token = null; S.kind = null; S.boot = null; S.home = null; S.vis = null; S.trk = null; S.keepTicker = null; Live.data = null; Routes.el = null; Routes.data = null; clearInterval(Routes.timer); clearInterval(Routes.ticker);
+  S.token = null; S.kind = null; S.boot = null; S.home = null; S.vis = null; S.trk = null; S.keepTicker = null; Live.data = null; Routes.el = null; Routes.data = null; clearInterval(Routes.timer); clearInterval(Routes.ticker); [...Arr.maps.keys()].forEach(el => Arr.kill(el)); EmpArr.reset();
   EChat.msgs = null; Chat.cur = null; Chat.msgs = []; S.f = {};
   LS.del('em_att_token'); LS.del('em_att_kind');
   modals.slice().forEach(m => m.close());
@@ -3193,7 +3388,7 @@ function taskSteps(t) {
 function taskCard(t) {
   const m = TS[t.status] || TS.new;
   return `<div class="ecard tcard ${t.status}"><span class="stripe" style="background:var(--${m.c})"></span>
-    <div class="hd"><div class="tile sm ${m.tile}">${ic(m.i)}</div><div style="flex:1;min-width:0"><b>${esc(t.title)}</b><span>${ic('hospital')} ${esc(t.center)}${t.dev_name ? ' • ' + esc(t.dev_name) : ''}</span></div>${t.priority === 'urgent' ? chip('عاجل', 'red', 'alert') : ''}</div>
+    <div class="hd"><div class="tile sm ${m.tile}${t.status === 'new' ? ' beat' : ''}">${ic(m.i)}</div><div style="flex:1;min-width:0"><b>${esc(t.title)}</b><span>${ic('hospital')} ${esc(t.center)}${t.dev_name ? ' • ' + esc(t.dev_name) : ''}</span></div>${t.priority === 'urgent' ? chip('عاجل', 'red', 'alert') : ''}</div>
     <div class="tags">${tsChip(t.status)}${t.due_at ? chip((t.overdue ? 'متأخرة • ' : 'الميعاد ') + dtText(t.due_at), t.overdue ? 'red' : 'slate', 'clock') : ''}${t.arrive_dist !== null && t.arrive_dist !== undefined ? chip('وصل على بُعد ' + meters(t.arrive_dist), t.arrive_dist > 300 ? 'orange' : 'green', 'pin') : ''}</div>
     ${t.source === 'center' ? `<div class="rep-box">${ic('call')}<div><b>بلاغ من المركز: ${esc(t.reporter_name || '')}</b>${t.reporter_phone ? ` <a class="ltr" href="tel:${esc(t.reporter_phone)}">${esc(t.reporter_phone)}</a>` : ''}</div>${t.photo ? `<a href="${photoUrl(t.photo)}" target="_blank" rel="noopener"><img src="${photoUrl(t.photo)}" alt=""></a>` : ''}</div>` : ''}
     ${t.details ? `<div class="vdet">${esc(t.details)}</div>` : ''}${t.emp_note ? `<div class="note warn" style="padding:8px 12px">${ic('alert')}<div>${esc(t.emp_note)}</div></div>` : ''}
@@ -3825,12 +4020,19 @@ const Routes = {
   },
   frame() {
     return `<div class="rt-sky"></div><div class="rt-head"><div class="rt-title"><span class="live"><i></i>مباشر</span><h2>الفنيين في الطريق</h2></div>
-      <div class="rt-meta"><span>${ic('clock')}<b class="num" data-clock-sec></b></span><span data-r="counts"></span><a class="rt-link" href="#/tracking">${ic('route')} الخريطة</a></div></div>
-      <div class="rt-lanes" data-r="lanes"></div><div class="rt-idle" data-r="idle"></div>`;
+      <div class="rt-meta"><span>${ic('clock')}<b class="num" data-clock-sec></b></span><span data-r="counts"></span><span class="rt-view"><button type="button" data-rv="map">${ic('pin')} خريطة</button><button type="button" data-rv="walk">${ic('route')} ممشى</button></span><a class="rt-link" href="#/tracking">${ic('route')} التتبع</a></div></div>
+      <div class="arr-grid" data-r="cards"></div><div class="rt-lanes" data-r="lanes"></div><div class="rt-idle" data-r="idle"></div>`;
   },
+  vmap() { return LS.get('em_att_rview', 'map') !== 'walk'; },
+  setView(v) { LS.set('em_att_rview', v); this.viewCls(); this.paint(); },
+  viewCls() { if (!this.el) return; const m = this.vmap(); this.el.classList.toggle('v-map', m); $$('[data-rv]', this.el).forEach(b => b.classList.toggle('on', (b.dataset.rv === 'map') === m)); },
   mount(holder) {
-    if (!this.el) { this.el = document.createElement('section'); this.el.className = 'routes'; this.el.innerHTML = this.frame(); }
-    holder.replaceWith(this.el); this.paint(); tickClock();
+    if (!this.el) {
+      this.el = document.createElement('section'); this.el.className = 'routes'; this.el.innerHTML = this.frame();
+      this.el.addEventListener('click', e => { const b = e.target.closest('[data-rv]'); if (b) { e.stopPropagation(); this.setView(b.dataset.rv); } });
+    }
+    holder.replaceWith(this.el); this.viewCls(); this.paint(); tickClock();
+    $$('.arr', this.el).forEach(x => { const m = Arr.maps.get(x); if (m && m.map) setTimeout(() => { m.map.invalidateSize(); Arr.fit(m, true); }, 40); });
     if (!this.data || srvNow().getTime() - this.recv > 8000) this.load();
     clearInterval(this.timer); this.timer = setInterval(() => { if (S.kind === 'user' && S.page === 'dashboard' && document.visibilityState === 'visible') this.load(); }, 10000);
     clearInterval(this.ticker); this.ticker = setInterval(() => this.tick(), 500);
@@ -3875,9 +4077,27 @@ const Routes = {
       l._base = l.state === 'arrived' ? 1 : (l.progress || 0); l._t0 = this.tsMs(l.last_at) || srvNow().getTime();
       if (fresh) { this.disp[k] = 0; setTimeout(() => this.place(x, this.est(l)), 60); } else this.place(x, this.est(l));
     });
-    const idle = d.idle || [];
-    $('[data-r=idle]', el).innerHTML = idle.length ? `<span class="muted2">في الشغل من غير موقع:</span>${idle.slice(0, 12).map(e => `<span class="rt-chip" data-act="track-emp" data-id="${e.emp_id}">${av(e.name, e.emp_id, 'xs', e.photo)}${esc(e.name.split(' ')[0])}</span>`).join('')}` : '';
+    const idle = d.idle || [], free = this.vmap() ? d.lanes.filter(l => l.state === 'free') : [];
+    $('[data-r=idle]', el).innerHTML = (free.length ? `<span class="muted2">في الشغل:</span>${free.map(l => `<span class="rt-chip" data-act="track-emp" data-id="${l.emp_id}">${av(l.name, l.emp_id, 'xs', l.photo)}${esc(l.name.split(' ')[0])} <small>${esc(this.statText(l).t)}</small></span>`).join('')}` : '')
+      + (idle.length ? `<span class="muted2">في الشغل من غير موقع:</span>${idle.slice(0, 12).map(e => `<span class="rt-chip" data-act="track-emp" data-id="${e.emp_id}">${av(e.name, e.emp_id, 'xs', e.photo)}${esc(e.name.split(' ')[0])}</span>`).join('')}` : '');
+    this.paintCards();
     this.tick();
+  },
+  card(k) { const l = this.data && this.data.lanes.find(x => 'e' + x.emp_id === k); return l ? laneCard(l) : null; },
+  paintCards() {
+    const box = this.el && $('[data-r=cards]', this.el); if (!box || !this.data) return;
+    if (!this.vmap()) return;
+    const L0 = this.data.lanes.filter(l => l.state !== 'free'), keys = new Set(L0.map(l => 'e' + l.emp_id));
+    $$('.arr', box).forEach(x => { if (!keys.has(x.dataset.ak)) { Arr.kill(x); x.remove(); } });
+    const none = $('.arr-none', box);
+    if (!L0.length) { if (!none) box.insertAdjacentHTML('afterbegin', `<div class="arr-none"><div class="tile t-gold">${ic('route')}</div><div><b>محدش رايح لمهمة دلوقتي</b><span>أول ما فني يقبل مهمة أو يدوس «أنا في الطريق» هتظهر هنا خريطته: مكانه، الطريق للمركز، الوقت المتوقع للوصول والمسافة الباقية.</span></div></div>`); }
+    else if (none) none.remove();
+    L0.forEach((l, i) => {
+      const d = laneCard(l); let x = $(`.arr[data-ak="${d.k}"]`, box);
+      if (!x) { box.insertAdjacentHTML('beforeend', Arr.html(d)); x = box.lastElementChild; Arr.mount(x, d, { keep: true, src: () => this.card(d.k) }); }
+      else Arr.update(x, d);
+      x.style.order = i;
+    });
   },
   est(l) {
     if (l.state === 'arrived') return 1;
@@ -3916,6 +4136,152 @@ const Routes = {
     }
   },
 };
+
+/* ===================================================== v1.8: arrival tracking card (satellite map + road route + ETA) === */
+const CARF = '<svg class="i carf" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="none" d="M5.4 10.3 7 6.5A2.3 2.3 0 0 1 9.1 5h5.8A2.3 2.3 0 0 1 17 6.5l1.6 3.8A2.6 2.6 0 0 1 20 12.6V17a1 1 0 0 1-1 1h-1.2a1 1 0 0 1-1-1v-1H7.2v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4.4c0-1 .56-1.9 1.4-2.3ZM7.8 10h8.4l-1.1-2.8a.8.8 0 0 0-.75-.5H9.65a.8.8 0 0 0-.75.5ZM7 14.3a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Zm10 0a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Z"/></svg>';
+const PINR = '<svg viewBox="0 0 40 52" aria-hidden="true"><defs><linearGradient id="pinG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff5b5b"/><stop offset="1" stop-color="#d81f2a"/></linearGradient></defs><path d="M20 51C20 51 3 31.5 3 19.5a17 17 0 0 1 34 0C37 31.5 20 51 20 51Z" fill="url(#pinG)" stroke="#fff" stroke-width="2.4"/><path d="M20 11v17M11.5 19.5h17" stroke="#fff" stroke-width="5.2" stroke-linecap="round"/></svg>';
+const Arr = {
+  maps: new Map(),
+  SAT: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  ms: ts => ts ? Date.parse(ts.replace(' ', 'T') + 'Z') : null,
+  km(m) { if (m === null || m === undefined) return '—'; return m < 1000 ? `${Math.max(10, Math.round(m / 10) * 10)} م` : `${(m / 1000).toFixed(m < 20000 ? 1 : 0)} كم`; },
+  hm(ms) { const d = new Date(ms), h = d.getUTCHours(); return { hm: `${pad(h % 12 || 12)}:${pad(d.getUTCMinutes())}`, ap: h < 12 ? 'ص' : 'م' }; },
+  etaMs(d) {
+    if (!d.road || !d.cur) return null; const now = srvNow().getTime();
+    if (d.state !== 'onway') return now + d.road.dur * 1000;                 // not moving yet: "if he leaves now"
+    return Math.max((this.ms(d.cur.at) || now) + d.road.dur * 1000, now + 60000);
+  },
+  left(d) { const e = this.etaMs(d); return e === null ? null : Math.max(0, Math.round((e - srvNow().getTime()) / 60000)); },
+  bubble(d) {
+    if (d.state === 'arrived') return { t: 'وصل ✓', s: d.at ? t12(d.at) : '', c: 'ok' };
+    if (!d.cur) return { t: 'مستني موقعه', s: '', c: 'wait' };
+    if (d.stale) return { t: 'التحديث واقف', s: 'آخر موقع ' + ago(tsAgo(d.cur.at)), c: 'warn' };
+    const n = this.left(d), mins = n === null ? '' : n < 1 ? 'أقل من دقيقة' : n === 1 ? 'دقيقة' : n === 2 ? 'دقيقتين' : n <= 10 ? `${n} دقايق` : `${n} دقيقة`;
+    if (d.state === 'accepted') return { t: 'قبل المهمة', s: mins ? 'لو اتحرك: ' + mins : '', c: 'wait', car: false };
+    if (d.state === 'plan') return { t: 'في جدوله' + (d.time ? ' ' + t12(d.time) : ''), s: mins, c: 'wait' };
+    return { t: 'في الطريق', s: mins, c: 'go', car: true };
+  },
+  html(d, { big = false, self = false } = {}) {
+    const call = d.phone ? `<a class="arr-b call" href="tel:${esc(d.phone)}" title="اتصال ${esc(d.phone)}">${ic('call')}</a>` : '';
+    const chat = d.chat ? `<button type="button" class="arr-b msg" ${d.chat} title="رسالة">${ic('chat')}</button>` : '';
+    return `<div class="arr ${big ? 'big' : ''} ${self ? 'self' : ''}" data-ak="${esc(d.k)}">
+      <div class="arr-map" dir="ltr"></div><div class="arr-shade"></div>
+      <div class="arr-top"><div class="arr-who"><span class="arr-av">${av(d.name, d.emp_id, 'lg', d.photo)}<i class="sdot"></i></span><div style="min-width:0"><b>${esc(d.name)}</b><span data-a="sub"></span></div></div>
+        <div class="arr-btns">${call}${chat}</div></div>${big ? '' : `<button type="button" class="arr-exp" data-arr-big>${ic('expand')} تكبير الخريطة</button>`}
+      <div class="arr-msg hide" data-a="msg"></div>
+      <div class="arr-bot"><div class="arr-st"><div><span data-a="etaL">الوصول المتوقع</span><b class="num" data-a="eta">—</b></div><div class="arr-ico">${ic('timer')}</div></div><i class="arr-sep"></i>
+        <div class="arr-st"><div><span data-a="distL">المسافة المتبقية</span><b class="num" data-a="dist">—</b></div><div class="arr-ico car">${CARF}</div></div></div>
+      <div class="arr-attr">صور © Esri${d.road && d.road.src === 'road' ? ' • طرق © OpenStreetMap' : ''}</div></div>`;
+  },
+  async mount(el, d, opt = {}) {
+    const x = { d, opt, el, fitKey: '', anim: null };
+    this.maps.set(el, x);
+    this.texts(x);
+    try { await loadLeaflet(); } catch (e) { const m = $('[data-a=msg]', el); m.textContent = e.message; m.classList.remove('hide'); return x; }
+    if (!el.isConnected && !opt.detached) return x;
+    const big = !!opt.big;
+    const map = L.map($('.arr-map', el), { zoomControl: big, attributionControl: false, dragging: big, touchZoom: big, scrollWheelZoom: big, doubleClickZoom: big, boxZoom: false, keyboard: false, tap: false, zoomSnap: 0.25, fadeAnimation: true });
+    const c0 = d.cur ? [d.cur.lat, d.cur.lng] : d.dest.lat !== null && d.dest.lat !== undefined ? [d.dest.lat, d.dest.lng] : [30.0444, 31.2357];
+    map.setView(c0, 14, { animate: false });            // a view must exist before markers render (otherwise their DOM is created late)
+    L.tileLayer(this.SAT, { maxNativeZoom: 18, maxZoom: 19, crossOrigin: true }).addTo(map);
+    if (big) map.zoomControl.setPosition('bottomleft');
+    x.map = map;
+    x.trailG = L.polyline([], { color: '#2f7bff', weight: 11, opacity: .22, lineCap: 'round', interactive: false }).addTo(map);
+    x.trail = L.polyline([], { color: '#4a90ff', weight: 4, opacity: .75, lineCap: 'round', interactive: false }).addTo(map);
+    x.glow = L.polyline([], { color: '#2f86ff', weight: 14, opacity: .30, lineCap: 'round', lineJoin: 'round', interactive: false, className: 'arr-glow' }).addTo(map);
+    x.core = L.polyline([], { color: '#56b4ff', weight: 5, opacity: 1, lineCap: 'round', lineJoin: 'round', interactive: false }).addTo(map);
+    x.dots = L.polyline([], { color: '#eaf6ff', weight: 3, opacity: .95, dashArray: '1 13', lineCap: 'round', interactive: false, className: 'arr-dots' }).addTo(map);
+    if (!big) map.on('click', () => this.open(x.d, x.opt.src));
+    map.on('zoomend moveend', () => this.place(x));
+    this.draw(x, true);
+    setTimeout(() => { map.invalidateSize(); this.fit(x, true); }, 80);
+    return x;
+  },
+  texts(x) {
+    const { d, el } = x, b = this.bubble(d);
+    const sub = $('[data-a=sub]', el); if (sub) sub.textContent = [d.job, d.title].filter(Boolean).join(' • ') || 'فني صيانة';
+    const dot = $('.arr-av .sdot', el); if (dot) dot.className = 'sdot ' + (d.cur && !d.stale ? 'free' : 'off');
+    const eta = $('[data-a=eta]', el), etaL = $('[data-a=etaL]', el), dist = $('[data-a=dist]', el), distL = $('[data-a=distL]', el), msg = $('[data-a=msg]', el);
+    if (d.state === 'arrived') {
+      etaL.textContent = 'وصل الساعة'; const t = d.at ? this.hm(this.ms(d.at)) : null; eta.innerHTML = t ? `${t.hm}<small>${t.ap}</small>` : '✓';
+      distL.textContent = 'المسافة المتبقية'; dist.textContent = 'وصل ✓';
+    } else {
+      etaL.textContent = d.state === 'onway' ? 'الوصول المتوقع' : 'لو اتحرك دلوقتي'; distL.textContent = 'المسافة المتبقية';
+      const e = d.stale ? null : this.etaMs(d); const t = e ? this.hm(e) : null;
+      eta.innerHTML = t ? `${t.hm}<small>${t.ap}</small>` : '—';
+      dist.textContent = d.road ? this.km(d.road.dist) : '—';
+    }
+    let m = '';
+    if (d.dest.lat === null || d.dest.lat === undefined) m = `مكان ${esc(d.dest.name)} مش متحدد على الخريطة — حدده من صفحة المراكز`;
+    else if (!d.cur && d.state !== 'arrived') m = 'لسه مفيش موقع من الفني — أول ما يبعت موقعه هيظهر هنا ماشي لحد المركز';
+    if (msg) { msg.innerHTML = m; msg.classList.toggle('hide', !m); }
+    const bub = x.emk && x.emk.getElement() && $('.am-bub', x.emk.getElement());
+    if (bub) { bub.className = 'am-bub ' + b.c; bub.innerHTML = `<b>${esc(b.t)}</b>${b.s ? `<span>${esc(b.s)}${b.car ? CARF : ''}</span>` : ''}`; }
+  },
+  draw(x, first) {
+    const { d, map } = x; if (!map) return;
+    const hasDest = d.dest.lat !== null && d.dest.lat !== undefined;
+    if (hasDest) {
+      const ll = [d.dest.lat, d.dest.lng];
+      if (!x.dmk) x.dmk = L.marker(ll, { interactive: false, keyboard: false, icon: L.divIcon({ className: 'am-w', html: `<div class="am-dest">${PINR}<span>${esc(d.dest.name)}</span></div>`, iconSize: [40, 52], iconAnchor: [20, 51] }), zIndexOffset: 100 }).addTo(map);
+      else x.dmk.setLatLng(ll);
+    }
+    const here = d.state === 'arrived' && hasDest ? [d.dest.lat, d.dest.lng] : d.cur ? [d.cur.lat, d.cur.lng] : null;
+    if (here) {
+      if (!x.emk) {
+        x.emk = L.marker(here, { interactive: false, keyboard: false, zIndexOffset: 500, icon: L.divIcon({ className: 'am-w', html: `<div class="am-emp"><div class="am-bub"></div><div class="am-face">${av(d.name, d.emp_id, '', d.photo)}</div><i class="am-dot"></i></div>`, iconSize: [64, 64], iconAnchor: [32, 58] }) }).addTo(map);
+      } else this.slide(x, here);
+    } else if (x.emk) { x.emk.remove(); x.emk = null; }
+    const road = d.state === 'arrived' ? [] : (d.road && d.road.coords) || [];
+    const line = road.length && here ? [here, ...road.slice(1)] : road;
+    x.glow.setLatLngs(line); x.core.setLatLngs(line); x.dots.setLatLngs(line);
+    x.core.setStyle({ dashArray: d.road && d.road.src === 'line' ? '10 10' : null });
+    const tr = d.trail || []; x.trail.setLatLngs(tr); x.trailG.setLatLngs(tr);
+    this.texts(x);
+    if (!first) this.fit(x);
+  },
+  slide(x, to) {
+    const m = x.emk, from = m.getLatLng(); cancelAnimationFrame(x.anim);
+    if (Math.abs(from.lat - to[0]) < 1e-7 && Math.abs(from.lng - to[1]) < 1e-7) return;
+    const t0 = performance.now(), T = 1400;
+    const step = now => { const k = Math.min(1, (now - t0) / T), e = 1 - Math.pow(1 - k, 3); m.setLatLng([from.lat + (to[0] - from.lat) * e, from.lng + (to[1] - from.lng) * e]); if (k < 1) x.anim = requestAnimationFrame(step); else this.place(x); };
+    x.anim = requestAnimationFrame(step);
+  },
+  place(x) {
+    const { map, el } = x; if (!map || !el.isConnected) return; const W = el.offsetWidth, H = el.offsetHeight;
+    const em = x.emk && x.emk.getElement(), dm = x.dmk && x.dmk.getElement();
+    if (em && em.firstElementChild) { const p = map.latLngToContainerPoint(x.emk.getLatLng()), c = em.firstElementChild.classList; c.toggle('below', p.y < 198); c.toggle('to-r', p.x < 78); c.toggle('to-l', p.x > W - 78); }
+    if (dm && dm.firstElementChild) { const p = map.latLngToContainerPoint(x.dmk.getLatLng()), c = dm.firstElementChild.classList; c.toggle('to-r', p.x < 92); c.toggle('to-l', p.x > W - 92); c.toggle('up', p.y > H - 144); }
+  },
+  fit(x, force) {
+    const { d, map, el } = x; if (!map || !el.isConnected) return;
+    const pts = [];
+    if (d.dest.lat !== null && d.dest.lat !== undefined) pts.push([d.dest.lat, d.dest.lng]);
+    if (d.cur && d.state !== 'arrived') pts.push([d.cur.lat, d.cur.lng]);
+    if (d.state !== 'arrived' && d.road && d.road.coords) pts.push(...d.road.coords);
+    if (!pts.length) { if (force) map.setView([30.0444, 31.2357], 11); return; }
+    const key = pts.length + ':' + pts.slice(0, 2).map(p => p.map(v => v.toFixed(3)).join(',')).join('|') + ':' + el.offsetWidth + 'x' + el.offsetHeight;
+    if (!force && key === x.fitKey) { this.place(x); return; } x.fitKey = key;
+    const h = el.offsetHeight || 450, top = Math.min(212, h * 0.46), bot = Math.min(150, h * 0.33);
+    if (pts.length === 1 || d.state === 'arrived') { map.setView(pts[0], 17, { animate: !force }); map.panBy([0, (bot - top) / 2], { animate: false }); this.place(x); return; }
+    map.fitBounds(L.latLngBounds(pts), { paddingTopLeft: [62, top], paddingBottomRight: [62, bot], maxZoom: 17, animate: !force, duration: .8 });
+    if (force) this.place(x);
+  },
+  update(el, d) { const x = this.maps.get(el); if (!x) return; x.d = d; this.draw(x); },
+  tick() { for (const x of this.maps.values()) { if (!x.el.isConnected) continue; this.texts(x); } },
+  kill(el) { const x = this.maps.get(el); if (!x) return; cancelAnimationFrame(x.anim); try { x.map && x.map.remove(); } catch {} this.maps.delete(el); },
+  gc() { for (const [el, x] of this.maps) if (!el.isConnected && !x.opt.keep) this.kill(el); },
+  open(d, src) {
+    const m = modal({ title: `${d.name} — ${d.dest.name}`, sub: d.title || '', icon: 'route', tile: 't-blue', size: 'lg arr-modal', body: this.html(d, { big: true }) });
+    const el = $('.arr', m.el); this.mount(el, d, { big: true, src });
+    const t = setInterval(() => { if (!el.isConnected) { clearInterval(t); this.kill(el); return; } const nd = src && src(); if (nd) this.update(el, nd); }, 3000);
+  },
+};
+document.addEventListener('click', e => { const b = e.target.closest('[data-arr-big]'); if (!b) return; const el = b.closest('.arr'), x = el && Arr.maps.get(el); if (x) Arr.open(x.d, x.opt.src); });
+setInterval(() => Arr.tick(), 5000);
+/* lane (from /api/live/routes) -> card data */
+const laneCard = l => ({ k: 'e' + l.emp_id, emp_id: l.emp_id, name: l.name, photo: l.photo, job: l.job, phone: l.phone, chat: `data-act="chat-emp" data-id="${l.emp_id}"`,
+  state: l.state, title: (l.priority === 'urgent' ? '🚨 ' : '') + (l.title || ''), time: l.time, dest: l.dest, cur: l.cur, road: l.road, trail: l.trail, stale: l.stale, at: l.at });
 
 /* ---------- Attendance edit & map ---------- */
 async function attModal({ id, emp, date }) {
@@ -4049,7 +4415,7 @@ const ACT = {
   'emp-reset': async el => { const e = byId(S.boot.employees, el.dataset.id); if (!await confirmBox(`فك ربط موبايل <b>${esc(e.name)}</b>؟ هيقدر يدخل من أي موبايل جديد وهيتربط بيه.`, { ok: 'فك الربط' })) return; await busy(null, async () => { await api('/api/employees/reset-device', { id: e.id }); toast('تم فك الربط'); renderPage(true); }); },
   'emp-link': () => { const m = modal({ title: 'رابط تطبيق الموظفين', icon: 'link', tile: 't-gold', size: 'sm', body: `<p>الموظف يفتح الرابط ده من موبايله ويدخل بالكود والرقم السري بتوعه:</p><div class="row"><input class="inp ltr" readonly value="${esc(appLink())}" style="text-align:left"><button class="btn btn-soft btn-icon" data-c>${ic('copy')}</button></div><div class="note">${ic('info')}<div>من المتصفح يقدر يختار <b>"إضافة إلى الشاشة الرئيسية"</b> علشان يبقى زي التطبيق بالظبط.</div></div>`, foot: `<a class="btn btn-green" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent('رابط برنامج الحضور والانصراف: ' + appLink())}">${ic('wa')} مشاركة واتساب</a><span class="sp"></span><button class="btn btn-primary" data-close>تمام</button>` }); $('[data-c]', m.el).onclick = () => copyText(appLink()); },
   'copy-link': () => copyText(appLink()),
-  theme: () => Theme.toggle(),
+  theme: () => appearanceSheet(),
   audit: el => busy(el, showAudit),
   'visit-view': el => { const v = S.visitCache && S.visitCache.get(Number(el.dataset.id)); if (v) visitModal(v, true); },
   'visit-review': el => busy(el, async () => { await api('/api/visits/review', { id: +el.dataset.id, reviewed: true }); toast('تمت المراجعة'); renderPage(true); }),
@@ -4247,11 +4613,11 @@ function renderEmp() {
   const pend = h.leaves.filter(l => l.status === 'pending').length;
   const newT = (h.tasks || []).filter(t => t.status === 'new').length;
   const T = [['home', 'home', 'الرئيسية'], ['visits', 'wrench', 'شغلي'], ['kb', 'bulb', 'الأعطال'], chatOn ? ['chat', 'chat', 'الرسائل'] : ['history', 'calCheck', 'سجلي'], ['leaves', 'clipboard', 'طلباتي'], ['profile', 'user', 'حسابي']];
-  const tabs = `<nav class="etabs">${T.map(t => `<button data-etab="${t[0]}" class="${S.etab === t[0] ? 'on' : ''}">${ic(t[1])}${t[2]}${t[0] === 'leaves' && pend ? `<span class="bdg">${pend}</span>` : ''}${t[0] === 'visits' && newT ? `<span class="bdg" style="background:var(--blue)">${newT}</span>` : ''}${t[0] === 'chat' ? `<span class="bdg ${h.chat_unread ? '' : 'hide'}" data-ebadge-chat style="background:var(--green)">${h.chat_unread || ''}</span>` : ''}</button>`).join('')}</nav>`;
+  const tabs = `<nav class="etabs">${T.map(t => `<button data-etab="${t[0]}" class="${S.etab === t[0] ? 'on' : ''}">${ic(t[1])}${t[2]}${t[0] === 'leaves' && pend ? `<span class="bdg">${pend}</span>` : ''}${t[0] === 'visits' && newT ? `<span class="bdg beat" style="background:var(--blue)">${newT}</span>` : ''}${t[0] === 'chat' ? `<span class="bdg ${h.chat_unread ? '' : 'hide'}" data-ebadge-chat style="background:var(--green)">${h.chat_unread || ''}</span>` : ''}</button>`).join('')}</nav>`;
   const body = ({ home: empHomeHtml, visits: empVisitsHtml, kb: empKbHtml, chat: empChatHtml, history: empHistHtml, leaves: empLeavesHtml, profile: empProfileHtml }[S.etab] || empHomeHtml)();
   $('#app').innerHTML = `<div class="emp ${S.etab === 'chat' ? 'chatmode' : ''}">${body}</div>${tabs}`;
   document.title = 'حضور وانصراف — ' + h.emp.name;
-  tickClock(); updateLocPill(); Tracker.paint();
+  tickClock(); updateLocPill(); Tracker.paint(); EmpArr.attach();
   if (S.etab === 'leaves') { const f = $('#lvForm'); if (f) bindLeaveForm(f); }
   if (S.etab === 'chat' && EChat.msgs) EChat.paint(true);
 }
@@ -4282,7 +4648,7 @@ function empHomeHtml() {
   const miss2 = miss.filter(x => !pendFix.includes(x.date));
   const missNote = miss2.length ? `<div class="note warn">${ic('alert')}<div style="flex:1">مسجلتش انصراف يوم ${miss2.map(x => dShort(x.date)).join(' و ')} — اطلب تعديل وهيوصل للإدارة توافق عليه.<div style="margin-top:8px">${miss2.map(x => `<button class="btn btn-xs btn-soft" data-eact="fix-req" data-date="${x.date}">${ic('edit')} اطلب تعديل ${miss2.length > 1 ? dShort(x.date) : ''}</button>`).join(' ')}</div></div></div>` : '';
   const TK = h.tasks || [], newT = TK.filter(t => t.status === 'new'), curT = TK.find(t => ['arrived', 'onway', 'accepted'].includes(t.status));
-  const taskBanner = newT.length ? `<div class="task-banner" data-etab="visits"><div class="tile sm">${ic('send')}</div><div class="grow" style="min-width:0"><b>عندك ${newT.length === 1 ? 'مهمة جديدة' : newT.length + ' مهام جديدة'} من الإدارة</b><span>${esc(newT[0].title)} — ${esc(newT[0].center)}</span></div>${ic('chevL')}</div>` : '';
+  const taskBanner = newT.length ? `<div class="task-banner" data-etab="visits"><div class="tile sm beat">${ic('send')}</div><div class="grow" style="min-width:0"><b>عندك ${newT.length === 1 ? 'مهمة جديدة' : newT.length + ' مهام جديدة'} من الإدارة</b><span>${esc(newT[0].title)} — ${esc(newT[0].center)}</span></div>${ic('chevL')}</div>` : '';
   const pushNudge = !h.push_on && Push.state() === 'default' ? `<div class="ecard2" style="padding:12px 14px"><div class="row"><div class="tile sm t-green">${ic('bell')}</div><div class="grow" style="min-width:0"><b style="font-size:14px;color:var(--heading);display:block">فعّل الإشعارات</b><span class="muted" style="font-size:12px">علشان المهام والرسائل توصلك حتى والبرنامج مقفول</span></div><button class="btn btn-sm btn-green" data-act="push-on">${ic('bell')} تفعيل</button></div></div>` : '';
   return empHeader('حضور وانصراف') + `<div class="emp-body"><div data-qbar-holder>${OQ.bar()}</div>${taskBanner}${missNote}
     <div class="clockcard"><div class="bigt num" data-bigclock></div><div class="dt">${dLong(nowParts().date)}</div>
@@ -4317,15 +4683,15 @@ function eTaskCard(t) {
   const nav = navUrl(t.c_lat, t.c_lng, [t.center, t.c_area].filter(Boolean).join(' '));
   let acts = '';
   if (t.status === 'new') acts = `<button class="btn btn-green" data-eact="task" data-a="accept" data-id="${t.id}">${ic('check')} قبول المهمة</button><button class="btn btn-soft" style="color:var(--red)" data-eact="task" data-a="decline" data-id="${t.id}">${ic('x')} اعتذار</button>`;
-  else if (t.status === 'accepted') acts = `<a class="btn btn-primary" href="${nav}" target="_blank" rel="noopener" data-eact="task" data-a="onway" data-id="${t.id}">${ic('nav')} أنا في الطريق</a>`;
-  else if (t.status === 'onway') acts = `<button class="btn btn-gold" data-eact="task" data-a="arrive" data-id="${t.id}">${ic('pin')} وصلت المركز</button><a class="btn btn-soft" href="${nav}" target="_blank" rel="noopener">${ic('nav')} الخريطة</a>`;
+  else if (t.status === 'accepted') acts = `<button class="btn btn-primary" data-eact="task" data-a="onway" data-id="${t.id}">${ic('nav')} أنا في الطريق</button>`;
+  else if (t.status === 'onway') acts = `<button class="btn btn-gold" data-eact="task" data-a="arrive" data-id="${t.id}">${ic('pin')} وصلت المركز</button>`;
   else if (t.status === 'arrived') acts = `<button class="btn btn-green" data-eact="task" data-a="visit" data-id="${t.id}">${ic('wrench')} سجّل الشغل وقفل المهمة</button>`;
   const contact = open && (t.c_contact || t.c_phone) ? `<div class="row wrap" style="gap:8px;font-size:12.5px">${t.c_contact ? `<span class="muted">${ic('user')} ${esc(t.c_contact)}</span>` : ''}${t.c_phone ? `<a class="flag blue" href="tel:${esc(t.c_phone)}">${ic('call')}<span class="ltr">${esc(t.c_phone)}</span></a>` : ''}</div>` : '';
   return `<div class="ecard tcard ${t.status}"><span class="stripe" style="background:var(--${m.c})"></span>
     <div class="hd"><div class="tile sm ${m.tile}">${ic(m.i)}</div><div style="flex:1;min-width:0"><b>${esc(t.title)}</b><span>${ic('hospital')} ${esc(t.center)}${t.c_area ? ' — ' + esc(t.c_area) : ''}${t.dev_name ? ' • ' + esc(t.dev_name) : ''}</span></div>${t.priority === 'urgent' ? chip('عاجل', 'red', 'alert') : ''}</div>
     <div class="tags">${tsChip(t.status)}${t.due_at ? chip((t.overdue ? 'متأخرة • ' : 'مطلوبة ') + dtText(t.due_at), t.overdue ? 'red' : 'slate', 'clock') : ''}</div>
     ${t.details ? `<div class="vdetail" style="font-size:13.5px;padding:10px 12px">${esc(t.details)}</div>` : ''}${open && t.c_address ? `<div class="muted" style="font-size:12.5px">${ic('pin')} ${esc(t.c_address)}</div>` : ''}${contact}
-    ${taskSteps(t)}${open ? `<button class="kb-hint sm" data-kbq="${esc(t.title)}">${ic('bulb')}<div><b>اسأل المساعد: العطل ده اتحل قبل كده إزاي؟</b></div>${ic('chevL')}</button>` : ''}
+    ${taskSteps(t)}${t.status === 'onway' && S.etab === 'home' ? EmpArr.holder(t) + `<a class="arr-gm" href="${nav}" target="_blank" rel="noopener">${ic('nav')} محتاج اتجاهات؟ افتح جوجل ماب (اختياري)</a>` : ''}${open ? `<button class="kb-hint sm" data-kbq="${esc(t.title)}">${ic('bulb')}<div><b>اسأل المساعد: العطل ده اتحل قبل كده إزاي؟</b></div>${ic('chevL')}</button>` : ''}
     ${acts ? `<div class="acts">${acts}</div>` : t.status === 'done' ? `<div class="row" style="justify-content:space-between">${chip('خلصت ' + t12(t.done_at), 'green', 'checkCircle')}${t.visit_id ? `<button class="btn btn-xs btn-soft" data-eact="visit-show" data-id="${t.visit_id}">${ic('eye')} الزيارة</button>` : ''}</div>` : ''}</div>`;
 }
 function askText(title, label, { icon = 'edit', tile = 't-red', ok = 'إرسال' } = {}) {
@@ -4345,6 +4711,7 @@ async function taskAct(a) {
     const r = await api('/api/my/task', body);
     const i = S.home.tasks.findIndex(x => x.id === id); if (i >= 0) S.home.tasks[i] = r.task;
     if (act === 'onway' || act === 'accept') { Tracker.lastOk = 0; setTimeout(() => { Tracker.sync(); Tracker.tick(true); }, 300); }
+    if (act === 'onway') { EmpArr.reset(); setTimeout(() => window.scrollTo({ top: Math.max(0, ($('.arr.self') || {}).offsetTop - 90 || 0), behavior: 'smooth' }), 450); }
     if (navigator.vibrate) navigator.vibrate(40);
     toast({ accept: 'تمام — المهمة اتقبلت', onway: 'الإدارة عرفت إنك في الطريق', arrive: r.task.arrive_dist !== null && r.task.arrive_dist !== undefined ? `اتسجل وصولك (على بُعد ${meters(r.task.arrive_dist)} من المركز)` : 'اتسجل وصولك للمركز', decline: 'اتبعت اعتذارك للإدارة' }[act], act === 'decline' ? 'warn' : 'ok', 'send');
     renderEmp();
@@ -4868,6 +5235,41 @@ const EmpSync = {
 
 /* ------------------------------------- Employee: live location sharing --- */
 // Sends the phone location every N minutes between check-in and check-out while the app is open.
+/* v1.8: the technician's own arrival card (keeps its map alive across the 5-second silent refresh) */
+const EmpArr = {
+  el: null, task: null, data: null, busy: false, t: 0,
+  holder: t => `<div data-keep="emparr" data-task="${t.id}"></div>`,
+  reset() { if (this.el) Arr.kill(this.el); this.el = null; this.task = null; this.data = null; this.t = 0; },
+  attach() {
+    const h = $('[data-keep=emparr]');
+    if (!h) { if (this.el && !this.el.isConnected && !(S.home && (S.home.tasks || []).some(x => x.id === this.task && x.status === 'onway'))) this.reset(); return; }
+    const tid = +h.dataset.task;
+    if (this.task !== tid) { this.reset(); this.task = tid; }
+    if (!this.el) {
+      const d = this.card(), w = document.createElement('div'); w.innerHTML = Arr.html(d, { self: true }); this.el = w.firstElementChild;
+      h.replaceWith(this.el); Arr.mount(this.el, d, { keep: true, src: () => this.card() });
+    } else {
+      h.replaceWith(this.el); const x = Arr.maps.get(this.el);
+      if (x && x.map) setTimeout(() => { x.map.invalidateSize(); Arr.fit(x, true); }, 30);
+    }
+    if (Date.now() - this.t > 25000) this.load();
+  },
+  card() {
+    const h = S.home || {}, e = h.emp || {}, t = (h.tasks || []).find(x => x.id === this.task) || {}, a = this.data || {};
+    const dest = a.dest || { name: t.center || '—', lat: t.c_lat ?? null, lng: t.c_lng ?? null };
+    return { k: 'me', emp_id: e.id, name: e.name || '', photo: e.photo, job: null, title: 'رايح ' + dest.name, phone: t.c_phone || null,
+      chat: h.settings && h.settings.chat === '1' ? 'data-etab="chat"' : '', state: t.status || 'onway', dest, cur: a.cur || null, road: a.road || null, trail: a.trail || [], stale: false, at: t.arrived_at };
+  },
+  async load(force) {
+    if (this.busy || !this.task || (!force && Date.now() - this.t < 8000)) return;
+    this.busy = true; this.t = Date.now();
+    try {
+      const l = S.loc && S.loc.lat !== undefined && !S.loc.err && Date.now() - (S.loc.at || 0) < 120000 ? S.loc : null;
+      const r = await api('/api/my/arrival' + (l ? `?lat=${l.lat}&lng=${l.lng}&acc=${Math.round(l.acc || 0)}` : ''), undefined, { noTrack: true });
+      if (r.task && r.task.id === this.task) { this.data = r; if (this.el) Arr.update(this.el, this.card()); }
+    } catch {} finally { this.busy = false; }
+  },
+};
 const Tracker = {
   timer: null, lastOk: 0, err: null, busy: false,
   going() { const h = S.home; return !!(h && h.settings.track === '1' && (h.tasks || []).some(t => t.status === 'onway' || t.status === 'accepted')); },
@@ -4890,7 +5292,7 @@ const Tracker = {
       const p = await getPos(20000); S.loc = p;
       let battery = null; try { if (navigator.getBattery) battery = Math.round((await navigator.getBattery()).level * 100); } catch {}
       const r = await api('/api/my/ping', { lat: p.lat, lng: p.lng, acc: p.acc, battery });
-      if (r.ok) { this.lastOk = r.at ? Date.parse(r.at.replace(' ', 'T') + 'Z') : now; this.err = null; }
+      if (r.ok) { this.lastOk = r.at ? Date.parse(r.at.replace(' ', 'T') + 'Z') : now; this.err = null; if (this.going()) EmpArr.load(true); }
       else if (r.closed || r.off) this.stop();
     } catch (e) { this.err = e.message; }
     finally { this.busy = false; this.paint(); updateLocPill(); }

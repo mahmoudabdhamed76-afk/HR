@@ -13,7 +13,7 @@ const _emit = process.emitWarning;
 process.emitWarning = function (w, ...rest) { if (String(w && w.message || w).includes('SQLite')) return; return _emit.call(process, w, ...rest); };
 const { DatabaseSync } = require('node:sqlite');
 
-const VERSION = '1.7.0';
+const VERSION = '1.8.0';
 const PORT = Number(process.env.PORT) || 8686;
 const HOST = process.env.HOST || '0.0.0.0';
 const APP_PATH = (process.env.APP_PATH || '').replace(/\/+$/, '');
@@ -2142,7 +2142,7 @@ function visitReportHtml(v, token) {
   const base = APP_PATH;
   const stars = n => '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n);
   return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>تقرير زيارة — ${htmlEsc(v.center)}</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${base}/vendor/fonts/fonts.css">
 <style>*{box-sizing:border-box;margin:0;padding:0}html{-webkit-text-size-adjust:100%}body{font-family:Cairo,Tahoma,Arial,sans-serif;background:#eef3fa;color:#0d1b3a;padding:18px 14px 40px;line-height:1.7}
 .w{max-width:760px;margin:0 auto;background:#fff;border-radius:22px;box-shadow:0 20px 50px -25px rgba(10,35,87,.4);overflow:hidden}
 .h{background:linear-gradient(120deg,#0a2357,#1b4aa6);color:#fff;padding:22px 24px;display:flex;align-items:center;gap:14px;position:relative}
@@ -2473,7 +2473,7 @@ function reportPageHtml(L, key) {
   const c = L.center, d = L.device, base = APP_PATH;
   const logo = SETTINGS.company_logo ? `<img src="${base}/logo?v=${logoVer()}" alt="">` : htmlEsc(String(SETTINGS.company_name || 'E').slice(0, 1));
   return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0a2357"><title>بلاغ عطل — ${htmlEsc(c.name)}</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${base}/vendor/fonts/fonts.css">
 <style>*{box-sizing:border-box;margin:0;padding:0}html{-webkit-text-size-adjust:100%}body{font-family:Cairo,Tahoma,Arial,sans-serif;background:#eef3fa;color:#0d1b3a;padding:16px 14px 40px;line-height:1.7}
 .w{max-width:560px;margin:0 auto}.card{background:#fff;border-radius:22px;box-shadow:0 20px 50px -25px rgba(10,35,87,.4);overflow:hidden;margin-bottom:14px}
 .h{background:linear-gradient(120deg,#0a2357,#1b4aa6);color:#fff;padding:20px 22px;display:flex;align-items:center;gap:14px;position:relative}.h::after{content:'';position:absolute;bottom:0;right:0;width:140px;height:5px;background:#f7c12d}
@@ -2560,14 +2560,54 @@ route('POST', '/api/my/rewards/seen', 'emp', (b, a) => {
   return { ok: true };
 });
 
+/* ---------- v1.8: road route + ETA (OSRM, cached; falls back to a straight line when offline) ---------- */
+const ROUTER_URL = (process.env.ROUTER_URL || 'https://router.project-osrm.org').replace(/\/+$/, '');
+const TRAFFIC = 1.3;                        // OSRM durations are free-flow; Egyptian city traffic is slower
+const roadCache = new Map(), roadPending = new Map(), roadQ = []; let roadDownUntil = 0, roadBusy = 0;
+const roadSlot = () => roadBusy < 2 ? (roadBusy++, Promise.resolve()) : new Promise(r => roadQ.push(r));     // max 2 requests at a time (public router etiquette)
+const roadFree = () => { const n = roadQ.shift(); if (n) n(); else roadBusy--; };
+function thin(pts, max = 160) { if (pts.length <= max) return pts; const st = (pts.length - 1) / (max - 1), o = []; for (let i = 0; i < max; i++) o.push(pts[Math.round(i * st)]); return o; }
+const r5 = x => Math.round(x * 1e5) / 1e5;
+function lineRoute(fLat, fLng, tLat, tLng) {
+  const d = Math.round(haversine(fLat, fLng, tLat, tLng) * 1.35);
+  return { dist: d, dur: Math.round(d / (25 / 3.6)), coords: [[r5(fLat), r5(fLng)], [r5(tLat), r5(tLng)]], src: 'line' };
+}
+async function roadRoute(fLat, fLng, tLat, tLng) {
+  if ([fLat, fLng, tLat, tLng].some(v => v === null || v === undefined || isNaN(v))) return null;
+  const key = `${fLat.toFixed(4)},${fLng.toFixed(4)}>${tLat.toFixed(4)},${tLng.toFixed(4)}`, now = Date.now();
+  const hit = roadCache.get(key); if (hit && now - hit.t < 15 * 60000) return hit.r;
+  if (haversine(fLat, fLng, tLat, tLng) < 60) return { dist: Math.round(haversine(fLat, fLng, tLat, tLng)), dur: 30, coords: [[r5(fLat), r5(fLng)], [r5(tLat), r5(tLng)]], src: 'near' };
+  if (now < roadDownUntil) return lineRoute(fLat, fLng, tLat, tLng);
+  if (roadPending.has(key)) return roadPending.get(key);
+  const p = roadFetch(key, fLat, fLng, tLat, tLng).finally(() => roadPending.delete(key));
+  roadPending.set(key, p); return p;
+}
+async function roadFetch(key, fLat, fLng, tLat, tLng) {
+  await roadSlot();
+  try {
+    if (Date.now() < roadDownUntil) return lineRoute(fLat, fLng, tLat, tLng);
+    const r = await fetch(`${ROUTER_URL}/route/v1/driving/${fLng},${fLat};${tLng},${tLat}?overview=full&geometries=geojson&alternatives=false&steps=false`,
+      { headers: { 'User-Agent': 'EmdadX-Attendance/' + VERSION }, signal: AbortSignal.timeout(4500) });
+    if (!r.ok) throw new Error('router ' + r.status);
+    const j = await r.json(); const rt = j.routes && j.routes[0];
+    if (!rt || !rt.geometry) return lineRoute(fLat, fLng, tLat, tLng);          // no road found (not an outage)
+    const coords = thin(rt.geometry.coordinates.map(c => [r5(c[1]), r5(c[0])]));
+    const out = { dist: Math.round(rt.distance), dur: Math.round(rt.duration * TRAFFIC), coords, src: 'road' };
+    roadCache.set(key, { t: Date.now(), r: out }); if (roadCache.size > 2000) roadCache.clear();
+    return out;
+  } catch { roadDownUntil = Date.now() + 120000; return lineRoute(fLat, fLng, tLat, tLng); }
+  finally { roadFree(); }
+}
+
 /* ---------- Live routes board: who is heading to which center, how far, ETA ---------- */
-route('GET', '/api/live/routes', 'user', () => {
+route('GET', '/api/live/routes', 'user', async () => {
   const now = nowLocal(), nowM = tsMin(now.ts), iv = trackInterval(), day0 = now.date + ' 00:00:00';
   const lastLoc = id => one('SELECT * FROM locations WHERE emp_id = ? AND at >= ? ORDER BY at DESC, id DESC LIMIT 1', id, day0);
   const lanes = [], used = new Set();
   const mk = (e, dest, st, from, extra) => {
     const l = lastLoc(e.id);
-    const lane = { emp_id: e.id, name: e.name, photo: e.photo, state: st, dest, ...extra, last_at: l ? l.at : null, age_min: l ? Math.round(nowM - tsMin(l.at)) : null };
+    const lane = { emp_id: e.id, name: e.name, photo: e.photo, job: e.job || null, phone: e.phone || null, state: st, dest, ...extra, last_at: l ? l.at : null, age_min: l ? Math.round(nowM - tsMin(l.at)) : null,
+      cur: l ? { lat: l.lat, lng: l.lng, acc: l.acc, at: l.at } : null };
     if (l && dest.lat !== null && dest.lat !== undefined) {
       const cur = Math.round(haversine(l.lat, l.lng, dest.lat, dest.lng));
       const pts = from ? all('SELECT lat, lng, at FROM locations WHERE emp_id = ? AND at >= ? ORDER BY at, id', e.id, from) : [];
@@ -2582,6 +2622,7 @@ route('GET', '/api/live/routes', 'user', () => {
       if (st === 'arrived' || (near && st !== 'plan')) { lane.state = 'arrived'; lane.progress = 1; }
       else lane.progress = Math.max(0, Math.min(0.98, 1 - cur / start));
       lane.dist = cur; lane.start = start; lane.speed = speed;
+      lane.trail = thin(pts.map(p => [r5(p.lat), r5(p.lng)]), 120);
       lane.eta_min = lane.state === 'arrived' ? 0 : Math.round(cur / 1000 / (speed && speed >= 4 ? speed : 25) * 60);
     } else { lane.progress = st === 'arrived' ? 1 : 0; lane.dist = null; }
     lane.stale = lane.age_min === null || lane.age_min > iv * 2 + 5;
@@ -2589,7 +2630,7 @@ route('GET', '/api/live/routes', 'user', () => {
   };
   for (const t of all(TASK_SQL + " WHERE t.status IN ('arrived','onway','accepted') AND t.emp_id IS NOT NULL ORDER BY CASE t.status WHEN 'onway' THEN 0 WHEN 'arrived' THEN 1 ELSE 2 END, t.updated_at DESC")) {
     if (used.has(t.emp_id)) continue;
-    const e = one('SELECT id, name, photo FROM employees WHERE id = ?', t.emp_id); if (!e) continue;
+    const e = one('SELECT id, name, photo, job, phone FROM employees WHERE id = ?', t.emp_id); if (!e) continue;
     const c = t.center_id ? one('SELECT name, lat, lng, radius FROM centers WHERE id = ?', t.center_id) : null;
     mk(e, { name: (c && c.name) || t.center_name || '—', lat: c ? c.lat : null, lng: c ? c.lng : null, radius: c ? c.radius : null }, t.status, t.onway_at || t.accepted_at,
       { kind: 'task', task_id: t.id, title: t.title, priority: t.priority, at: t.arrived_at || t.onway_at || t.accepted_at });
@@ -2597,7 +2638,8 @@ route('GET', '/api/live/routes', 'user', () => {
   for (const p of all(PLAN_SQL + " WHERE p.date = ? AND p.status = 'planned' ORDER BY COALESCE(p.time, '99')", now.date)) {
     if (used.has(p.emp_id) || p.c_lat === null) continue;
     const c = one('SELECT radius FROM centers WHERE id = ?', p.center_id) || {};
-    mk({ id: p.emp_id, name: p.emp_name, photo: p.emp_photo }, { name: p.c_name || p.center_name, lat: p.c_lat, lng: p.c_lng, radius: c.radius }, 'plan', null, { kind: 'plan', plan_id: p.id, title: p.note || 'زيارة من جدوله', time: p.time });
+    const pe = one('SELECT job, phone FROM employees WHERE id = ?', p.emp_id) || {};
+    mk({ id: p.emp_id, name: p.emp_name, photo: p.emp_photo, job: pe.job, phone: pe.phone }, { name: p.c_name || p.center_name, lat: p.c_lat, lng: p.c_lng, radius: c.radius }, 'plan', null, { kind: 'plan', plan_id: p.id, title: p.note || 'زيارة من جدوله', time: p.time });
   }
   const limit = minToTs(nowM - Number(SETTINGS.open_hours || 16) * 60);
   const working = all('SELECT e.id AS emp_id, e.name, e.photo, e.site_id, e.track_enabled FROM attendance a JOIN employees e ON e.id = a.emp_id WHERE a.out_at IS NULL AND a.in_at >= ? AND e.active = 1 ORDER BY e.name', limit).filter(x => !used.has(x.emp_id));
@@ -2614,7 +2656,31 @@ route('GET', '/api/live/routes', 'user', () => {
     lanes.push({ emp_id: w.emp_id, name: w.name, photo: w.photo, state: 'free', kind: 'free', dest: { name: near ? near.name : atSite ? site.name : 'في الشغل' }, place: near ? 'center' : atSite ? 'site' : 'road',
       title: near ? `في ${near.name}` : atSite ? `في ${site.name}` : (speed && speed >= 4 ? 'بيتحرك' : 'في الشغل'), progress: near || atSite ? 1 : 0.5, speed, dist: null, last_at: l.at, age_min: age, stale: age > iv * 2 + 5 });
   }
-  return { now, interval: iv, lanes: lanes.slice(0, 10), more: Math.max(0, lanes.length - 10), idle };
+  const out = lanes.slice(0, 10);
+  // road route + ETA for everyone heading somewhere (cached per position, so the 10-second polling stays cheap)
+  await Promise.all(out.map(async l => {
+    if (!['onway', 'accepted', 'plan'].includes(l.state) || !l.cur || l.dest.lat === null || l.dest.lat === undefined) return;
+    l.road = await roadRoute(l.cur.lat, l.cur.lng, l.dest.lat, l.dest.lng);
+  }));
+  return { now, interval: iv, lanes: out, more: Math.max(0, lanes.length - 10), idle };
+});
+
+/* the technician's own arrival card: route from where he is now to the center of his current task */
+route('GET', '/api/my/arrival', 'emp', async (b, a, c) => {
+  const q = c.url.searchParams;
+  const t = one(TASK_SQL + " WHERE t.emp_id = ? AND t.status IN ('onway','accepted','arrived') ORDER BY CASE t.status WHEN 'onway' THEN 0 WHEN 'accepted' THEN 1 ELSE 2 END, t.updated_at DESC LIMIT 1", a.emp.id);
+  if (!t) return { task: null };
+  const dest = { name: t.c_name || t.center_name || '—', lat: t.c_lat, lng: t.c_lng };
+  let lat = num(q.get('lat')), lng = num(q.get('lng')), at = nowLocal().ts, acc = num(q.get('acc'));
+  if (lat === null || lng === null || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+    const l = one('SELECT * FROM locations WHERE emp_id = ? AND at >= ? ORDER BY at DESC, id DESC LIMIT 1', a.emp.id, nowLocal().date + ' 00:00:00');
+    if (l) { lat = l.lat; lng = l.lng; at = l.at; acc = l.acc; } else { lat = lng = null; }
+  }
+  const from = t.onway_at || t.accepted_at;
+  const trail = from ? thin(all('SELECT lat, lng FROM locations WHERE emp_id = ? AND at >= ? ORDER BY at, id', a.emp.id, from).map(p => [r5(p.lat), r5(p.lng)]), 120) : [];
+  const road = lat !== null && dest.lat !== null && t.status !== 'arrived' ? await roadRoute(lat, lng, dest.lat, dest.lng) : null;
+  return { now: nowLocal(), task: { id: t.id, status: t.status, title: t.title, onway_at: t.onway_at, arrived_at: t.arrived_at, c_phone: t.c_phone || null, c_contact: t.c_contact || null },
+    dest, cur: lat !== null ? { lat, lng, acc, at } : null, road, trail };
 });
 
 /* ---------- QR kiosk (rotating code on a screen at the site) ---------- */
